@@ -11,16 +11,16 @@
 #include <thread>
 #include <vector>
 
-// Tests for the multi-threaded TimeChecker<true,T> used by non-threaded nodes:
-//   1. the chosen implementation (Trivial / AtomicCAS / Mutex) per input type
-//      and CheckTime setting
-//   2. single-threaded equivalence with the original mutex rule on random
-//      time sequences
-//   3. several producer threads feeding one checker: nothing lost when
-//      CheckTime=false; when CheckTime=true every thread's accepted sequence
-//      is monotonic, nothing older than the final accepted maximum is
-//      accepted after it, and the totals add up
-//   4. a real graph: two importer threads -> one simpleExporter
+//Tests for the multi-threaded TimeChecker<true,T> used by non-threaded nodes:
+//  1. the chosen implementation (Trivial / AtomicCAS / Mutex) per input type
+//     and CheckTime setting
+//  2. single-threaded equivalence with the original mutex rule on random
+//     time sequences
+//  3. several producer threads feeding one checker: nothing lost when
+//     CheckTime=false; when CheckTime=true every thread's accepted sequence
+//     is monotonic, nothing older than the final accepted maximum is
+//     accepted after it, and the totals add up
+//  4. a real graph: two importer threads -> one simpleExporter
 
 using namespace dev::cd606::tm;
 
@@ -73,7 +73,7 @@ namespace {
         return {env, infra::WithTime<T, TP>{tp, std::move(v), false}};
     }
 
-    // reference: the pre-change rule
+    //reference: the pre-change rule
     struct RefChecker {
         bool hasData = false;
         TP last{};
@@ -104,12 +104,12 @@ namespace {
         Env env;
         std::mt19937_64 rng(12345);
         bool same = true;
-        for (int round = 0; round < 200 && same; ++round) {
+        for (int round=0; round<200 && same; ++round) {
             TC<Env, int64_t> tc;
             RefChecker ref;
-            for (int ii = 0; ii < 1000; ++ii) {
-                // small range so that equal and older time points are frequent
-                TP t = TP{} + std::chrono::nanoseconds(static_cast<int64_t>(rng() % 50));
+            for (int ii=0; ii<1000; ++ii) {
+                //small range so that equal and older time points are frequent
+                TP t = TP{} + std::chrono::nanoseconds(static_cast<int64_t>(rng()%50));
                 bool a = tc(make<Env, int64_t>(&env, t, ii));
                 bool b = ref(t, CheckTime);
                 if (a != b) {
@@ -119,7 +119,7 @@ namespace {
             }
             same = same && tc.good();
         }
-        check(same, std::string("single-thread equivalence with mutex rule, CheckTime=") + (CheckTime ? "true" : "false"));
+        check(same, std::string("single-thread equivalence with mutex rule, CheckTime=")+(CheckTime ? "true" : "false"));
     }
 
     template <bool CheckTime>
@@ -134,15 +134,15 @@ namespace {
         std::vector<std::vector<int64_t>> accepted(kThreads);
         std::vector<int64_t> rejected(kThreads, 0);
         std::vector<std::thread> threads;
-        for (int k = 0; k < kThreads; ++k) {
+        for (int k=0; k<kThreads; ++k) {
             accepted[k].reserve(kPerThread);
             threads.emplace_back([&, k]() {
                 while (!go.load(std::memory_order_acquire)) {
                 }
-                for (int ii = 0; ii < kPerThread; ++ii) {
-                    // globally increasing time source, but threads race between
-                    // taking the time and handing it to the checker, so the
-                    // checker sees out-of-order time points
+                for (int ii=0; ii<kPerThread; ++ii) {
+                    //globally increasing time source, but threads race between
+                    //taking the time and handing it to the checker, so the
+                    //checker sees out-of-order time points
                     int64_t ns = clockCounter.fetch_add(1, std::memory_order_relaxed);
                     if (tc(make<Env, int64_t>(&env, TP{} + std::chrono::nanoseconds(ns), ns))) {
                         accepted[k].push_back(ns);
@@ -159,11 +159,11 @@ namespace {
         int64_t total = 0, totalRejected = 0;
         bool perThreadMonotonic = true;
         int64_t maxAccepted = -1;
-        for (int k = 0; k < kThreads; ++k) {
+        for (int k=0; k<kThreads; ++k) {
             total += static_cast<int64_t>(accepted[k].size());
             totalRejected += rejected[k];
-            for (std::size_t ii = 1; ii < accepted[k].size(); ++ii) {
-                if (accepted[k][ii] < accepted[k][ii - 1]) {
+            for (std::size_t ii=1; ii<accepted[k].size(); ++ii) {
+                if (accepted[k][ii] < accepted[k][ii-1]) {
                     perThreadMonotonic = false;
                 }
             }
@@ -171,20 +171,20 @@ namespace {
                 maxAccepted = std::max(maxAccepted, accepted[k].back());
             }
         }
-        std::string tag = std::string(" CheckTime=") + (CheckTime ? "true" : "false");
-        check(total + totalRejected == int64_t(kThreads) * kPerThread, "accepted+rejected == sent" + tag);
+        std::string tag = std::string(" CheckTime=")+(CheckTime ? "true" : "false");
+        check(total+totalRejected == int64_t(kThreads)*kPerThread, "accepted+rejected == sent" + tag);
         check(tc.good(), "good() after data" + tag);
         if (!CheckTime) {
             check(totalRejected == 0, "nothing rejected without time check" + tag);
         } else {
             check(perThreadMonotonic, "per-thread accepted time points are monotonic" + tag);
-            // once the maximum has been accepted, a later call with an older time
-            // point must be rejected
-            bool afterMax = tc(make<Env, int64_t>(&env, TP{} + std::chrono::nanoseconds(maxAccepted - 1), 0));
+            //once the maximum has been accepted, a later call with an older time
+            //point must be rejected
+            bool afterMax = tc(make<Env, int64_t>(&env, TP{} + std::chrono::nanoseconds(maxAccepted-1), 0));
             check(!afterMax, "older than the accepted maximum is rejected afterwards" + tag);
             bool equalMax = tc(make<Env, int64_t>(&env, TP{} + std::chrono::nanoseconds(maxAccepted), 0));
             check(equalMax, "equal to the accepted maximum is accepted" + tag);
-            std::cout << "      (" << totalRejected << " of " << kThreads * kPerThread << " rejected as out of order)" << std::endl;
+            std::cout << "      (" << totalRejected << " of " << kThreads*kPerThread << " rejected as out of order)" << std::endl;
         }
     }
 
@@ -199,7 +199,7 @@ namespace {
         check(a && !b && c, "VersionedData still goes through the version check (mutex path)");
     }
 
-    // graph level: two importer threads, one non-threaded simpleExporter
+    //graph level: two importer threads, one non-threaded simpleExporter
     template <class M>
     class ThreadSource final : public M::template AbstractImporter<int64_t> {
     private:
@@ -212,7 +212,7 @@ namespace {
             , done_(done) {}
         virtual void start(typename M::EnvironmentType *env) override final {
             std::thread([this, env]() {
-                for (int64_t ii = 0; ii < n_; ++ii) {
+                for (int64_t ii=0; ii<n_; ++ii) {
                     this->publish(M::template pureInnerData<int64_t>(env, int64_t(ii)));
                 }
                 done_->fetch_add(1);
@@ -242,17 +242,17 @@ namespace {
         while (done.load() < 2) {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
-        std::string tag = std::string(" CheckTime=") + (CheckTime ? "true" : "false");
+        std::string tag = std::string(" CheckTime=")+(CheckTime ? "true" : "false");
         if (!CheckTime) {
-            check(received.load() == 2 * kN, "graph: two importer threads -> simpleExporter, nothing lost" + tag);
+            check(received.load() == 2*kN, "graph: two importer threads -> simpleExporter, nothing lost" + tag);
         } else {
-            // real clock time points from two threads: some may be dropped as
-            // out of order, but at least one full thread's worth gets through
-            // in the common case and never more than sent
-            check(received.load() > 0 && received.load() <= 2 * kN, "graph: two importer threads -> simpleExporter, sane count" + tag);
-            std::cout << "      (" << received.load() << " of " << 2 * kN << " delivered)" << std::endl;
+            //real clock time points from two threads: some may be dropped as
+            //out of order, but at least one full thread's worth gets through
+            //in the common case and never more than sent
+            check(received.load() > 0 && received.load() <= 2*kN, "graph: two importer threads -> simpleExporter, sane count" + tag);
+            std::cout << "      (" << received.load() << " of " << 2*kN << " delivered)" << std::endl;
         }
-        // graph intentionally leaked (detached importer threads already finished)
+        //graph intentionally leaked (detached importer threads already finished)
     }
 
 } // namespace
