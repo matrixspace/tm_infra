@@ -70,10 +70,19 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
     template <class T>
     class VersionChecker {
     public:
+        //marks the stateless checker, specializations do not define it
+        static constexpr bool IsTrivialVersionChecker = true;
         static bool checkVersion(T const &) {
             return true;
         }
     };
+    //true only when VersionChecker<T> is the stateless primary template,
+    //i.e. checkVersion() always succeeds and touches no state
+    template <class T, class=void>
+    struct VersionCheckerIsTrivial : std::false_type {};
+    template <class T>
+    struct VersionCheckerIsTrivial<T, std::void_t<decltype(VersionChecker<T>::IsTrivialVersionChecker)>>
+        : std::bool_constant<VersionChecker<T>::IsTrivialVersionChecker> {};
     template <class VersionType, class DataType, class CmpType>
     class VersionChecker<VersionedData<VersionType, DataType, CmpType>> {
     private:
