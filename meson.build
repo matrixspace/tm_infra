@@ -17,3 +17,4 @@ endif
 
 subdir('tm_kit/infra')
 subdir('src')
+subdir('test')

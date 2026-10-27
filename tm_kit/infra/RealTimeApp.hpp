@@ -2,6 +2,7 @@
 #define TM_KIT_INFRA_REALTIME_APP_HPP_
 
 #include <tm_kit/infra/WithTimeData.hpp>
+#include <tm_kit/infra/Environments.hpp>
 #include <tm_kit/infra/ControllableNode.hpp>
 #include <tm_kit/infra/ObservableNode.hpp>
 #include <tm_kit/infra/StoppableProducer.hpp>
@@ -18,6 +19,7 @@
 #include <sstream>
 #include <any>
 #include <array>
+#include <limits>
 
 namespace dev { namespace cd606 { namespace tm { namespace infra {
     template <class M>
@@ -82,15 +84,117 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 return hasData_;
             }
         };
+        //smallest value of a time point type, for std::chrono::time_point and
+        //arithmetic time points; other types fall back to the mutex checker
+        template <class TP, class=void>
+        struct LowestTimePoint {
+            static constexpr bool Supported = false;
+        };
+        template <class TP>
+        struct LowestTimePoint<TP, std::enable_if_t<std::is_arithmetic_v<TP>>> {
+            static constexpr bool Supported = true;
+            static constexpr TP value() {return std::numeric_limits<TP>::lowest();}
+        };
+        template <class TP>
+        struct LowestTimePoint<TP, std::void_t<decltype(TP::min()), typename TP::clock>> {
+            static constexpr bool Supported = true;
+            static constexpr TP value() {return TP::min();}
+        };
+        //Which implementation TimeChecker<true,T> (the one used by non-threaded
+        //nodes that may be fed from several threads) picks:
+        //  Mutex:     the default, exactly the original behavior; also always
+        //             used for inputs with a stateful VersionChecker
+        //  Trivial:   only with LockFreeTimeCheckerComponent in the
+        //             environment; no version state and no time check, the
+        //             only state is hasData_, no lock at all
+        //  AtomicCAS: only with LockFreeTimeCheckerComponent in the
+        //             environment; no version state, monotonic time check
+        //             done with a CAS loop on an atomic time point
+        enum class TimeCheckerMode {Trivial, AtomicCAS, Mutex};
+        template <class TP>
+        struct TimePointIsLockFreeAtomic : std::conjunction<
+            std::is_trivially_copyable<TP>
+            , std::bool_constant<LowestTimePoint<TP>::Supported>
+        > {};
         template <class T>
-        class TimeChecker<true, T> {
+        struct TimeCheckerModeFor {
+        private:
+            static constexpr bool lockFreeTime() {
+                if constexpr (TimePointIsLockFreeAtomic<typename StateT::TimePointType>::value) {
+                    return std::atomic<typename StateT::TimePointType>::is_always_lock_free;
+                } else {
+                    return false;
+                }
+            }
+            //checked here (not at class level) so that StateT only needs to be
+            //complete where a node is instantiated, as for StateT::CheckTime
+            static constexpr bool lockFreeEnabled = std::is_base_of_v<LockFreeTimeCheckerComponent, StateT>;
+        public:
+            static constexpr TimeCheckerMode value =
+                (!lockFreeEnabled || !VersionCheckerIsTrivial<T>::value)
+                ? TimeCheckerMode::Mutex
+                : (
+                    (!StateT::CheckTime)
+                    ? TimeCheckerMode::Trivial
+                    : (lockFreeTime() ? TimeCheckerMode::AtomicCAS : TimeCheckerMode::Mutex)
+                );
+        };
+        template <class T, TimeCheckerMode Mode=TimeCheckerModeFor<T>::value>
+        class MultiThreadedTimeChecker;
+        template <class T>
+        class MultiThreadedTimeChecker<T, TimeCheckerMode::Trivial> {
+        private:
+            std::atomic<bool> hasData_;
+        public:
+            MultiThreadedTimeChecker() : hasData_(false) {}
+            inline bool operator()(TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType> const &) {
+                //load first so that the steady state never writes the cache line
+                if (!hasData_.load(std::memory_order_relaxed)) {
+                    hasData_.store(true, std::memory_order_relaxed);
+                }
+                return true;
+            }
+            inline bool good() const {
+                return hasData_;
+            }
+        };
+        template <class T>
+        class MultiThreadedTimeChecker<T, TimeCheckerMode::AtomicCAS> {
+        private:
+            std::atomic<bool> hasData_;
+            //starts at the smallest time point so that the first data always
+            //passes, which is the same rule as the mutex version without
+            //needing a separate (racy) "first" flag
+            std::atomic<typename StateT::TimePointType> lastTime_;
+        public:
+            MultiThreadedTimeChecker() : hasData_(false), lastTime_(LowestTimePoint<typename StateT::TimePointType>::value()) {}
+            inline bool operator()(TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType> const &data) {
+                auto const &t = data.timedData.timePoint;
+                auto last = lastTime_.load(std::memory_order_relaxed);
+                //concurrent callers behave as if serialized in CAS order
+                do {
+                    if (t < last) {
+                        return false;
+                    }
+                } while (!lastTime_.compare_exchange_weak(last, t, std::memory_order_relaxed, std::memory_order_relaxed));
+                if (!hasData_.load(std::memory_order_relaxed)) {
+                    hasData_.store(true, std::memory_order_relaxed);
+                }
+                return true;
+            }
+            inline bool good() const {
+                return hasData_;
+            }
+        };
+        template <class T>
+        class MultiThreadedTimeChecker<T, TimeCheckerMode::Mutex> {
         private:
             std::atomic<bool> hasData_;
             std::mutex mutex_;
             typename StateT::TimePointType lastTime_;
             VersionChecker<T> versionChecker_;
         public:
-            TimeChecker() : hasData_(false), mutex_(), lastTime_(), versionChecker_() {}
+            MultiThreadedTimeChecker() : hasData_(false), mutex_(), lastTime_(), versionChecker_() {}
             inline bool operator()(TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType> const &data) {
                 std::lock_guard<std::mutex> _(mutex_);
                 if (!versionChecker_.checkVersion(data.timedData.value)) {
@@ -109,7 +213,11 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 return hasData_;
             }
         };
-
+        template <class T>
+        class TimeChecker<true, T> : public MultiThreadedTimeChecker<T> {
+        public:
+            TimeChecker() : MultiThreadedTimeChecker<T>() {}
+        };
         #include <tm_kit/infra/RealTimeApp_TimeChecker_Piece.hpp>
 
     private:

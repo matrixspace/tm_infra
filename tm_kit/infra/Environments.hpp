@@ -42,6 +42,19 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
     struct CheckTimeComponent {
         static constexpr bool CheckTime = DoCheck;
     };
+    //The "lock-free time checker" component (opt-in, realtime mode only)
+    //Without it, a non-threaded node that can be fed from several threads
+    //checks its input under a std::mutex, as it always did. With it in the
+    //environment, the check skips the mutex whenever the input type has no
+    //version state (see VersionCheckerIsTrivial in VersionedData.hpp):
+    //  - CheckTime=false: no lock at all, one relaxed atomic load per input
+    //  - CheckTime=true:  a CAS loop on an atomic time point, same acceptance
+    //                     rule; concurrent inputs are ordered by the CAS
+    //                     instead of by the lock
+    //Inputs with version state (VersionedData etc.) keep the mutex. What is
+    //given up is the happens-before edge between concurrent callers that the
+    //lock provided; the node's own code was never covered by that lock.
+    struct LockFreeTimeCheckerComponent {};
     //The "exit control" component
     struct TrivialExitControlComponent {
         static constexpr bool running() {
