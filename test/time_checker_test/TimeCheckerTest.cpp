@@ -11,9 +11,11 @@
 #include <thread>
 #include <vector>
 
-//Tests for the multi-threaded TimeChecker<true,T> used by non-threaded nodes:
-//  1. the chosen implementation (Trivial / AtomicCAS / Mutex) per input type
-//     and CheckTime setting
+//Tests for the multi-threaded TimeChecker<true,T> used by non-threaded nodes,
+//run for both the default environment (always the original mutex checker)
+//and an environment with LockFreeTimeCheckerComponent (opt-in):
+//  1. the chosen implementation (Trivial / AtomicCAS / Mutex) per input type,
+//     CheckTime setting and opt-in
 //  2. single-threaded equivalence with the original mutex rule on random
 //     time sequences
 //  3. several producer threads feeding one checker: nothing lost when
@@ -43,8 +45,20 @@ namespace {
         void log(infra::LogLevel, std::string const &) {}
     };
 
+    template <bool CheckTime, bool LockFree>
+    struct TestEnvFor {
+        using type = infra::Environment<infra::CheckTimeComponent<CheckTime>, infra::TrivialExitControlComponent, TestClockComponent>;
+    };
     template <bool CheckTime>
-    using TestEnv = infra::Environment<infra::CheckTimeComponent<CheckTime>, infra::TrivialExitControlComponent, TestClockComponent>;
+    struct TestEnvFor<CheckTime, true> {
+        using type = infra::Environment<infra::CheckTimeComponent<CheckTime>, infra::TrivialExitControlComponent, TestClockComponent, infra::LockFreeTimeCheckerComponent>;
+    };
+    template <bool CheckTime, bool LockFree>
+    using TestEnv = typename TestEnvFor<CheckTime, LockFree>::type;
+
+    std::string tagOf(bool checkTime, bool lockFree) {
+        return std::string(" CheckTime=")+(checkTime ? "true" : "false")+(lockFree ? " lock-free" : " default");
+    }
 
     using TP = std::chrono::system_clock::time_point;
     using Versioned = infra::VersionedData<int64_t, int64_t>;
@@ -88,19 +102,25 @@ namespace {
     };
 
     void testModes() {
-        static_assert(modeOf<TestEnv<false>, int64_t>() == Mode<TestEnv<false>>::Trivial);
-        static_assert(modeOf<TestEnv<true>, int64_t>() == Mode<TestEnv<true>>::AtomicCAS);
-        static_assert(modeOf<TestEnv<false>, std::string>() == Mode<TestEnv<false>>::Trivial);
-        static_assert(modeOf<TestEnv<false>, Versioned>() == Mode<TestEnv<false>>::Mutex);
-        static_assert(modeOf<TestEnv<true>, Versioned>() == Mode<TestEnv<true>>::Mutex);
-        static_assert(modeOf<TestEnv<false>, std::shared_ptr<Versioned>>() == Mode<TestEnv<false>>::Mutex);
-        static_assert(modeOf<TestEnv<false>, std::tuple<int, Versioned>>() == Mode<TestEnv<false>>::Mutex);
-        check(true, "implementation selection (static_asserts)");
+        //default environment: always the original mutex checker
+        static_assert(modeOf<TestEnv<false,false>, int64_t>() == Mode<TestEnv<false,false>>::Mutex);
+        static_assert(modeOf<TestEnv<true,false>, int64_t>() == Mode<TestEnv<true,false>>::Mutex);
+        static_assert(modeOf<TestEnv<false,false>, std::string>() == Mode<TestEnv<false,false>>::Mutex);
+        static_assert(modeOf<TestEnv<false,false>, Versioned>() == Mode<TestEnv<false,false>>::Mutex);
+        //opt-in: lock-free unless the input has version state
+        static_assert(modeOf<TestEnv<false,true>, int64_t>() == Mode<TestEnv<false,true>>::Trivial);
+        static_assert(modeOf<TestEnv<true,true>, int64_t>() == Mode<TestEnv<true,true>>::AtomicCAS);
+        static_assert(modeOf<TestEnv<false,true>, std::string>() == Mode<TestEnv<false,true>>::Trivial);
+        static_assert(modeOf<TestEnv<false,true>, Versioned>() == Mode<TestEnv<false,true>>::Mutex);
+        static_assert(modeOf<TestEnv<true,true>, Versioned>() == Mode<TestEnv<true,true>>::Mutex);
+        static_assert(modeOf<TestEnv<false,true>, std::shared_ptr<Versioned>>() == Mode<TestEnv<false,true>>::Mutex);
+        static_assert(modeOf<TestEnv<false,true>, std::tuple<int, Versioned>>() == Mode<TestEnv<false,true>>::Mutex);
+        check(true, "implementation selection, default -> Mutex, opt-in -> Trivial/AtomicCAS (static_asserts)");
     }
 
-    template <bool CheckTime>
+    template <bool CheckTime, bool LockFree>
     void testSingleThreadEquivalence() {
-        using Env = TestEnv<CheckTime>;
+        using Env = TestEnv<CheckTime, LockFree>;
         Env env;
         std::mt19937_64 rng(12345);
         bool same = true;
@@ -119,12 +139,12 @@ namespace {
             }
             same = same && tc.good();
         }
-        check(same, std::string("single-thread equivalence with mutex rule, CheckTime=")+(CheckTime ? "true" : "false"));
+        check(same, "single-thread equivalence with the original rule"+tagOf(CheckTime, LockFree));
     }
 
-    template <bool CheckTime>
+    template <bool CheckTime, bool LockFree>
     void testMultiThread() {
-        using Env = TestEnv<CheckTime>;
+        using Env = TestEnv<CheckTime, LockFree>;
         Env env;
         TC<Env, int64_t> tc;
         constexpr int kThreads = 4;
@@ -171,7 +191,7 @@ namespace {
                 maxAccepted = std::max(maxAccepted, accepted[k].back());
             }
         }
-        std::string tag = std::string(" CheckTime=")+(CheckTime ? "true" : "false");
+        std::string tag = tagOf(CheckTime, LockFree);
         check(total+totalRejected == int64_t(kThreads)*kPerThread, "accepted+rejected == sent" + tag);
         check(tc.good(), "good() after data" + tag);
         if (!CheckTime) {
@@ -188,15 +208,16 @@ namespace {
         }
     }
 
+    template <bool LockFree>
     void testVersionedStillChecked() {
-        using Env = TestEnv<false>;
+        using Env = TestEnv<false, LockFree>;
         Env env;
         TC<Env, Versioned> tc;
         TP t{};
         bool a = tc(make<Env, Versioned>(&env, t, Versioned{5, 0}));
         bool b = tc(make<Env, Versioned>(&env, t, Versioned{4, 0}));
         bool c = tc(make<Env, Versioned>(&env, t, Versioned{6, 0}));
-        check(a && !b && c, "VersionedData still goes through the version check (mutex path)");
+        check(a && !b && c, "VersionedData goes through the version check (mutex path)"+tagOf(false, LockFree));
     }
 
     //graph level: two importer threads, one non-threaded simpleExporter
@@ -220,9 +241,9 @@ namespace {
         }
     };
 
-    template <bool CheckTime>
+    template <bool CheckTime, bool LockFree>
     void testGraph() {
-        using Env = TestEnv<CheckTime>;
+        using Env = TestEnv<CheckTime, LockFree>;
         using M = infra::RealTimeApp<Env>;
         using R = infra::AppRunner<M>;
         constexpr int64_t kN = 200000;
@@ -242,7 +263,7 @@ namespace {
         while (done.load() < 2) {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
-        std::string tag = std::string(" CheckTime=")+(CheckTime ? "true" : "false");
+        std::string tag = tagOf(CheckTime, LockFree);
         if (!CheckTime) {
             check(received.load() == 2*kN, "graph: two importer threads -> simpleExporter, nothing lost" + tag);
         } else {
@@ -259,13 +280,20 @@ namespace {
 
 int main() {
     testModes();
-    testSingleThreadEquivalence<false>();
-    testSingleThreadEquivalence<true>();
-    testMultiThread<false>();
-    testMultiThread<true>();
-    testVersionedStillChecked();
-    testGraph<false>();
-    testGraph<true>();
+    testSingleThreadEquivalence<false,false>();
+    testSingleThreadEquivalence<true,false>();
+    testSingleThreadEquivalence<false,true>();
+    testSingleThreadEquivalence<true,true>();
+    testMultiThread<false,false>();
+    testMultiThread<true,false>();
+    testMultiThread<false,true>();
+    testMultiThread<true,true>();
+    testVersionedStillChecked<false>();
+    testVersionedStillChecked<true>();
+    testGraph<false,false>();
+    testGraph<true,false>();
+    testGraph<false,true>();
+    testGraph<true,true>();
     if (g_failures == 0) {
         std::cout << "ALL PASSED" << std::endl;
         return 0;

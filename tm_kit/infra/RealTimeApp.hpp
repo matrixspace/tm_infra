@@ -2,6 +2,7 @@
 #define TM_KIT_INFRA_REALTIME_APP_HPP_
 
 #include <tm_kit/infra/WithTimeData.hpp>
+#include <tm_kit/infra/Environments.hpp>
 #include <tm_kit/infra/ControllableNode.hpp>
 #include <tm_kit/infra/ObservableNode.hpp>
 #include <tm_kit/infra/StoppableProducer.hpp>
@@ -101,11 +102,14 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
         };
         //Which implementation TimeChecker<true,T> (the one used by non-threaded
         //nodes that may be fed from several threads) picks:
-        //  Trivial:   no version state and no time check, the only state is
-        //             hasData_, no lock at all
-        //  AtomicCAS: no version state, monotonic time check done with a CAS
-        //             loop on an atomic time point
-        //  Mutex:     the general case (stateful VersionChecker), as before
+        //  Mutex:     the default, exactly the original behavior; also always
+        //             used for inputs with a stateful VersionChecker
+        //  Trivial:   only with LockFreeTimeCheckerComponent in the
+        //             environment; no version state and no time check, the
+        //             only state is hasData_, no lock at all
+        //  AtomicCAS: only with LockFreeTimeCheckerComponent in the
+        //             environment; no version state, monotonic time check
+        //             done with a CAS loop on an atomic time point
         enum class TimeCheckerMode {Trivial, AtomicCAS, Mutex};
         template <class TP>
         struct TimePointIsLockFreeAtomic : std::conjunction<
@@ -122,9 +126,12 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                     return false;
                 }
             }
+            //checked here (not at class level) so that StateT only needs to be
+            //complete where a node is instantiated, as for StateT::CheckTime
+            static constexpr bool lockFreeEnabled = std::is_base_of_v<LockFreeTimeCheckerComponent, StateT>;
         public:
             static constexpr TimeCheckerMode value =
-                (!VersionCheckerIsTrivial<T>::value)
+                (!lockFreeEnabled || !VersionCheckerIsTrivial<T>::value)
                 ? TimeCheckerMode::Mutex
                 : (
                     (!StateT::CheckTime)
