@@ -131,7 +131,7 @@
 - ChainWriter：三种策略各写入 5000 条内存链数据，全部 FIFO；100ms 空闲窗口保持约 1ms 节奏；200 次处理期间入队场景 p50≈3.2µs（门限 300µs）。
 - transport debug：`ninja -j2 -C tm_transport/builddir_debug`，23/23 完成，0 错误。
 - transport 端到端：运行 `tm_transport/builddir_debug/test/threaded_handler_transport_test/threaded_handler_transport_test` 在启动 JSON REST 服务时失败。最小 `socket.socket()` 也返回 `PermissionError: [Errno 1] Operation not permitted`，已确认是当前沙箱权限限制；需在允许本地 socket 的环境重跑。
-- examples：`ninja -j4 -C tm_examples/builddir_debug`，进行中。
+- examples：按用户要求暂停编译；最后一轮完成 98/170 个剩余构建动作，未发现编译错误，尚不能记为全量通过。
 - 生成器：`python3 tm_infra/tools/piece_gen/gen_realtime_pieces.py --check` 通过；Action / MultiAction / ExecHandler 三族各有 19 个特化。
 
 以上相对命令在 `worktrees/realtime-threaded-executor/` 下执行。环境配置后，私有前缀应设置为：
@@ -175,3 +175,11 @@ plain wall +6.2%、CPU +7.1%，符合 ±20% 门限。其他变体受线程调度
 - 主记录：[README.md](README.md)
 - 下游索引：[tm_basic/doc/INDEX.md](../../../tm_basic/doc/INDEX.md)、[tm_transport/doc/INDEX.md](../../../tm_transport/doc/INDEX.md)
 - 参考文档：[App 类型](../../../../../tm_kit_reference/tm_infra/01-app-types.md)、[生成代码](../../../../../tm_kit_reference/tm_infra/09-generated-pieces.md)、[共享链](../../../../../tm_kit_reference/tm_basic/08-shared-chain.md)、[PATTERNS](../../../../../tm_kit_reference/PATTERNS.md) 4.1。
+
+## 2026-11-06：optional 与分配开销分析（用户要求暂停编译后）
+- 已停止 examples 编译，退出码 130；本轮只做源码与标准库实现分析，不修改执行器实现，也不启动测量编译。
+- `std::optional<Item>` 的值保存在自身存储内，不为包装的 Item 单独分配堆内存。本机 GCC 15 `<optional>` 使用 `_Storage` union 和 `_M_engaged` 标记，`_M_construct` 在 union 的 Item 地址上构造对象。标准依据：[optional.optional.general](https://eel.is/c++draft/optional.optional.general)。Item 自己的构造 / 移动仍可能分配，需与 optional 的包装开销区分。
+- Dedicated / SharedPool 共用的 MPSC：实际每消息分配来自 `push()` 的 `new Node()`，消费后删除旧哨兵节点。Node 内 optional 用于空哨兵和显式控制 Item 生命周期；消费端局部 optional 是栈上暂存，但 `tryPop()` 造成一次额外 Item 移动。
+- moodycamel：optional 空值是 stop / wakeIdle token；队列块扩容才是动态存储来源之一。64 项 bulk buffer 的 vector 在 worker 启动时分配一次，不是每消息分配。SharedPool 还有 ready deque 与 idle tick 临时 vector 的独立分配来源。
+- 建议保留 optional，优先计量分配次数、移动次数、对象布局及尾延迟；随后可将内部 MPSC 出队改为原位消费回调，去掉消费端暂存和额外移动。若节点分配占主要成本，再采用节点块分配 / 回收，保留无界与跨生产者 FIFO 语义；谨慎处理旧哨兵退役、复用同步及 ABA。
+- 有界预分配队列可以避免稳态节点分配，但队满时必须新增阻塞 / 拒收 / 丢弃语义，不能在未确认时替换当前默认无界队列。手写 union 代替 optional 不会自动减少堆分配；直接 Item 成员还可能引入默认构造要求。
