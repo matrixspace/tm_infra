@@ -3,7 +3,7 @@
 **任务开始时间：** 2026-11-06  
 **任务结束时间：** 2026-11-06  
 **状态：** 本轮完成；第二阶段整体验收仍待 examples / transport 环境验证  
-**分支：** `feature/realtime-threaded-executor`  
+**分支：** `feature/realtime-threaded-executor`（infra commit `3e0cc84`；basic commit `9013c55`）  
 
 ## 背景与目标
 
@@ -149,4 +149,4 @@ infra::SharedThreadPool::configure(pool);
 
 ## 收尾
 
-本轮优化和测试记录随源码提交，提交号随后补记。保留 feature 分支，不合并 / 不推送；主任务第二阶段仍待原有 examples 暂停和 transport socket 环境限制解除后完成整体验收，tm_kit_reference 按既定流程在推送后再同步。
+本轮优化和测试记录已随源码提交：infra `3e0cc84`，basic `9013c55`；本次文档补记随后的 doc commit。两仓库工作区在收尾时 clean。保留 feature 分支，不合并 / 不推送；主任务第二阶段仍待原有 examples 暂停和 transport socket 环境限制解除后完成整体验收，tm_kit_reference 按既定流程在推送后再同步。
