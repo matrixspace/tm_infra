@@ -326,7 +326,7 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             }
         protected:
             void putData(InputData &&data) {
-                exec_.push(std::move(data));
+                realtime_threaded_executor_detail::submit(exec_, std::move(data), &host_, 0);
             }
             TimeChecker<!Exec::kSerialCallbacks, T> const &timeChecker() const
             {
@@ -1488,6 +1488,11 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                     Producer<B>::publish(std::move(x));
                 });
             }
+            // This built-in node has no idle callback or side effects.
+            bool hasIdleWork() const
+            {
+                return false;
+            }
             void idleWork()
             {
                 if constexpr (!Base::kOwnContext) {
@@ -1640,6 +1645,11 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                     );
                 }
             }
+            // This built-in node has no idle callback or side effects.
+            bool hasIdleWork() const
+            {
+                return false;
+            }
             void idleWork()
             {
                 if constexpr (!Base::kOwnContext) {
@@ -1697,6 +1707,11 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                         }, std::move(*res))
                     );
                 }
+            }
+            // This built-in node has no idle callback or side effects.
+            bool hasIdleWork() const
+            {
+                return false;
             }
             void idleWork()
             {
@@ -2534,6 +2549,11 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 );
                 TM_INFRA_EXPORTER_TRACER(d.environment);
                 f_(std::move(d));
+            }
+            // This built-in node has no idle callback or side effects.
+            bool hasIdleWork() const
+            {
+                return false;
             }
             void idleWork()
             {

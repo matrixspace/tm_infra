@@ -47,7 +47,8 @@ namespace dev
                 namespace realtime_threaded_executor_detail
                 {
                     //Vyukov intrusive unbounded MPSC queue with a stub node.
-                    //push is wait-free (one exchange + one store); the global order is
+                    //link publication uses one exchange + one store; allocation may block.
+                    //The global order is
                     //the exchange order, so items of all producers form one FIFO.
                     template <class Item>
                     class MPSCQueue {
@@ -55,6 +56,11 @@ namespace dev
                         struct Node {
                             std::atomic<Node *> next{nullptr};
                             std::optional<Item> value;
+                            Node() = default;
+                            explicit Node(Item &&x)
+                                : value(std::in_place, std::move(x))
+                            {
+                            }
                         };
                         //written by producers
                         alignas(64) std::atomic<Node *> head_;
@@ -90,27 +96,37 @@ namespace dev
                         //atomic_thread_fence so that TSan can check the protocol.
                         void push(Item &&x)
                         {
-                            Node *n = new Node();
-                            n->value.emplace(std::move(x));
+                            Node *n = new Node(std::move(x));
                             Node *prev = head_.exchange(n, std::memory_order_seq_cst);
                             prev->next.store(n, std::memory_order_release);
                         }
                         //consumer only; may transiently report empty while a producer
                         //is between its exchange and its link store, the wake-up
                         //protocol of the executor covers that window
-                        bool tryPop(std::optional<Item> &out)
+                        template <class F>
+                        bool tryConsume(F &&consume)
                         {
                             Node *next = tail_->next.load(std::memory_order_acquire);
                             if (!next) {
                                 return false;
                             }
-                            out.emplace(std::move(*(next->value)));
-                            next->value.reset();
-                            delete tail_;
+                            Node *old = tail_;
                             tail_ = next;
+                            delete old;
+                            // The new tail remains the queue's stub. Its item
+                            // can be consumed in place, without a second move.
+                            // Reset also on exceptions, leaving a valid stub.
+                            struct Reset {
+                                std::optional<Item> &value;
+                                ~Reset()
+                                {
+                                    value.reset();
+                                }
+                            } reset{next->value};
+                            std::forward<F>(consume)(std::move(*next->value));
                             return true;
                         }
-                        //consumer only. Unlike tryPop this also reports items whose
+                        //consumer only. Unlike tryConsume this also reports items whose
                         //producer has done the exchange but not yet linked the node, so
                         //the consumer never goes to sleep inside that window
                         bool maybeNonEmpty() const
@@ -149,7 +165,8 @@ namespace dev
                 //Default executor: one dedicated (detached) thread per node.
                 //Blocking: the producer only takes the mutex / notifies when the consumer
                 //has announced it is about to sleep (eventcount style), so the hot path
-                //is one wait-free push without syscall. While the host has idle work the
+                //avoids per-item notification while the consumer is active; node
+                //allocation still has its own costs. While the host has idle work the
                 //consumer waits at most Config::idlePeriod and then calls the idle work,
                 //otherwise it sleeps until push / stop / wakeIdle.
 
@@ -171,24 +188,22 @@ namespace dev
                     template <class Host>
                     static bool drainBatch(State *s, Host *h)
                     {
-                        std::optional<Item> item;
-                        if (!s->queue.tryPop(item)) {
-                            return false;
-                        }
-                        if (s->opts.trackPendingCount) {
-                            h->executorBeforeBatch(*item, s->pending.load(std::memory_order_relaxed));
-                        }
-                        do {
+                        bool handled = false;
+                        while (s->queue.tryConsume([&](Item &&item) {
                             if (s->opts.trackPendingCount) {
+                                if (!handled) {
+                                    h->executorBeforeBatch(item, s->pending.load(std::memory_order_relaxed));
+                                }
                                 s->pending.fetch_sub(1, std::memory_order_relaxed);
                             }
-                            h->executorHandle(std::move(*item));
-                            item.reset();
+                            handled = true;
+                            h->executorHandle(std::move(item));
+                        })) {
                             if (!s->running.load(std::memory_order_acquire)) {
                                 break;
                             }
-                        } while (s->queue.tryPop(item));
-                        return true;
+                        }
+                        return handled;
                     }
                     //Blocking mode: returns once there may be work, the idle period has
                     //elapsed, or the executor is stopping
@@ -318,6 +333,17 @@ namespace dev
                         handle_(host_, std::move(x));
                         return true;
                     }
+                    // Internal fast path: h must be the Host passed to start().
+                    // Retain the stop check and never bypass custom executors.
+                    template <class Host>
+                    bool pushWithHost(Item &&x, Host *h)
+                    {
+                        if (!running_.load(std::memory_order_acquire)) {
+                            return false;
+                        }
+                        h->executorHandle(std::move(x));
+                        return true;
+                    }
                     void stop()
                     {
                         running_.store(false, std::memory_order_release);
@@ -341,6 +367,17 @@ namespace dev
 
                 namespace realtime_threaded_executor_detail
                 {
+                    template <class Exec, class Item, class Host>
+                    auto submit(Exec &exec, Item &&item, Host *host, int) -> std::enable_if_t<std::is_same_v<Exec, InlineExecutor<std::decay_t<Item>>>, bool>
+                    {
+                        return exec.pushWithHost(std::move(item), host);
+                    }
+                    template <class Exec, class Item, class Host>
+                    bool submit(Exec &exec, Item &&item, Host *, long)
+                    {
+                        return exec.push(std::move(item));
+                    }
+
                     template <class StateT, class Item, class = void>
                     struct ExecutorFor {
                         using type = DedicatedThreadExecutor<Item>;

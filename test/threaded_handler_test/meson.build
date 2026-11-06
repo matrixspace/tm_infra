@@ -12,3 +12,12 @@ threaded_handler_test_exe = executable('threaded_handler_test'
     , install: false
 )
 test('threaded_handler_test', threaded_handler_test_exe, timeout: 300)
+
+executor_mechanism_test_exe = executable('executor_mechanism_test'
+    , ['ExecutorMechanismTest.cpp']
+    , include_directories: inc
+    , dependencies: common_deps
+    , link_with: threaded_handler_test_lib
+    , install: false
+)
+test('executor_mechanism_test', executor_mechanism_test_exe, timeout: 30)

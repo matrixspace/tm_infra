@@ -14,6 +14,7 @@
 #include <stdexcept>
 #include <thread>
 #include <vector>
+#include <unordered_map>
 
 #ifdef __linux__
 #include <pthread.h>
@@ -47,7 +48,8 @@
 //    default executor
 //  - idle work is driven by one pool-wide tick (SharedThreadPoolConfig::
 //    idleTick, default 1ms) instead of DedicatedThreadExecutorConfig::idlePeriod;
-//    nodes whose executorHasIdleWork() is false cost nothing while idle
+//    only nodes with idle work participate; with no active idle nodes
+//    the timer blocks until a registration/wakeIdle change
 //  - the destructor waits until no pool thread is inside a callback of the
 //    node (unless called from that callback), so the host is never used
 //    after the executor is gone
@@ -73,6 +75,11 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             virtual ~IStrand() = default;
             virtual void runSlice() = 0;
             virtual void requestIdle() = 0;
+            // Queried only while updating the idle registry; must not lock host state.
+            virtual bool idleActive() const
+            {
+                return true;
+            }
         };
         //the strand whose callbacks the current pool thread is running
         inline thread_local IStrand const *tlCurrentStrand = nullptr;
@@ -86,7 +93,13 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
         std::condition_variable cond_;
         std::deque<std::shared_ptr<IStrand>> ready_;
         std::mutex registryMutex_;
-        std::vector<std::weak_ptr<IStrand>> registry_;
+        std::condition_variable registryCond_;
+        struct IdleEntry {
+            IStrand *key;
+            std::weak_ptr<IStrand> weak;
+        };
+        std::vector<IdleEntry> registry_;
+        std::unordered_map<IStrand *, std::size_t> registryIndex_;
 
         static std::mutex &configMutex() {
             static std::mutex m;
@@ -141,24 +154,44 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 realtime_shared_pool_detail::tlCurrentStrand = nullptr;
             }
         }
+        // Called under registryMutex_. Keep the scanned entries contiguous;
+        // the hash index is used only for membership changes, not each tick.
+        void eraseIdleLocked(IStrand *key)
+        {
+            auto it = registryIndex_.find(key);
+            if (it == registryIndex_.end()) {
+                return;
+            }
+            auto index = it->second;
+            if (index + 1 != registry_.size()) {
+                registry_[index] = std::move(registry_.back());
+                registryIndex_.find(registry_[index].key)->second = index;
+            }
+            registry_.pop_back();
+            registryIndex_.erase(it);
+        }
         void tickLoop() {
+            std::vector<std::shared_ptr<IStrand>> alive;
+            std::unique_lock<std::mutex> lock(registryMutex_);
             while (true) {
-                std::this_thread::sleep_for(cfg_.idleTick);
-                std::vector<std::shared_ptr<IStrand>> alive;
-                {
-                    std::lock_guard<std::mutex> _(registryMutex_);
-                    auto keep = registry_.begin();
-                    for (auto &w : registry_) {
-                        if (auto p = w.lock()) {
-                            alive.push_back(std::move(p));
-                            *keep++ = std::move(w);
-                        }
-                    }
-                    registry_.erase(keep, registry_.end());
+                registryCond_.wait(lock, [this] { return !registry_.empty(); });
+                if (registryCond_.wait_for(lock, cfg_.idleTick, [this] { return registry_.empty(); })) {
+                    continue;
                 }
+                for (std::size_t i = 0; i < registry_.size();) {
+                    if (auto p = registry_[i].weak.lock()) {
+                        alive.push_back(std::move(p));
+                        ++i;
+                    } else {
+                        eraseIdleLocked(registry_[i].key);
+                    }
+                }
+                lock.unlock();
                 for (auto &p : alive) {
                     p->requestIdle();
                 }
+                alive.clear(); // release references, retain buffer capacity
+                lock.lock();
             }
         }
     public:
@@ -191,37 +224,39 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             cond_.notify_one();
         }
         void registerStrand(std::shared_ptr<IStrand> const &s) {
-            std::lock_guard<std::mutex> _(registryMutex_);
-            registry_.push_back(s);
+            std::lock_guard<std::mutex> lock(registryMutex_);
+            // stop() removes under this same lock. Rechecking the flags
+            // here prevents a delayed activation from re-registering a
+            // strand after stop has already removed it.
+            if (s->idleActive()) {
+                auto it = registryIndex_.find(s.get());
+                if (it != registryIndex_.end()) {
+                    registry_[it->second].weak = s;
+                } else {
+                    registry_.push_back({s.get(), s});
+                    try {
+                        registryIndex_.emplace(s.get(), registry_.size() - 1);
+                    } catch (...) {
+                        registry_.pop_back();
+                        throw;
+                    }
+                }
+            } else {
+                eraseIdleLocked(s.get());
+            }
+            registryCond_.notify_one();
+        }
+        void unregisterStrand(IStrand *s)
+        {
+            std::lock_guard<std::mutex> lock(registryMutex_);
+            eraseIdleLocked(s);
+            if (registry_.empty()) {
+                registryCond_.notify_one();
+            }
         }
     };
 
     namespace realtime_shared_pool_detail {
-        //type-erased host callbacks, so that the strand (and its queue) can
-        //exist before start(Host *) tells us the host type
-        template <class Item>
-        class IHostAdapter {
-        public:
-            virtual ~IHostAdapter() = default;
-            virtual void waitForStart() = 0;
-            virtual void handle(Item &&) = 0;
-            virtual void idleWork() = 0;
-            virtual bool hasIdleWork() = 0;
-            virtual void beforeBatch(Item const &, std::size_t) = 0;
-        };
-        template <class Item, class Host>
-        class HostAdapter final : public IHostAdapter<Item> {
-        private:
-            Host *h_;
-        public:
-            explicit HostAdapter(Host *h) : h_(h) {}
-            void waitForStart() override {h_->executorWaitForStart();}
-            void handle(Item &&x) override {h_->executorHandle(std::move(x));}
-            void idleWork() override {h_->executorIdleWork();}
-            bool hasIdleWork() override {return h_->executorHasIdleWork();}
-            void beforeBatch(Item const &x, std::size_t n) override {h_->executorBeforeBatch(x, n);}
-        };
-
         //pending_ counts work units: queued items, one start token and at
         //most one idle token. Whoever moves it away from 0 schedules the
         //strand; a slice subtracts what it consumed and reschedules if
@@ -237,13 +272,23 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             alignas(64) std::atomic<bool> running_ {false};
             std::atomic<bool> idleRequested_ {false};
             //cached result of executorHasIdleWork(), refreshed inside slices
-            std::atomic<bool> wantsIdle_ {true};
+            std::atomic<bool> wantsIdle_{false};
             std::atomic<bool> orphaned_ {false};
             bool started_ = false;
             SharedThreadPool *pool_ = nullptr;
             std::mutex hostMutex_;
-            std::unique_ptr<IHostAdapter<Item>> host_;
+            void *host_ = nullptr;
+            // Type erasure once per slice, not once per handled item.
+            void (*run_)(Strand *) = nullptr;
 
+            void setWantsIdle(bool wants)
+            {
+                // Only slices write this cache, under hostMutex_.
+                if (wantsIdle_.load(std::memory_order_relaxed) != wants) {
+                    wantsIdle_.store(wants, std::memory_order_release);
+                    pool_->registerStrand(this->shared_from_this());
+                }
+            }
             void addWork() {
                 if (pending_.fetch_add(1, std::memory_order_acq_rel) == 0) {
                     pool_->schedule(this->shared_from_this());
@@ -256,11 +301,14 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             }
         public:
             explicit Strand(ThreadedExecOptions const &o) : opts_(o) {}
-            void start(std::unique_ptr<IHostAdapter<Item>> &&h) {
+            template <class Host>
+            void start(Host *h)
+            {
                 pool_ = &SharedThreadPool::instance();
                 {
                     std::lock_guard<std::mutex> _(hostMutex_);
-                    host_ = std::move(h);
+                    host_ = h;
+                    run_ = [](Strand *self) { self->template runSliceTyped<Host>(); };
                 }
                 running_.store(true, std::memory_order_release);
                 //start token: the first slice runs executorWaitForStart
@@ -275,7 +323,9 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 return true;
             }
             void stop() {
-                running_.store(false, std::memory_order_release);
+                if (running_.exchange(false, std::memory_order_acq_rel) && pool_) {
+                    pool_->unregisterStrand(this);
+                }
             }
             void wakeIdle() {
                 if (pool_) {
@@ -292,15 +342,27 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                     orphaned_.store(true, std::memory_order_release);
                 } else {
                     std::lock_guard<std::mutex> _(hostMutex_);
-                    host_.reset();
+                    host_ = nullptr;
                 }
+            }
+            bool idleActive() const override
+            {
+                return running_.load(std::memory_order_acquire) && wantsIdle_.load(std::memory_order_acquire);
             }
             void requestIdle() override {
                 if (running_.load(std::memory_order_acquire) && wantsIdle_.load(std::memory_order_acquire)) {
                     addIdleToken();
                 }
             }
-            void runSlice() override {
+            void runSlice() override
+            {
+                run_(this);
+            }
+
+        private:
+            template <class Host>
+            void runSliceTyped()
+            {
                 std::int64_t consumed = 0;
                 {
                     std::lock_guard<std::mutex> lock(hostMutex_);
@@ -308,42 +370,44 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                         return host_ && running_.load(std::memory_order_acquire)
                             && !orphaned_.load(std::memory_order_acquire);
                     };
+                    Host *h = static_cast<Host *>(host_);
                     if (!started_) {
                         started_ = true;
                         ++consumed;
                         if (alive()) {
-                            host_->waitForStart();
+                            h->executorWaitForStart();
+                            if (alive()) {
+                                setWantsIdle(h->executorHasIdleWork());
+                            }
                         }
                     }
-                    std::optional<Item> item;
                     unsigned n = 0;
                     unsigned const maxBatch = pool_->config().maxBatch;
-                    while (n < maxBatch && queue_.tryPop(item)) {
+                    while (n < maxBatch && queue_.tryConsume([&](Item &&item) {
                         ++consumed;
                         ++n;
                         if (alive()) {
                             if (opts_.trackPendingCount && n == 1) {
-                                host_->beforeBatch(*item, static_cast<std::size_t>(
-                                    std::max<std::int64_t>(pending_.load(std::memory_order_relaxed), 0)));
+                                h->executorBeforeBatch(item, static_cast<std::size_t>(std::max<std::int64_t>(pending_.load(std::memory_order_relaxed), 0)));
                             }
-                            host_->handle(std::move(*item));
+                            h->executorHandle(std::move(item));
                         }
-                        //after stop() the remaining items are dropped
-                        item.reset();
+                        // After stop(), remaining items are destroyed in place.
+                    })) {
                     }
                     if (idleRequested_.exchange(false, std::memory_order_acq_rel)) {
                         ++consumed;
                         if (alive()) {
-                            bool const w = host_->hasIdleWork();
-                            wantsIdle_.store(w, std::memory_order_release);
+                            bool const w = h->executorHasIdleWork();
+                            setWantsIdle(w);
                             //contract 4: idle work only with nothing pending
                             if (w && !queue_.maybeNonEmpty()) {
-                                host_->idleWork();
+                                h->executorIdleWork();
                             }
                         }
                     }
                     if (orphaned_.load(std::memory_order_acquire)) {
-                        host_.reset();
+                        host_ = nullptr;
                     }
                 }
                 //an item whose producer is between exchange and link is
@@ -370,8 +434,7 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             }
             template <class Host>
             void start(Host *h) {
-                s_->start(std::make_unique<HostAdapter<Item, Host>>(h));
-                SharedThreadPool::instance().registerStrand(s_);
+                s_->start(h);
             }
             bool push(Item &&x) {
                 return s_->push(std::move(x));

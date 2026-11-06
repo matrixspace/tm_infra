@@ -102,4 +102,4 @@
 - tm_kit_reference：`PATTERNS.md` 4.1、`tm_infra/01-app-types.md`、`tm_infra/09-generated-pieces.md`、`tm_basic/08-shared-chain.md`
 - 下游记录：`tm_basic/doc/INDEX.md`（基准扩展）、`tm_transport/doc/INDEX.md`（transport 层 threaded handler 回归测试），均链接回本记录
 
-执行器额外开销的后续分析与建议顺序见 [executor-overhead-optimization.md](executor-overhead-optimization.md)；当前为分析结论，尚未实施优化，编译保持暂停。
+执行器额外开销优化已实施并完成本轮定向验证，包含 Inline 静态调用、MPSC 原位消费、SharedPool 批次调用与 idle 活跃集合；profiling 工具、取舍、数据和测试见 [executor-overhead-optimization.md](executor-overhead-optimization.md)。examples 全量编译仍暂停，第二阶段整体状态不变。
