@@ -406,10 +406,36 @@ namespace {
         using Env = TestEnv<true, false>;
         using C = infra::RealTimeAppComponents<Env>;
         Env env;
-        C::TimeChecker<true, int64_t> checker;
-        auto later = make(&env, 1, TP{} + std::chrono::seconds(2));
-        auto earlier = make(&env, 2, TP{} + std::chrono::seconds(1));
-        check(checker(later) && !checker(earlier), "inline checker rejects decreasing timestamps");
+        struct Checked final : C::ExecHandler<int64_t, Checked, C::InlinePolicy> {
+            std::atomic<int> accepted{0};
+            Checked()
+            {
+                this->startThread();
+            }
+            void actuallyHandle(infra::TimedDataWithEnvironment<int64_t, Env, TP> &&data)
+            {
+                if (this->timeCheckGood(data)) {
+                    ++accepted;
+                }
+            }
+        } checked;
+        auto feed = [&](TP timestamp) {
+            std::vector<std::thread> threads;
+            for (int i = 0; i < 4; ++i) {
+                threads.emplace_back([&checked, &env, timestamp] {
+                    for (int j = 0; j < 20000; ++j) {
+                        checked.handle(make(&env, 1, timestamp));
+                    }
+                });
+            }
+            for (auto &t : threads) {
+                t.join();
+            }
+        };
+        feed(TP{} + std::chrono::seconds(2));
+        check(checked.accepted == 80000, "inline handler accepts concurrent equal timestamps");
+        feed(TP{} + std::chrono::seconds(1));
+        check(checked.accepted == 80000, "inline handler rejects decreasing timestamps from all producers");
     }
 
     //---- 7. CheckTime=true, single producer with increasing time points

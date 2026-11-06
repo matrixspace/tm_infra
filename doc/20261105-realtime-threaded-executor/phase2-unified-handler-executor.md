@@ -3,7 +3,7 @@
 **开始时间：** 2026-11-06  
 **结束时间：**  
 **状态：** 进行中  
-**分支：** `feature/realtime-threaded-executor`（tm_infra、tm_basic、tm_transport）  
+**分支：** `feature/realtime-threaded-executor`（tm_infra 代码 commit `96ba064`；tm_basic 代码 commit `5c06751`；tm_transport 无源码改动）
 **主记录：** [README.md](README.md)
 
 ## 背景
@@ -146,3 +146,6 @@
 | src+action+facility | 2364 | 1964 | 7865 | 6794 |
 
 plain wall +6.2%、CPU +7.1%，符合 ±20% 门限。其他变体受线程调度及共享机器负载影响大，不据此声称稳定加速。第一阶段主记录的历史测量仍保留；本轮同机基线与历史绝对值不同，不能直接用历史数字判断回退。全部运行 `bad=0`，输出计数一致。
+
+- 补强 Inline TimeChecker 集成覆盖：4 生产者通过 `ExecHandler<..., InlinePolicy>` 并发提交 80000 条同时间戳数据，全部接受；随后并发提交 80000 条更早时间戳数据，全部拒绝。debug 全套测试再次 ALL PASSED。
+- examples 后续编译调整为 `-j8`；当时 56 CPU、load≈11、可用内存≈42GiB，仍使用固定并行上限。已完成的目标继续复用自己的缓存。
