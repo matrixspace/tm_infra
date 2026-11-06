@@ -183,3 +183,5 @@ plain wall +6.2%、CPU +7.1%，符合 ±20% 门限。其他变体受线程调度
 - moodycamel：optional 空值是 stop / wakeIdle token；队列块扩容才是动态存储来源之一。64 项 bulk buffer 的 vector 在 worker 启动时分配一次，不是每消息分配。SharedPool 还有 ready deque 与 idle tick 临时 vector 的独立分配来源。
 - 建议保留 optional，优先计量分配次数、移动次数、对象布局及尾延迟；随后可将内部 MPSC 出队改为原位消费回调，去掉消费端暂存和额外移动。若节点分配占主要成本，再采用节点块分配 / 回收，保留无界与跨生产者 FIFO 语义；谨慎处理旧哨兵退役、复用同步及 ABA。
 - 有界预分配队列可以避免稳态节点分配，但队满时必须新增阻塞 / 拒收 / 丢弃语义，不能在未确认时替换当前默认无界队列。手写 union 代替 optional 不会自动减少堆分配；直接 Item 成员还可能引入默认构造要求。
+
+后续完整热路径分析见 [executor-overhead-optimization.md](executor-overhead-optimization.md)，覆盖静态提交、MPSC 原位消费、节点回收、共享池调度 / idle 扫描及 moodycamel token。仅记录分析，未恢复编译或修改执行器。

@@ -101,3 +101,5 @@
 ## 相关文档（相关任务、tm_kit_reference 章节）
 - tm_kit_reference：`PATTERNS.md` 4.1、`tm_infra/01-app-types.md`、`tm_infra/09-generated-pieces.md`、`tm_basic/08-shared-chain.md`
 - 下游记录：`tm_basic/doc/INDEX.md`（基准扩展）、`tm_transport/doc/INDEX.md`（transport 层 threaded handler 回归测试），均链接回本记录
+
+执行器额外开销的后续分析与建议顺序见 [executor-overhead-optimization.md](executor-overhead-optimization.md)；当前为分析结论，尚未实施优化，编译保持暂停。
