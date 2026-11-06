@@ -1,8 +1,8 @@
 # RealTimeApp threaded handler 框架开销优化与可替换执行模型
 
 **任务开始时间：** 2026-11-05  
-**任务结束时间：** 2026-11-06  
-**状态：** 完成  
+**任务结束时间：**（第一阶段 2026-11-06 完成；第二阶段进行中）  
+**状态：** 进行中（第二阶段：执行器抽象重构）  
 **分支：** `feature/realtime-threaded-executor`（tm_infra、tm_basic、tm_transport；commit：tm_infra `6836234`、tm_basic `437bfcc`、tm_transport `117fdb6`）
 
 ## 背景
@@ -19,6 +19,9 @@
 - 默认队列：Vyukov 侵入式无界 MPSC，跨生产者按 exchange 顺序线性化，与现有 mutex+list 的 FIFO 语义一致。
 - 放弃：tm_infra 内置 moodycamel / folly。moodycamel 跨生产者不保序，CheckTime=true 时 `TimeChecker<false,T>` 会多丢数据；folly 依赖过重。用户可按新契约自行适配。
 - 可选参考实现：共享线程池执行器 `RealTimeSharedPoolExecutor`（opt-in），BusyLoop 模式退回专用线程。
+
+### 第二阶段：执行器抽象重构（2026-11-06 起，进行中）
+去掉 `ThreadedExecMode`，执行器契约只剩 `Exec<Item>`，执行方式由各执行器自行实现；新增 `InlineExecutor` 表示同步执行，所有基于 handler 的框架节点合并为一份实现，按策略选择同步或 threaded。BusyLoop 移出 infra，ChainWriter 改用本地 handler（基线实现，修掉 1ms 白等）；piece 生成脚本提交进仓库。设计、决策与验证计划见 [phase2-unified-handler-executor.md](phase2-unified-handler-executor.md)。
 
 ## 对上层的影响（实施前已核查）
 - 源码兼容：直接继承者 GenericIOStreamImporterExporter、ByteDataWithTopicRecordFileImporterExporter、ChainWriter InnerHandler1/2、JsonRESTClientFacility×3、GrpcClientFacility 只用保留接口。
@@ -90,6 +93,7 @@
 - 踩坑：`AppRunner` 经 `env.log()` 报图警告，环境必须带日志组件（用 `TimeComponentEnhancedWithSpdLogging`）；同一个 action 只能在第一次连接时注册名字，之后要用不带名字的重载；`registerOnOrderFacility` + `placeOrderWithFacility(带名字)` 会重复注册；facility 的输出 sink 类型是 `KeyedData<in,out>`；最早的"静默 100ms"等待把等待时间也计入计时，改为以最后一次计数变化为终点；kpush/s 列最初用整数运算得到 0/1，改为浮点 `messages/(wallNs/1e6)`；joinOut/facilityOut 改为减去预热前基数，只统计计时期间的输出。
 
 ## 兼容性与注意事项
+- 第二阶段删除 `BusyLoopThreadedHandler`（含 `BusyLoopThreadedHandlerBase`）和 `ThreadedExecMode`，属于不兼容改动，已经用户确认；下游仅 ChainWriter 与 moodycamel 测试使用，随本阶段一起修改。
 - ActionCore/MultiActionCore 的 variant 特化 piece（2–20 路）为机器生成，生成器不在仓库中（见 tm_kit_reference/tm_infra/09-generated-pieces.md），用脚本对各特化做同一改动。
 - tm_kit_reference（`PATTERNS.md` 4.1、`tm_infra/01-app-types.md` 的执行器/共享池说明）待推送远程后再更新。
 - 已有问题（非本次引入）：handler 线程 detach 后析构 join 不生效，ChainWriter 析构 `delete innerHandler1_` 时线程可能仍在运行。列为后续项。
