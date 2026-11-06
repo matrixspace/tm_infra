@@ -21,7 +21,7 @@
 - 可选参考实现：共享线程池执行器 `RealTimeSharedPoolExecutor`（opt-in），BusyLoop 模式退回专用线程。
 
 ### 第二阶段：执行器抽象重构（2026-11-06 起，进行中）
-去掉 `ThreadedExecMode`，执行器契约只剩 `Exec<Item>`，执行方式由各执行器自行实现；新增 `InlineExecutor` 表示同步执行，所有基于 handler 的框架节点合并为一份实现，按策略选择同步或 threaded。BusyLoop 移出 infra，ChainWriter 改用本地 handler（基线实现，修掉 1ms 白等）；piece 生成脚本提交进仓库。设计、决策与验证计划见 [phase2-unified-handler-executor.md](phase2-unified-handler-executor.md)。
+去掉 `ThreadedExecMode`，执行器契约只剩 `Exec<Item>`，执行方式由各执行器自行实现；新增 `InlineExecutor` 表示同步执行，所有基于 handler 的框架节点合并为一份实现，按策略选择同步或 threaded。BusyLoop 移出 infra，ChainWriter 改用本地 handler（基线实现，修掉 1ms 白等）；piece 生成脚本提交进仓库。第二阶段代码已实现，debug/release 与 TSan 核心测试已通过；transport socket 测试受当前沙箱限制，examples 回归进行中。设计、决策与验证计划见 [phase2-unified-handler-executor.md](phase2-unified-handler-executor.md)。
 
 ## 对上层的影响（实施前已核查）
 - 源码兼容：直接继承者 GenericIOStreamImporterExporter、ByteDataWithTopicRecordFileImporterExporter、ChainWriter InnerHandler1/2、JsonRESTClientFacility×3、GrpcClientFacility 只用保留接口。

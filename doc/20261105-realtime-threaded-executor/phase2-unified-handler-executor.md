@@ -98,7 +98,51 @@
 - 2026-11-06：方案确定，建档。
 
 ## 代码改动
-（实施后补充）
+- `RealTimeThreadedExecutor.hpp`：`Exec<Item>` 契约、两个能力常量、`InlineExecutor`、默认配置类型；Environment 选择器去掉 Mode。
+- `RealTimeSharedPoolExecutor.hpp`：直接选择 strand，不再回退 BusyLoop。
+- `RealTimeApp.hpp`：统一 `ExecHandlerCore` / `ExecHandler` 与 `HandlerPolicy`；保留 `ThreadedHandler` 别名；Action / MultiAction / Continuation / 两种 facility / SimpleExporter 均只保留一份实现。
+- 三个 `RealTimeApp_*_Piece.hpp`：统一 variant 分派与执行策略，元数 2–20；生成器及两份模板在 `tools/piece_gen/`。
+- `ThreadedHandlerTest.cpp`：移除 BusyLoop 用例；新增 InlineExecutor 并发与停止、同步图、环境选择 InlineExecutor 的图回归。
+- tm_basic `MoodycamelThreadedExecutor.hpp` 及测试：阻塞实现与新契约；moodycamel 原有跨生产者排序差异仍保留。
+- tm_basic `ChainWriter.hpp`：从基线提取本地 mutex/list 阻塞与 busy loop handler；只修改阻塞等待 predicate / stop 通知；三个 polling 策略的调用结构不变。
+- tm_basic `test/chain_writer_loop_test`：真实内存链 FIFO 与本地循环 idle / 漏通知窗口延迟回归，加入 Meson。
+
+### 使用与迁移
+- 自定义执行器从 `template<class Item, ThreadedExecMode Mode>` 改为 `template<class Item>`，声明 `kOwnContext` 和 `kSerialCallbacks`；Environment 的 alias 同样去掉 Mode。
+- 同步节点仍由 `SuggestThreaded(false)` 选择，不依赖 Environment 的 threaded 执行器选择。选择 `InlineExecutor` 的 Environment 则让 `SuggestThreaded(true)` 节点也同步运行，`isThreaded()` 根据能力返回 false。
+- 默认执行器配置通过 `DedicatedThreadExecutor<Item, MyConfig>` 提供；`MyConfig` 定义 `idlePeriod` / `spinBeforeSleep`，可用单参数 alias 接入组件。
+- `ThreadedExecOptions` 只保留 `trackPendingCount`；`BusyLoopThreadedHandler` 已移除。ChainWriter 的 `ChainPollingPolicy` API 保持不变。
+- 生成：`python3 tools/piece_gen/gen_realtime_pieces.py`；校验：追加 `--check`。需要已有 `clang-format`，按仓库配置格式化输出。
+
 
 ## 测试与验证结果
-（实施后补充）
+构建均先 `source build-common/build-env-setting.sh`，使用 GCC 15.2.1，worktree 私有构建目录及安装前缀 `worktrees/realtime-threaded-executor/install`，Ninja `-j2`。
+- infra debug：`ninja -j2 -C tm_infra/builddir_debug`；`threaded_handler_test`（同步、环境覆盖 Inline、dedicated、pool）ALL PASSED；`time_checker_test` ALL PASSED。
+- basic debug：`ninja -j2 -C tm_basic/builddir_debug`；`moodycamel_executor_test` ALL PASSED，moodycamel 单条延迟 p50 12.3µs。
+- `chain_writer_loop_test`：三种策略各写入 5000 条，全部 FIFO；100ms 空闲窗口保持约 1ms 节奏；200 次处理期间入队场景 p50 3.2µs（门限 300µs）。ALL PASSED。
+- infra TSan：`g++ -std=c++17 -O1 -g -fsanitize=thread -pthread -I tm_infra ThreadedHandlerTest.cpp <worktree debug infra archive> -o <test>`，运行 ALL PASSED，0 报告。
+- `python3 tools/piece_gen/gen_realtime_pieces.py --check`：通过。
+
+
+- 2026-11-06：开始实施；已核对 `978b5df` 计划、`6836234` 实现与三个仓库工作区。沿用功能分支，先重构执行器和统一核心，再生成 variant 特化、迁移下游及验证。
+
+- 2026-11-06：执行器统一、节点合并、三类 piece 生成器及下游迁移已实施。infra debug 编译通过；同步图、dedicated/pool 图与并发测试 ALL PASSED，单条 dedicated p50 16.4µs、pool 17.9µs。
+- 新增 ChainWriter 内存链测试覆盖三种 polling 策略；本地阻塞循环用“上一条回调尚未结束时入队”明确触发旧实现漏通知的窗口。生成器使用仓库 `.clang-format` 格式化输出，并提供 `--check` 校验。
+
+- 测试发现既有 `ChainWriter` 的 `SingleWritingMode=true` 分支以 `Key<Response>` 构造 `(status,response)`，无法实例化；该问题在基线已经存在，与本次循环迁移无关。内存链回归使用常规重试模式，未扩展修改此分支。
+
+- 2026-11-06：infra / basic debug 与 release 均构建成功；infra release 两项测试通过。三组 TSan（infra、ChainWriter、moodycamel）均 ALL PASSED、0 报告。moodycamel 第三方头文件仍有 `-Wtsan` fence 警告（第一阶段已有），TSan 无法完整建模其内部 fence。
+- transport debug 构建 23/23 通过；JSON REST 端到端测试启动失败，原因为当前沙箱禁止 socket：最小 `socket.socket()` 返回 `PermissionError: [Errno 1] Operation not permitted`，不是编译错误或端口占用。该项需在允许本地 socket 的环境重跑。
+- examples 全量目标回归较慢，确认机器剩余可用内存约 40GiB、56 CPU 后，以 `-j4` 继续增量编译（仍仅使用自己的 builddir）。
+
+### release 性能复测
+为避免把不同机器负载混为实现变化，在临时 detached worktree 从第一阶段 `6836234` 重编译同一个基准，再交替运行第一阶段与当前版本各 5 次；`taskset -c 20-27`，每变体 200000 push，取中位数。比较结束已删除临时 worktree。
+
+| 变体 | 第一阶段 wall ns/push | 第二阶段 wall ns/push | 第一阶段 CPU ns/push | 第二阶段 CPU ns/push |
+|---|---:|---:|---:|---:|
+| plain | 2469 | 2623 | 4443 | 4759 |
+| src threaded | 2313 | 1469 | 7470 | 4955 |
+| action+facility threaded | 2189 | 2204 | 7614 | 9287 |
+| src+action+facility | 2364 | 1964 | 7865 | 6794 |
+
+plain wall +6.2%、CPU +7.1%，符合 ±20% 门限。其他变体受线程调度及共享机器负载影响大，不据此声称稳定加速。第一阶段主记录的历史测量仍保留；本轮同机基线与历史绝对值不同，不能直接用历史数字判断回退。全部运行 `bad=0`，输出计数一致。

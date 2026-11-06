@@ -46,10 +46,8 @@
 //    occupies a pool thread meanwhile; such nodes should stay on the
 //    default executor
 //  - idle work is driven by one pool-wide tick (SharedThreadPoolConfig::
-//    idleTick, default 1ms) instead of ThreadedExecOptions::idlePeriod;
+//    idleTick, default 1ms) instead of DedicatedThreadExecutorConfig::idlePeriod;
 //    nodes whose executorHasIdleWork() is false cost nothing while idle
-//  - BusyLoop mode is never put on the pool, it falls back to
-//    DedicatedThreadExecutor
 //  - the destructor waits until no pool thread is inside a callback of the
 //    node (unless called from that callback), so the host is never used
 //    after the executor is gone
@@ -361,6 +359,8 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
         private:
             std::shared_ptr<Strand<Item>> s_;
         public:
+            static constexpr bool kOwnContext = true;
+            static constexpr bool kSerialCallbacks = true;
             explicit SharedPoolStrandExecutor(ThreadedExecOptions const &opts = ThreadedExecOptions {})
                 : s_(std::make_shared<Strand<Item>>(opts)) {}
             SharedPoolStrandExecutor(SharedPoolStrandExecutor const &) = delete;
@@ -388,13 +388,8 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
         };
     }
 
-    //BusyLoop never goes on the pool (it would pin a pool thread forever)
-    template <class Item, ThreadedExecMode M>
-    using RealTimeSharedPoolExecutor = std::conditional_t<
-        M == ThreadedExecMode::BusyLoop
-        , DedicatedThreadExecutor<Item, M>
-        , realtime_shared_pool_detail::SharedPoolStrandExecutor<Item>
-    >;
+    template <class Item>
+    using RealTimeSharedPoolExecutor = realtime_shared_pool_detail::SharedPoolStrandExecutor<Item>;
 
     struct RealTimeSharedPoolExecutorComponent
         : public RealTimeThreadedExecutorComponent<RealTimeSharedPoolExecutor> {};

@@ -17,8 +17,6 @@
 //  1. executor selection from the environment
 //  2. ThreadedHandler, several producers: nothing lost / duplicated,
 //     per-producer order kept, callbacks never overlap
-//  3. BusyLoopThreadedHandler, same checks (pool env falls back to a
-//     dedicated thread)
 //  4. stop() from inside actuallyHandle: no further item is handled,
 //     later pushes are dropped
 //  5. idle work: periodic while hasIdleWork() is true, none while it is
@@ -93,17 +91,10 @@ namespace {
     void testSelection() {
         using Dflt = TestEnv<false, false>;
         using Pool = TestEnv<false, true>;
-        constexpr bool d1 = std::is_same_v<infra::RealTimeThreadedExecutorFor<Dflt, int, infra::ThreadedExecMode::Blocking>
-            , infra::DedicatedThreadExecutor<int, infra::ThreadedExecMode::Blocking>>;
-        constexpr bool d2 = std::is_same_v<infra::RealTimeThreadedExecutorFor<Dflt, int, infra::ThreadedExecMode::BusyLoop>
-            , infra::DedicatedThreadExecutor<int, infra::ThreadedExecMode::BusyLoop>>;
-        constexpr bool p1 = std::is_same_v<infra::RealTimeThreadedExecutorFor<Pool, int, infra::ThreadedExecMode::Blocking>
-            , infra::realtime_shared_pool_detail::SharedPoolStrandExecutor<int>>;
-        constexpr bool p2 = std::is_same_v<infra::RealTimeThreadedExecutorFor<Pool, int, infra::ThreadedExecMode::BusyLoop>
-            , infra::DedicatedThreadExecutor<int, infra::ThreadedExecMode::BusyLoop>>;
-        check(d1 && d2, "default environment selects DedicatedThreadExecutor");
+        constexpr bool d1 = std::is_same_v<infra::RealTimeThreadedExecutorFor<Dflt, int>, infra::DedicatedThreadExecutor<int>>;
+        constexpr bool p1 = std::is_same_v<infra::RealTimeThreadedExecutorFor<Pool, int>, infra::realtime_shared_pool_detail::SharedPoolStrandExecutor<int>>;
+        check(d1, "default environment selects DedicatedThreadExecutor");
         check(p1, "pool environment selects the shared pool for Blocking");
-        check(p2, "pool environment falls back to a dedicated thread for BusyLoop");
     }
     //---- shared bookkeeping for handler tests
     struct Stats {
@@ -179,31 +170,6 @@ namespace {
         }
     };
 
-    template <class Env>
-    class TestBusyHandler final : public infra::RealTimeAppComponents<Env>::template BusyLoopThreadedHandler<int64_t, TestBusyHandler<Env>> {
-    private:
-        Stats *st_;
-        int64_t kPer_;
-    public:
-        TestBusyHandler(Stats *st, int64_t kPer)
-            : infra::RealTimeAppComponents<Env>::template BusyLoopThreadedHandler<int64_t, TestBusyHandler<Env>>(false)
-            , st_(st), kPer_(kPer) {
-            this->startThread();
-        }
-        void waitForStart() {
-            ++st_->started;
-        }
-        void actuallyHandle(infra::TimedDataWithEnvironment<int64_t, Env, TP> &&d) {
-            st_->onItem(d.timedData.value, kPer_);
-        }
-        void idleWork() {
-            ++st_->idle;
-        }
-        void stopNow() {
-            this->stop();
-        }
-    };
-
     //producers call IHandler::handle directly, as upstream nodes do
     template <class Env, class H>
     void produce(Env *env, H *h, int producers, int64_t kPer, bool increasingTime = false) {
@@ -243,27 +209,6 @@ namespace {
         (void) h;
     }
 
-    //---- 3. BusyLoopThreadedHandler, several producers
-    template <bool Pool>
-    void testBusyLoopMultiProducer() {
-        using Env = TestEnv<false, Pool>;
-        Env &env = *new Env(); //leaked: detached handler threads may still use it
-        constexpr int kProd = 4;
-        constexpr int64_t kPer = 50000;
-        //leaked with the handler: its detached thread may still touch it
-        Stats &st = *new Stats();
-        auto *h = new TestBusyHandler<Env>(&st, kPer);
-        produce(&env, h, kProd, kPer);
-        bool all = waitUntil([&]() {return st.handled.load() >= kProd*kPer;});
-        std::string tag = tagOf(Pool);
-        check(all && st.handled.load() == kProd*kPer, "busy loop handler: all items handled once" + tag);
-        check(st.dup.load() == 0 && st.orderErr.load() == 0 && st.overlap.load() == 0, "busy loop handler: order kept, no overlap" + tag);
-        check(h->threadHandle().has_value(), "busy loop handler: owns a thread" + tag);
-        h->stopNow();
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
-        //leaked on purpose: the handler thread is detached (pre-existing lifecycle, see task record)
-        (void) h;
-    }
 
     //---- 4. stop() from inside actuallyHandle
     template <bool Pool>
@@ -332,16 +277,18 @@ namespace {
         }
     };
 
-    template <bool Pool>
-    void testGraphActions() {
-        using Env = TestEnv<false, Pool>;
+    template <bool Pool, bool Threaded = true, bool InlineSelected = false>
+    void testGraphActions()
+    {
+        using InlineEnv = infra::Environment<infra::CheckTimeComponent<false>, infra::TrivialExitControlComponent, TestClockComponent, infra::RealTimeThreadedExecutorComponent<infra::InlineExecutor>>;
+        using Env = std::conditional_t<InlineSelected, InlineEnv, TestEnv<false, Pool>>;
         using M = infra::RealTimeApp<Env>;
         using R = infra::AppRunner<M>;
         constexpr int64_t kN = 20000;
         std::string tag = tagOf(Pool);
         auto *env = new Env();
         auto *r = new R(env);
-        auto thr = infra::LiftParameters<TP>().SuggestThreaded(true);
+        auto thr = infra::LiftParameters<TP>().SuggestThreaded(Threaded);
 
         std::vector<int64_t> ints(kN);
         std::vector<double> dbls(kN);
@@ -369,8 +316,7 @@ namespace {
         auto multi3 = M::template liftMulti3<int64_t, double, char>([](std::variant<int64_t, double, char> &&v) {
             return std::vector<int64_t>(v.index()+1, 1);
         }, thr);
-        auto once = M::template liftPure<int64_t>([](int64_t &&x) {return x;}
-            , infra::LiftParameters<TP>().SuggestThreaded(true).FireOnceOnly(true));
+        auto once = M::template liftPure<int64_t>([](int64_t &&x) { return x; }, infra::LiftParameters<TP>().SuggestThreaded(Threaded).FireOnceOnly(true));
 
         auto counter = [](std::atomic<int64_t> *c, std::atomic<int64_t> *s) {
             return M::template simpleExporter<int64_t>([c, s](typename M::template InnerData<int64_t> &&d) {
@@ -402,6 +348,7 @@ namespace {
 
         std::atomic<int> idle {0};
         r->finalize();
+        check(M::actionIsThreaded(pure) == (Threaded && !InlineSelected), "graph execution context matches selected policy");
         //registered after the threads are already running and sleeping
         M::setIdleWorkerForAction(pure, [&idle](void *) {++idle;});
 
@@ -415,12 +362,54 @@ namespace {
         check(multiCount.load() == expectMulti, "graph: threaded liftMulti3 dispatches all three inputs" + tag);
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
         check(onceCount.load() == 1, "graph: FireOnceOnly action fires exactly once" + tag);
-        check(idle.load() >= 10, "graph: setIdleWorkerForAction after start still gets idle calls (" + std::to_string(idle.load()) + ")" + tag);
+        check((Threaded && !InlineSelected) ? idle.load() >= 10 : idle.load() == 0, "graph: setIdleWorkerForAction after start still gets idle calls (" + std::to_string(idle.load()) + ")" + tag);
         //the graph outlives this function, so drop the worker that captures
         //the local counter; idleWork holds the worker mutex while calling it,
         //so once this returns no call can still touch idle
         M::setIdleWorkerForAction(pure, std::function<void(void *)> {});
         //graph intentionally leaked (detached importer threads)
+    }
+
+    // Inline callbacks execute in producer contexts and must not be serialized.
+    void testInlineExecutor()
+    {
+        struct Host {
+            std::atomic<int> entered{0};
+            std::atomic<int> handled{0};
+            std::atomic<bool> release{false};
+            void executorHandle(int &&)
+            {
+                ++entered;
+                while (!release.load()) {
+                    std::this_thread::yield();
+                }
+                ++handled;
+            }
+        } host;
+        infra::InlineExecutor<int> exec;
+        static_assert(!decltype(exec)::kOwnContext && !decltype(exec)::kSerialCallbacks);
+        exec.start(&host); // no wait/idle callbacks required on an inline host
+        std::vector<std::thread> producers;
+        for (int i = 0; i < 4; ++i) {
+            producers.emplace_back([&exec] { exec.push(1); });
+        }
+        bool concurrent = waitUntil([&] { return host.entered.load() == 4; });
+        host.release = true;
+        for (auto &t : producers) {
+            t.join();
+        }
+        check(concurrent && host.handled == 4, "inline callbacks enter concurrently from all producers");
+        exec.stop();
+        check(!exec.push(2) && host.handled == 4, "inline stop rejects subsequent pushes");
+        check(!exec.threadHandle(), "inline executor has no thread handle");
+
+        using Env = TestEnv<true, false>;
+        using C = infra::RealTimeAppComponents<Env>;
+        Env env;
+        C::TimeChecker<true, int64_t> checker;
+        auto later = make(&env, 1, TP{} + std::chrono::seconds(2));
+        auto earlier = make(&env, 2, TP{} + std::chrono::seconds(1));
+        check(checker(later) && !checker(earlier), "inline checker rejects decreasing timestamps");
     }
 
     //---- 7. CheckTime=true, single producer with increasing time points
@@ -495,10 +484,12 @@ int main() {
     infra::SharedThreadPool::configure(cfg);
 
     testSelection();
+    testInlineExecutor();
+    testGraphActions<false, true, true>();
+    testGraphActions<false, false>();
+    testGraphActions<true, false>();
     testThreadedMultiProducer<false>();
     testThreadedMultiProducer<true>();
-    testBusyLoopMultiProducer<false>();
-    testBusyLoopMultiProducer<true>();
     testStopInsideCallback<false>();
     testStopInsideCallback<true>();
     testIdleWork<false>();
