@@ -4,6 +4,8 @@ private:
     bool done_;
     std::function<void(void *)> idleWorker_;
     std::mutex idleWorkerMutex_;
+    //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+    std::atomic<bool> hasIdleWorker_ {false};
     T t_;
     std::function<void()> startWaiter_;
     std::mutex startWaiterMutex_;
@@ -70,10 +72,21 @@ public:
         return FireOnceOnly;
     }
     virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-        std::lock_guard<std::mutex> _(idleWorkerMutex_);
-        idleWorker_ = worker;
+        {
+            std::lock_guard<std::mutex> _(idleWorkerMutex_);
+            hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+            idleWorker_ = worker;
+        }
+        //the thread may already be sleeping without an idle period
+        this->wakeIdle();
+    }
+    bool hasIdleWork() {
+        return hasIdleWorker_.load(std::memory_order_acquire);
     }
     void idleWork() {
+        if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+            return;
+        }
         std::lock_guard<std::mutex> _(idleWorkerMutex_);
         if (idleWorker_) {
             idleWorker_(t_.getIdleHandlerParam());
@@ -179,6 +192,8 @@ private:
     bool done_;
     std::function<void(void *)> idleWorker_;
     std::mutex idleWorkerMutex_;
+    //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+    std::atomic<bool> hasIdleWorker_ {false};
     T t_;
     std::function<void()> startWaiter_;
     std::mutex startWaiterMutex_;
@@ -245,10 +260,21 @@ public:
         return FireOnceOnly;
     }
     virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-        std::lock_guard<std::mutex> _(idleWorkerMutex_);
-        idleWorker_ = worker;
+        {
+            std::lock_guard<std::mutex> _(idleWorkerMutex_);
+            hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+            idleWorker_ = worker;
+        }
+        //the thread may already be sleeping without an idle period
+        this->wakeIdle();
+    }
+    bool hasIdleWork() {
+        return hasIdleWorker_.load(std::memory_order_acquire);
     }
     void idleWork() {
+        if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+            return;
+        }
         std::lock_guard<std::mutex> _(idleWorkerMutex_);
         if (idleWorker_) {
             idleWorker_(t_.getIdleHandlerParam());
@@ -360,6 +386,8 @@ private:
     bool done_;
     std::function<void(void *)> idleWorker_;
     std::mutex idleWorkerMutex_;
+    //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+    std::atomic<bool> hasIdleWorker_ {false};
     T t_;
     std::function<void()> startWaiter_;
     std::mutex startWaiterMutex_;
@@ -426,10 +454,21 @@ public:
         return FireOnceOnly;
     }
     virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-        std::lock_guard<std::mutex> _(idleWorkerMutex_);
-        idleWorker_ = worker;
+        {
+            std::lock_guard<std::mutex> _(idleWorkerMutex_);
+            hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+            idleWorker_ = worker;
+        }
+        //the thread may already be sleeping without an idle period
+        this->wakeIdle();
+    }
+    bool hasIdleWork() {
+        return hasIdleWorker_.load(std::memory_order_acquire);
     }
     void idleWork() {
+        if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+            return;
+        }
         std::lock_guard<std::mutex> _(idleWorkerMutex_);
         if (idleWorker_) {
             idleWorker_(t_.getIdleHandlerParam());
@@ -547,6 +586,8 @@ private:
     bool done_;
     std::function<void(void *)> idleWorker_;
     std::mutex idleWorkerMutex_;
+    //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+    std::atomic<bool> hasIdleWorker_ {false};
     T t_;
     std::function<void()> startWaiter_;
     std::mutex startWaiterMutex_;
@@ -613,10 +654,21 @@ public:
         return FireOnceOnly;
     }
     virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-        std::lock_guard<std::mutex> _(idleWorkerMutex_);
-        idleWorker_ = worker;
+        {
+            std::lock_guard<std::mutex> _(idleWorkerMutex_);
+            hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+            idleWorker_ = worker;
+        }
+        //the thread may already be sleeping without an idle period
+        this->wakeIdle();
+    }
+    bool hasIdleWork() {
+        return hasIdleWorker_.load(std::memory_order_acquire);
     }
     void idleWork() {
+        if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+            return;
+        }
         std::lock_guard<std::mutex> _(idleWorkerMutex_);
         if (idleWorker_) {
             idleWorker_(t_.getIdleHandlerParam());
@@ -740,6 +792,8 @@ private:
     bool done_;
     std::function<void(void *)> idleWorker_;
     std::mutex idleWorkerMutex_;
+    //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+    std::atomic<bool> hasIdleWorker_ {false};
     T t_;
     std::function<void()> startWaiter_;
     std::mutex startWaiterMutex_;
@@ -806,10 +860,21 @@ public:
         return FireOnceOnly;
     }
     virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-        std::lock_guard<std::mutex> _(idleWorkerMutex_);
-        idleWorker_ = worker;
+        {
+            std::lock_guard<std::mutex> _(idleWorkerMutex_);
+            hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+            idleWorker_ = worker;
+        }
+        //the thread may already be sleeping without an idle period
+        this->wakeIdle();
+    }
+    bool hasIdleWork() {
+        return hasIdleWorker_.load(std::memory_order_acquire);
     }
     void idleWork() {
+        if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+            return;
+        }
         std::lock_guard<std::mutex> _(idleWorkerMutex_);
         if (idleWorker_) {
             idleWorker_(t_.getIdleHandlerParam());
@@ -939,6 +1004,8 @@ private:
     bool done_;
     std::function<void(void *)> idleWorker_;
     std::mutex idleWorkerMutex_;
+    //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+    std::atomic<bool> hasIdleWorker_ {false};
     T t_;
     std::function<void()> startWaiter_;
     std::mutex startWaiterMutex_;
@@ -1005,10 +1072,21 @@ public:
         return FireOnceOnly;
     }
     virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-        std::lock_guard<std::mutex> _(idleWorkerMutex_);
-        idleWorker_ = worker;
+        {
+            std::lock_guard<std::mutex> _(idleWorkerMutex_);
+            hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+            idleWorker_ = worker;
+        }
+        //the thread may already be sleeping without an idle period
+        this->wakeIdle();
+    }
+    bool hasIdleWork() {
+        return hasIdleWorker_.load(std::memory_order_acquire);
     }
     void idleWork() {
+        if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+            return;
+        }
         std::lock_guard<std::mutex> _(idleWorkerMutex_);
         if (idleWorker_) {
             idleWorker_(t_.getIdleHandlerParam());
@@ -1144,6 +1222,8 @@ private:
     bool done_;
     std::function<void(void *)> idleWorker_;
     std::mutex idleWorkerMutex_;
+    //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+    std::atomic<bool> hasIdleWorker_ {false};
     T t_;
     std::function<void()> startWaiter_;
     std::mutex startWaiterMutex_;
@@ -1210,10 +1290,21 @@ public:
         return FireOnceOnly;
     }
     virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-        std::lock_guard<std::mutex> _(idleWorkerMutex_);
-        idleWorker_ = worker;
+        {
+            std::lock_guard<std::mutex> _(idleWorkerMutex_);
+            hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+            idleWorker_ = worker;
+        }
+        //the thread may already be sleeping without an idle period
+        this->wakeIdle();
+    }
+    bool hasIdleWork() {
+        return hasIdleWorker_.load(std::memory_order_acquire);
     }
     void idleWork() {
+        if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+            return;
+        }
         std::lock_guard<std::mutex> _(idleWorkerMutex_);
         if (idleWorker_) {
             idleWorker_(t_.getIdleHandlerParam());
@@ -1355,6 +1446,8 @@ private:
     bool done_;
     std::function<void(void *)> idleWorker_;
     std::mutex idleWorkerMutex_;
+    //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+    std::atomic<bool> hasIdleWorker_ {false};
     T t_;
     std::function<void()> startWaiter_;
     std::mutex startWaiterMutex_;
@@ -1421,10 +1514,21 @@ public:
         return FireOnceOnly;
     }
     virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-        std::lock_guard<std::mutex> _(idleWorkerMutex_);
-        idleWorker_ = worker;
+        {
+            std::lock_guard<std::mutex> _(idleWorkerMutex_);
+            hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+            idleWorker_ = worker;
+        }
+        //the thread may already be sleeping without an idle period
+        this->wakeIdle();
+    }
+    bool hasIdleWork() {
+        return hasIdleWorker_.load(std::memory_order_acquire);
     }
     void idleWork() {
+        if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+            return;
+        }
         std::lock_guard<std::mutex> _(idleWorkerMutex_);
         if (idleWorker_) {
             idleWorker_(t_.getIdleHandlerParam());
@@ -1572,6 +1676,8 @@ private:
     bool done_;
     std::function<void(void *)> idleWorker_;
     std::mutex idleWorkerMutex_;
+    //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+    std::atomic<bool> hasIdleWorker_ {false};
     T t_;
     std::function<void()> startWaiter_;
     std::mutex startWaiterMutex_;
@@ -1638,10 +1744,21 @@ public:
         return FireOnceOnly;
     }
     virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-        std::lock_guard<std::mutex> _(idleWorkerMutex_);
-        idleWorker_ = worker;
+        {
+            std::lock_guard<std::mutex> _(idleWorkerMutex_);
+            hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+            idleWorker_ = worker;
+        }
+        //the thread may already be sleeping without an idle period
+        this->wakeIdle();
+    }
+    bool hasIdleWork() {
+        return hasIdleWorker_.load(std::memory_order_acquire);
     }
     void idleWork() {
+        if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+            return;
+        }
         std::lock_guard<std::mutex> _(idleWorkerMutex_);
         if (idleWorker_) {
             idleWorker_(t_.getIdleHandlerParam());
@@ -1795,6 +1912,8 @@ private:
     bool done_;
     std::function<void(void *)> idleWorker_;
     std::mutex idleWorkerMutex_;
+    //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+    std::atomic<bool> hasIdleWorker_ {false};
     T t_;
     std::function<void()> startWaiter_;
     std::mutex startWaiterMutex_;
@@ -1861,10 +1980,21 @@ public:
         return FireOnceOnly;
     }
     virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-        std::lock_guard<std::mutex> _(idleWorkerMutex_);
-        idleWorker_ = worker;
+        {
+            std::lock_guard<std::mutex> _(idleWorkerMutex_);
+            hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+            idleWorker_ = worker;
+        }
+        //the thread may already be sleeping without an idle period
+        this->wakeIdle();
+    }
+    bool hasIdleWork() {
+        return hasIdleWorker_.load(std::memory_order_acquire);
     }
     void idleWork() {
+        if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+            return;
+        }
         std::lock_guard<std::mutex> _(idleWorkerMutex_);
         if (idleWorker_) {
             idleWorker_(t_.getIdleHandlerParam());
@@ -2024,6 +2154,8 @@ private:
     bool done_;
     std::function<void(void *)> idleWorker_;
     std::mutex idleWorkerMutex_;
+    //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+    std::atomic<bool> hasIdleWorker_ {false};
     T t_;
     std::function<void()> startWaiter_;
     std::mutex startWaiterMutex_;
@@ -2090,10 +2222,21 @@ public:
         return FireOnceOnly;
     }
     virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-        std::lock_guard<std::mutex> _(idleWorkerMutex_);
-        idleWorker_ = worker;
+        {
+            std::lock_guard<std::mutex> _(idleWorkerMutex_);
+            hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+            idleWorker_ = worker;
+        }
+        //the thread may already be sleeping without an idle period
+        this->wakeIdle();
+    }
+    bool hasIdleWork() {
+        return hasIdleWorker_.load(std::memory_order_acquire);
     }
     void idleWork() {
+        if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+            return;
+        }
         std::lock_guard<std::mutex> _(idleWorkerMutex_);
         if (idleWorker_) {
             idleWorker_(t_.getIdleHandlerParam());
@@ -2259,6 +2402,8 @@ private:
     bool done_;
     std::function<void(void *)> idleWorker_;
     std::mutex idleWorkerMutex_;
+    //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+    std::atomic<bool> hasIdleWorker_ {false};
     T t_;
     std::function<void()> startWaiter_;
     std::mutex startWaiterMutex_;
@@ -2325,10 +2470,21 @@ public:
         return FireOnceOnly;
     }
     virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-        std::lock_guard<std::mutex> _(idleWorkerMutex_);
-        idleWorker_ = worker;
+        {
+            std::lock_guard<std::mutex> _(idleWorkerMutex_);
+            hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+            idleWorker_ = worker;
+        }
+        //the thread may already be sleeping without an idle period
+        this->wakeIdle();
+    }
+    bool hasIdleWork() {
+        return hasIdleWorker_.load(std::memory_order_acquire);
     }
     void idleWork() {
+        if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+            return;
+        }
         std::lock_guard<std::mutex> _(idleWorkerMutex_);
         if (idleWorker_) {
             idleWorker_(t_.getIdleHandlerParam());
@@ -2500,6 +2656,8 @@ private:
     bool done_;
     std::function<void(void *)> idleWorker_;
     std::mutex idleWorkerMutex_;
+    //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+    std::atomic<bool> hasIdleWorker_ {false};
     T t_;
     std::function<void()> startWaiter_;
     std::mutex startWaiterMutex_;
@@ -2566,10 +2724,21 @@ public:
         return FireOnceOnly;
     }
     virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-        std::lock_guard<std::mutex> _(idleWorkerMutex_);
-        idleWorker_ = worker;
+        {
+            std::lock_guard<std::mutex> _(idleWorkerMutex_);
+            hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+            idleWorker_ = worker;
+        }
+        //the thread may already be sleeping without an idle period
+        this->wakeIdle();
+    }
+    bool hasIdleWork() {
+        return hasIdleWorker_.load(std::memory_order_acquire);
     }
     void idleWork() {
+        if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+            return;
+        }
         std::lock_guard<std::mutex> _(idleWorkerMutex_);
         if (idleWorker_) {
             idleWorker_(t_.getIdleHandlerParam());
@@ -2747,6 +2916,8 @@ private:
     bool done_;
     std::function<void(void *)> idleWorker_;
     std::mutex idleWorkerMutex_;
+    //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+    std::atomic<bool> hasIdleWorker_ {false};
     T t_;
     std::function<void()> startWaiter_;
     std::mutex startWaiterMutex_;
@@ -2813,10 +2984,21 @@ public:
         return FireOnceOnly;
     }
     virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-        std::lock_guard<std::mutex> _(idleWorkerMutex_);
-        idleWorker_ = worker;
+        {
+            std::lock_guard<std::mutex> _(idleWorkerMutex_);
+            hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+            idleWorker_ = worker;
+        }
+        //the thread may already be sleeping without an idle period
+        this->wakeIdle();
+    }
+    bool hasIdleWork() {
+        return hasIdleWorker_.load(std::memory_order_acquire);
     }
     void idleWork() {
+        if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+            return;
+        }
         std::lock_guard<std::mutex> _(idleWorkerMutex_);
         if (idleWorker_) {
             idleWorker_(t_.getIdleHandlerParam());
@@ -3000,6 +3182,8 @@ private:
     bool done_;
     std::function<void(void *)> idleWorker_;
     std::mutex idleWorkerMutex_;
+    //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+    std::atomic<bool> hasIdleWorker_ {false};
     T t_;
     std::function<void()> startWaiter_;
     std::mutex startWaiterMutex_;
@@ -3066,10 +3250,21 @@ public:
         return FireOnceOnly;
     }
     virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-        std::lock_guard<std::mutex> _(idleWorkerMutex_);
-        idleWorker_ = worker;
+        {
+            std::lock_guard<std::mutex> _(idleWorkerMutex_);
+            hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+            idleWorker_ = worker;
+        }
+        //the thread may already be sleeping without an idle period
+        this->wakeIdle();
+    }
+    bool hasIdleWork() {
+        return hasIdleWorker_.load(std::memory_order_acquire);
     }
     void idleWork() {
+        if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+            return;
+        }
         std::lock_guard<std::mutex> _(idleWorkerMutex_);
         if (idleWorker_) {
             idleWorker_(t_.getIdleHandlerParam());
@@ -3259,6 +3454,8 @@ private:
     bool done_;
     std::function<void(void *)> idleWorker_;
     std::mutex idleWorkerMutex_;
+    //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+    std::atomic<bool> hasIdleWorker_ {false};
     T t_;
     std::function<void()> startWaiter_;
     std::mutex startWaiterMutex_;
@@ -3325,10 +3522,21 @@ public:
         return FireOnceOnly;
     }
     virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-        std::lock_guard<std::mutex> _(idleWorkerMutex_);
-        idleWorker_ = worker;
+        {
+            std::lock_guard<std::mutex> _(idleWorkerMutex_);
+            hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+            idleWorker_ = worker;
+        }
+        //the thread may already be sleeping without an idle period
+        this->wakeIdle();
+    }
+    bool hasIdleWork() {
+        return hasIdleWorker_.load(std::memory_order_acquire);
     }
     void idleWork() {
+        if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+            return;
+        }
         std::lock_guard<std::mutex> _(idleWorkerMutex_);
         if (idleWorker_) {
             idleWorker_(t_.getIdleHandlerParam());
@@ -3524,6 +3732,8 @@ private:
     bool done_;
     std::function<void(void *)> idleWorker_;
     std::mutex idleWorkerMutex_;
+    //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+    std::atomic<bool> hasIdleWorker_ {false};
     T t_;
     std::function<void()> startWaiter_;
     std::mutex startWaiterMutex_;
@@ -3590,10 +3800,21 @@ public:
         return FireOnceOnly;
     }
     virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-        std::lock_guard<std::mutex> _(idleWorkerMutex_);
-        idleWorker_ = worker;
+        {
+            std::lock_guard<std::mutex> _(idleWorkerMutex_);
+            hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+            idleWorker_ = worker;
+        }
+        //the thread may already be sleeping without an idle period
+        this->wakeIdle();
+    }
+    bool hasIdleWork() {
+        return hasIdleWorker_.load(std::memory_order_acquire);
     }
     void idleWork() {
+        if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+            return;
+        }
         std::lock_guard<std::mutex> _(idleWorkerMutex_);
         if (idleWorker_) {
             idleWorker_(t_.getIdleHandlerParam());
@@ -3795,6 +4016,8 @@ private:
     bool done_;
     std::function<void(void *)> idleWorker_;
     std::mutex idleWorkerMutex_;
+    //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+    std::atomic<bool> hasIdleWorker_ {false};
     T t_;
     std::function<void()> startWaiter_;
     std::mutex startWaiterMutex_;
@@ -3861,10 +4084,21 @@ public:
         return FireOnceOnly;
     }
     virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-        std::lock_guard<std::mutex> _(idleWorkerMutex_);
-        idleWorker_ = worker;
+        {
+            std::lock_guard<std::mutex> _(idleWorkerMutex_);
+            hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+            idleWorker_ = worker;
+        }
+        //the thread may already be sleeping without an idle period
+        this->wakeIdle();
+    }
+    bool hasIdleWork() {
+        return hasIdleWorker_.load(std::memory_order_acquire);
     }
     void idleWork() {
+        if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+            return;
+        }
         std::lock_guard<std::mutex> _(idleWorkerMutex_);
         if (idleWorker_) {
             idleWorker_(t_.getIdleHandlerParam());
@@ -4072,6 +4306,8 @@ private:
     bool done_;
     std::function<void(void *)> idleWorker_;
     std::mutex idleWorkerMutex_;
+    //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+    std::atomic<bool> hasIdleWorker_ {false};
     T t_;
     std::function<void()> startWaiter_;
     std::mutex startWaiterMutex_;
@@ -4138,10 +4374,21 @@ public:
         return FireOnceOnly;
     }
     virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-        std::lock_guard<std::mutex> _(idleWorkerMutex_);
-        idleWorker_ = worker;
+        {
+            std::lock_guard<std::mutex> _(idleWorkerMutex_);
+            hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+            idleWorker_ = worker;
+        }
+        //the thread may already be sleeping without an idle period
+        this->wakeIdle();
+    }
+    bool hasIdleWork() {
+        return hasIdleWorker_.load(std::memory_order_acquire);
     }
     void idleWork() {
+        if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+            return;
+        }
         std::lock_guard<std::mutex> _(idleWorkerMutex_);
         if (idleWorker_) {
             idleWorker_(t_.getIdleHandlerParam());

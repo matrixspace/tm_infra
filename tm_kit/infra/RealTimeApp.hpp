@@ -7,6 +7,7 @@
 #include <tm_kit/infra/ObservableNode.hpp>
 #include <tm_kit/infra/StoppableProducer.hpp>
 #include <tm_kit/infra/GraphStructureBasedResourceHolderComponent.hpp>
+#include <tm_kit/infra/RealTimeThreadedExecutor.hpp>
 
 #include <vector>
 #include <list>
@@ -221,91 +222,107 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
         #include <tm_kit/infra/RealTimeApp_TimeChecker_Piece.hpp>
 
     private:
-        template <class T, class W>
-        class ThreadedHandlerBase : public IRealTimeAppPossiblyThreadedNode {
+        //Common part of ThreadedHandlerBase and BusyLoopThreadedHandlerBase:
+        //the time checker plus the executor that runs W's callbacks
+        //(W::waitForStart / actuallyHandle / idleWork, optionally
+        //W::hasIdleWork). The executor is chosen by StateT, see
+        //RealTimeThreadedExecutor.hpp; the default is one dedicated thread.
+        template <class T, class W, ThreadedExecMode Mode>
+        class ThreadedHandlerCore : public IRealTimeAppPossiblyThreadedNode {
         private:
-            TimeChecker<false, T> timeChecker_;
-            std::mutex mutex_;
-            std::condition_variable cond_;
-            std::thread th_;
-            std::atomic<bool> running_;
-            std::list<TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType>> incoming_, processing_;  
+            using InputData = TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType>;
+            using Exec = RealTimeThreadedExecutorFor<StateT, InputData, Mode>;
 
-            void stopThread() {
-                running_ = false;
-                cond_.notify_one();
-            }
-            void runThread() {
-                static_cast<W *>(this)->waitForStart();
-                while (running_) {
-                    {
-                        std::unique_lock<std::mutex> lock(mutex_);
-                        cond_.wait_for(lock, std::chrono::milliseconds(1));
-                        if (!running_) {
-                            lock.unlock();
-                            return;
-                        }
-                        if (incoming_.empty()) {
-                            lock.unlock();
-                            static_cast<W *>(this)->idleWork();
-                            continue;
-                        }
-                        processing_.splice(processing_.end(), incoming_);
-                        lock.unlock();
-                        if constexpr (std::is_convertible_v<StateT *, OutputRealTimeThreadBufferSizeComponent *>) {
-                            std::ostringstream oss;
-                            oss << "Thread buffer for " << std::this_thread::get_id() << " size: " << processing_.size();
-                            processing_.front().environment->log(LogLevel::Debug, oss.str());
-                        }
+            template <class X, class=void>
+            struct HasIdleWorkQuery : std::false_type {};
+            template <class X>
+            struct HasIdleWorkQuery<X, std::void_t<decltype(std::declval<X &>().hasIdleWork())>> : std::true_type {};
+
+            //the callback adapter handed to the executor, keeps the
+            //executor* names out of the classes deriving from the bases
+            struct Host {
+                ThreadedHandlerCore *self;
+                W *w() const {
+                    return static_cast<W *>(self);
+                }
+                void executorWaitForStart() {
+                    w()->waitForStart();
+                }
+                void executorHandle(InputData &&data) {
+                    w()->actuallyHandle(std::move(data));
+                }
+                void executorIdleWork() {
+                    w()->idleWork();
+                }
+                bool executorHasIdleWork() {
+                    //handlers without hasIdleWork() keep the periodic idle
+                    //call they always had
+                    if constexpr (HasIdleWorkQuery<W>::value) {
+                        return w()->hasIdleWork();
+                    } else {
+                        return true;
                     }
-                    while (!processing_.empty()) {
-                        auto &data = processing_.front();
-                        static_cast<W *>(this)->actuallyHandle(std::move(data));
-                        processing_.pop_front();
+                }
+                void executorBeforeBatch(InputData const &first, std::size_t pending) {
+                    if constexpr (std::is_convertible_v<StateT *, OutputRealTimeThreadBufferSizeComponent *>) {
+                        std::ostringstream oss;
+                        oss << "Thread buffer for " << std::this_thread::get_id() << " size: " << pending;
+                        first.environment->log(LogLevel::Debug, oss.str());
                     }
-                }  
+                }
+            };
+
+            TimeChecker<false, T> timeChecker_;
+            Host host_;
+            Exec exec_;
+
+            static ThreadedExecOptions makeOptions(bool noYield) {
+                ThreadedExecOptions opts;
+                opts.noYield = noYield;
+                opts.trackPendingCount = std::is_convertible_v<StateT *, OutputRealTimeThreadBufferSizeComponent *>;
+                return opts;
             }
         protected:
-            bool timeCheckGood(TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType> const &data) {
+            bool timeCheckGood(InputData const &data) {
                 return timeChecker_(data);
             }
-            bool timeCheckGood(TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType> &&data) {
+            bool timeCheckGood(InputData &&data) {
                 return timeChecker_(std::move(data));
             }
         public:
-            ThreadedHandlerBase() : timeChecker_(), mutex_(), cond_(), th_(), running_(false), incoming_(), processing_() {
+            explicit ThreadedHandlerCore(bool noYield) : timeChecker_(), host_{this}, exec_(makeOptions(noYield)) {
             }
-            virtual ~ThreadedHandlerBase() {
-                stopThread();
-                try {
-                    if (th_.joinable()) {
-                        th_.join();
-                    }
-                } catch (...) {}
+            virtual ~ThreadedHandlerCore() {
+                exec_.stop();
             }
             void startThread() {
-                running_ = true;
-                th_ = std::thread(&ThreadedHandlerBase::runThread, this);
-                th_.detach();
+                exec_.start(&host_);
             }
             virtual std::optional<std::thread::native_handle_type> threadHandle() override final {
-                return th_.native_handle();
+                return exec_.threadHandle();
             }
         protected:
-            void putData(TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType> &&data) {
-                if (running_) {
-                    {
-                        std::lock_guard<std::mutex> _(mutex_);
-                        incoming_.push_back(std::move(data));
-                    }
-                    cond_.notify_one();
-                }                    
+            void putData(InputData &&data) {
+                exec_.push(std::move(data));
             }
             TimeChecker<false, T> const &timeChecker() const {
                 return timeChecker_;
             }
             void stop() {
-                stopThread();
+                exec_.stop();
+            }
+            //to be called by W after the result of W::hasIdleWork() changed
+            void wakeIdle() {
+                exec_.wakeIdle();
+            }
+        };
+
+        template <class T, class W>
+        class ThreadedHandlerBase : public ThreadedHandlerCore<T, W, ThreadedExecMode::Blocking> {
+        public:
+            ThreadedHandlerBase() : ThreadedHandlerCore<T, W, ThreadedExecMode::Blocking>(false) {
+            }
+            virtual ~ThreadedHandlerBase() {
             }
         };
 
@@ -327,83 +344,11 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
     private:
         //busy loop can only be used to handle one kind of input
         template <class T, class W>
-        class BusyLoopThreadedHandlerBase : public IRealTimeAppPossiblyThreadedNode {
-        private:
-            bool noYield_;
-            TimeChecker<false, T> timeChecker_;
-            std::mutex mutex_;
-            std::thread th_;
-            std::atomic<bool> running_;
-            std::list<TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType>> incoming_, processing_;  
-
-            void stopThread() {
-                running_ = false;
-            }
-            void runThread() {
-                static_cast<W *>(this)->waitForStart();
-                while (running_) {
-                    static_cast<W *>(this)->idleWork();
-                    {
-                        std::lock_guard<std::mutex> _(mutex_);
-                        if (!incoming_.empty()) {
-                            processing_.splice(processing_.end(), incoming_);
-                        }
-                    }
-                    if constexpr (std::is_convertible_v<StateT *, OutputRealTimeThreadBufferSizeComponent *>) {
-                        if (!processing_.empty()) {
-                            std::ostringstream oss;
-                            oss << "Thread buffer for " << std::this_thread::get_id() << " size: " << processing_.size();
-                            processing_.front().environment->log(LogLevel::Debug, oss.str());
-                        }
-                    }
-                    while (!processing_.empty()) {
-                        auto &data = processing_.front();
-                        static_cast<W *>(this)->actuallyHandle(std::move(data));
-                        processing_.pop_front();
-                    }
-                    if (!noYield_) {
-                        std::this_thread::yield();
-                    }
-                }  
-            }
-        protected:
-            bool timeCheckGood(TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType> const &data) {
-                return timeChecker_(data);
-            }
-            bool timeCheckGood(TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType> &&data) {
-                return timeChecker_(std::move(data));
-            }
+        class BusyLoopThreadedHandlerBase : public ThreadedHandlerCore<T, W, ThreadedExecMode::BusyLoop> {
         public:
-            BusyLoopThreadedHandlerBase(bool noYield=false) : noYield_(noYield), timeChecker_(), mutex_(), th_(), running_(false), incoming_(), processing_() {
+            BusyLoopThreadedHandlerBase(bool noYield=false) : ThreadedHandlerCore<T, W, ThreadedExecMode::BusyLoop>(noYield) {
             }
             virtual ~BusyLoopThreadedHandlerBase() {
-                stopThread();
-                try {
-                    if (th_.joinable()) {
-                        th_.join();
-                    }
-                } catch (...) {}
-            }
-            void startThread() {
-                running_ = true;
-                th_ = std::thread(&BusyLoopThreadedHandlerBase::runThread, this);
-                th_.detach();
-            }
-            virtual std::optional<std::thread::native_handle_type> threadHandle() override final {
-                return th_.native_handle();
-            }
-        protected:
-            void putData(TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType> &&data) {
-                if (running_) {
-                    std::lock_guard<std::mutex> _(mutex_);
-                    incoming_.push_back(std::move(data));
-                }                    
-            }
-            TimeChecker<false, T> const &timeChecker() const {
-                return timeChecker_;
-            }
-            void stop() {
-                stopThread();
             }
         };
 
@@ -1115,6 +1060,8 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             bool done_;
             std::function<void(void *)> idleWorker_;
             std::mutex idleWorkerMutex_;
+            //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+            std::atomic<bool> hasIdleWorker_ {false};
             T t_;
             std::function<void()> startWaiter_;
             std::mutex startWaiterMutex_;
@@ -1161,10 +1108,21 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 return FireOnceOnly;
             }
             virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-                std::lock_guard<std::mutex> _(idleWorkerMutex_);
-                idleWorker_ = worker;
+                {
+                    std::lock_guard<std::mutex> _(idleWorkerMutex_);
+                    hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+                    idleWorker_ = worker;
+                }
+                //the thread may already be sleeping without an idle period
+                this->wakeIdle();
+            }
+            bool hasIdleWork() {
+                return hasIdleWorker_.load(std::memory_order_acquire);
             }
             void idleWork() {
+                if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+                    return;
+                }
                 std::lock_guard<std::mutex> _(idleWorkerMutex_);
                 if (idleWorker_) {
                     idleWorker_(t_.getIdleHandlerParam());
@@ -1351,6 +1309,8 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             bool done_;
             std::function<void(void *)> idleWorker_;
             std::mutex idleWorkerMutex_;
+            //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+            std::atomic<bool> hasIdleWorker_ {false};
             T t_;
             std::function<void()> startWaiter_;
             std::mutex startWaiterMutex_;
@@ -1415,10 +1375,21 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 return FireOnceOnly;
             }
             virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-                std::lock_guard<std::mutex> _(idleWorkerMutex_);
-                idleWorker_ = worker;
+                {
+                    std::lock_guard<std::mutex> _(idleWorkerMutex_);
+                    hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+                    idleWorker_ = worker;
+                }
+                //the thread may already be sleeping without an idle period
+                this->wakeIdle();
+            }
+            bool hasIdleWork() {
+                return hasIdleWorker_.load(std::memory_order_acquire);
             }
             void idleWork() {
+                if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+                    return;
+                }
                 std::lock_guard<std::mutex> _(idleWorkerMutex_);
                 if (idleWorker_) {
                     idleWorker_(t_.getIdleHandlerParam());
