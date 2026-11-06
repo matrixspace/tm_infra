@@ -3,7 +3,7 @@
 **开始时间：** 2026-11-06  
 **结束时间：**  
 **状态：** 进行中  
-**分支：** `feature/realtime-threaded-executor`（tm_infra 代码 commit `96ba064`；tm_basic 代码 commit `5c06751`；tm_transport 无源码改动）
+**分支：** `feature/realtime-threaded-executor`（tm_infra 核心 commit `96ba064`、测试 commit `18a56a2`；tm_basic 代码 commit `5c06751`；tm_transport 无源码改动）
 **主记录：** [README.md](README.md)
 
 ## 背景
@@ -95,7 +95,13 @@
 5. 性能：`simple_graph_bench` release，`taskset -c 20-27`，5 次取中位数，与第一阶段的表对比。plain 变体（全部走 InlineExecutor）回退不得超出噪声（±20%）。
 
 ## 进展记录
-- 2026-11-06：方案确定，建档。
+- 2026-11-06：读完 `978b5df` 计划、`6836234` 实现及下游提交历史，确认 worktree 干净，沿用功能分支实施。
+- 执行器契约、统一核心与全部节点完成合并；从两路实现模板生成 2–20 路 piece，逐项核对分派、时间检查、finalFlag 与 idle / start 回调，再用 `--check` 校验可重现性。
+- ChainWriter 从 `6836234^` 提取本地循环；阻塞版改为 predicate 等待及锁内停止。用处理期间入队测试明确触发旧实现的漏通知窗口。
+- infra / basic debug、release 构建与测试通过，三组 TSan 无报告；同步图、Environment 选择 Inline、FireOnceOnly、idle 等行为通过。
+- 同机交替基准比较通过 plain 回退门限；临时基线 worktree 已清理。
+- 提交：infra 核心 `96ba064`、并发时间检查测试 `18a56a2`；basic `5c06751`。
+- transport 编译通过，但运行验证受沙箱禁止 socket 限制；examples 全量回归仍在编译。examples 起初 `-j2`，检查资源后依次调为 `-j4` / `-j8`（56 CPU、load≈11、可用内存≈42GiB），始终使用本 worktree 的缓存。观察到 8 并行的模板编译将可用内存降至约 11GiB 后，已退回 `-j4` 继续。
 
 ## 代码改动
 - `RealTimeThreadedExecutor.hpp`：`Exec<Item>` 契约、两个能力常量、`InlineExecutor`、默认配置类型；Environment 选择器去掉 Mode。
@@ -114,26 +120,38 @@
 - `ThreadedExecOptions` 只保留 `trackPendingCount`；`BusyLoopThreadedHandler` 已移除。ChainWriter 的 `ChainPollingPolicy` API 保持不变。
 - 生成：`python3 tools/piece_gen/gen_realtime_pieces.py`；校验：追加 `--check`。需要已有 `clang-format`，按仓库配置格式化输出。
 
-
 ## 测试与验证结果
-构建均先 `source build-common/build-env-setting.sh`，使用 GCC 15.2.1，worktree 私有构建目录及安装前缀 `worktrees/realtime-threaded-executor/install`，Ninja `-j2`。
-- infra debug：`ninja -j2 -C tm_infra/builddir_debug`；`threaded_handler_test`（同步、环境覆盖 Inline、dedicated、pool）ALL PASSED；`time_checker_test` ALL PASSED。
-- basic debug：`ninja -j2 -C tm_basic/builddir_debug`；`moodycamel_executor_test` ALL PASSED，moodycamel 单条延迟 p50 12.3µs。
-- `chain_writer_loop_test`：三种策略各写入 5000 条，全部 FIFO；100ms 空闲窗口保持约 1ms 节奏；200 次处理期间入队场景 p50 3.2µs（门限 300µs）。ALL PASSED。
-- infra TSan：`g++ -std=c++17 -O1 -g -fsanitize=thread -pthread -I tm_infra ThreadedHandlerTest.cpp <worktree debug infra archive> -o <test>`，运行 ALL PASSED，0 报告。
-- `python3 tools/piece_gen/gen_realtime_pieces.py --check`：通过。
+构建均先 `source build-common/build-env-setting.sh`，使用 GCC 15.2.1、C++17、worktree 私有构建目录和安装前缀。除 examples 外，Ninja 为 `-j2`。
 
+### 构建与功能
+- infra debug / release：`ninja -j2 -C tm_infra/builddir_<type> install`；debug `threaded_handler_test`、`time_checker_test` ALL PASSED，release `meson test -C tm_infra/builddir_release --no-rebuild threaded_handler_test time_checker_test` 为 2/2 OK。
+- basic debug / release：`ninja -j2 -C tm_basic/builddir_<type> install`；两种构建的 `moodycamel_executor_test` 与 `chain_writer_loop_test` 均 ALL PASSED。
+- 新增 Inline 集成测试：4 生产者经 `ExecHandler<..., InlinePolicy>` 并发提交 80000 条同时间戳数据，全部接受；随后并发提交 80000 条更早时间戳数据，全部拒绝。debug 全套再次 ALL PASSED；release 针对此测试执行 `ninja -j1` 构建后 `meson test --no-rebuild threaded_handler_test`，1/1 OK。
+- 同步图、dedicated / pool 图、Environment 选择 Inline、variant 两路 / 三路分派、FireOnceOnly、stop 后拒收、构造后设置 idle worker 均通过。单条 dedicated p50≈16.4µs、pool≈17.9µs、moodycamel≈12.3µs（受机器负载影响）。
+- ChainWriter：三种策略各写入 5000 条内存链数据，全部 FIFO；100ms 空闲窗口保持约 1ms 节奏；200 次处理期间入队场景 p50≈3.2µs（门限 300µs）。
+- transport debug：`ninja -j2 -C tm_transport/builddir_debug`，23/23 完成，0 错误。
+- transport 端到端：运行 `tm_transport/builddir_debug/test/threaded_handler_transport_test/threaded_handler_transport_test` 在启动 JSON REST 服务时失败。最小 `socket.socket()` 也返回 `PermissionError: [Errno 1] Operation not permitted`，已确认是当前沙箱权限限制；需在允许本地 socket 的环境重跑。
+- examples：`ninja -j4 -C tm_examples/builddir_debug`，进行中。
+- 生成器：`python3 tm_infra/tools/piece_gen/gen_realtime_pieces.py --check` 通过；Action / MultiAction / ExecHandler 三族各有 19 个特化。
 
-- 2026-11-06：开始实施；已核对 `978b5df` 计划、`6836234` 实现与三个仓库工作区。沿用功能分支，先重构执行器和统一核心，再生成 variant 特化、迁移下游及验证。
+以上相对命令在 `worktrees/realtime-threaded-executor/` 下执行。环境配置后，私有前缀应设置为：
 
-- 2026-11-06：执行器统一、节点合并、三类 piece 生成器及下游迁移已实施。infra debug 编译通过；同步图、dedicated/pool 图与并发测试 ALL PASSED，单条 dedicated p50 16.4µs、pool 17.9µs。
-- 新增 ChainWriter 内存链测试覆盖三种 polling 策略；本地阻塞循环用“上一条回调尚未结束时入队”明确触发旧实现漏通知的窗口。生成器使用仓库 `.clang-format` 格式化输出，并提供 `--check` 校验。
+```bash
+export INSTALL_PREFIX="$(pwd)/install"
+export PKG_CONFIG_PATH=${INSTALL_PREFIX}/lib64/pkgconfig:${VCPKG_ROOT}/installed/x64-linux/lib/pkgconfig:/usr/lib64/pkgconfig/
+```
 
-- 测试发现既有 `ChainWriter` 的 `SingleWritingMode=true` 分支以 `Key<Response>` 构造 `(status,response)`，无法实例化；该问题在基线已经存在，与本次循环迁移无关。内存链回归使用常规重试模式，未扩展修改此分支。
+### TSan
+infra、ChainWriter、moodycamel 三组均 ALL PASSED、0 数据竞争报告。补强 Inline 集成测试后 infra TSan 再次通过。
 
-- 2026-11-06：infra / basic debug 与 release 均构建成功；infra release 两项测试通过。三组 TSan（infra、ChainWriter、moodycamel）均 ALL PASSED、0 报告。moodycamel 第三方头文件仍有 `-Wtsan` fence 警告（第一阶段已有），TSan 无法完整建模其内部 fence。
-- transport debug 构建 23/23 通过；JSON REST 端到端测试启动失败，原因为当前沙箱禁止 socket：最小 `socket.socket()` 返回 `PermissionError: [Errno 1] Operation not permitted`，不是编译错误或端口占用。该项需在允许本地 socket 的环境重跑。
-- examples 全量目标回归较慢，确认机器剩余可用内存约 40GiB、56 CPU 后，以 `-j4` 继续增量编译（仍仅使用自己的 builddir）。
+```bash
+g++ -std=c++17 -O1 -g -fsanitize=thread -pthread \
+  -Itm_infra -Itm_basic -I${VCPKG_ROOT}/installed/x64-linux/include \
+  <test-source.cpp> tm_infra/builddir_debug/src/libtm_kit_infra_debug.a -o /tmp/<test-name>
+/tmp/<test-name>
+```
+
+三份源码分别为 `tm_infra/test/threaded_handler_test/ThreadedHandlerTest.cpp`、`tm_basic/test/chain_writer_loop_test/ChainWriterLoopTest.cpp`、`tm_basic/test/moodycamel_executor_test/MoodycamelExecutorTest.cpp`。moodycamel 第三方头文件仍有第一阶段已有的 `-Wtsan` fence 警告，TSan 无法完整建模其内部 fence；未修改第三方代码。
 
 ### release 性能复测
 为避免把不同机器负载混为实现变化，在临时 detached worktree 从第一阶段 `6836234` 重编译同一个基准，再交替运行第一阶段与当前版本各 5 次；`taskset -c 20-27`，每变体 200000 push，取中位数。比较结束已删除临时 worktree。
@@ -147,5 +165,13 @@
 
 plain wall +6.2%、CPU +7.1%，符合 ±20% 门限。其他变体受线程调度及共享机器负载影响大，不据此声称稳定加速。第一阶段主记录的历史测量仍保留；本轮同机基线与历史绝对值不同，不能直接用历史数字判断回退。全部运行 `bad=0`，输出计数一致。
 
-- 补强 Inline TimeChecker 集成覆盖：4 生产者通过 `ExecHandler<..., InlinePolicy>` 并发提交 80000 条同时间戳数据，全部接受；随后并发提交 80000 条更早时间戳数据，全部拒绝。debug 全套测试再次 ALL PASSED。
-- examples 后续编译调整为 `-j8`；当时 56 CPU、load≈11、可用内存≈42GiB，仍使用固定并行上限。已完成的目标继续复用自己的缓存。
+## 兼容性与未决事项
+- 用户已确认的两项不兼容删除：`ThreadedExecMode`、infra 的 `BusyLoopThreadedHandler`。普通继承 `ThreadedHandler` 的下游源代码保持兼容；ChainWriter 的 polling API 不变。
+- 生命周期按原计划保留 detached 行为；没有在本阶段修复 handler 析构与回调退出的既有风险。
+- 新内存链测试发现基线既有问题：`SingleWritingMode=true` 分支以 `Key<Response>` 构造 `(status,response)`，不能实例化。回归使用常规写入模式，该分支另列后续项。
+- transport socket 端到端验证待权限允许时补跑；完成验证后再合并 develop / 推送。按仓库规则，tm_kit_reference 在源码推送后同步，当前未修改。
+
+## 相关文档
+- 主记录：[README.md](README.md)
+- 下游索引：[tm_basic/doc/INDEX.md](../../../tm_basic/doc/INDEX.md)、[tm_transport/doc/INDEX.md](../../../tm_transport/doc/INDEX.md)
+- 参考文档：[App 类型](../../../../../tm_kit_reference/tm_infra/01-app-types.md)、[生成代码](../../../../../tm_kit_reference/tm_infra/09-generated-pieces.md)、[共享链](../../../../../tm_kit_reference/tm_basic/08-shared-chain.md)、[PATTERNS](../../../../../tm_kit_reference/PATTERNS.md) 4.1。
