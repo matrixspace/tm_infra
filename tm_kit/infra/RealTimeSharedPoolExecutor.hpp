@@ -67,6 +67,8 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
         std::chrono::nanoseconds idleTick = std::chrono::milliseconds(1);
         //max items one strand handles before giving the pool thread back
         unsigned maxBatch = 64;
+        // Active wait after a slice; empty idle ticks must not renew it.
+        std::chrono::nanoseconds spinWait = std::chrono::microseconds(200);
     };
 
     namespace realtime_shared_pool_detail {
@@ -80,6 +82,11 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             {
                 return true;
             }
+            virtual bool runSliceAndReportData()
+            {
+                runSlice();
+                return false;
+            }
         };
         //the strand whose callbacks the current pool thread is running
         inline thread_local IStrand const *tlCurrentStrand = nullptr;
@@ -92,6 +99,9 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
         std::mutex mutex_;
         std::condition_variable cond_;
         std::deque<std::shared_ptr<IStrand>> ready_;
+        std::atomic<bool> hasReady_{false};
+        // Protected by mutex_. One spinner avoids idle mutex/cache contention.
+        bool spinning_ = false;
         std::mutex registryMutex_;
         std::condition_variable registryCond_;
         struct IdleEntry {
@@ -139,18 +149,53 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             std::thread(&SharedThreadPool::tickLoop, this).detach();
         }
         void workerLoop() {
+            bool recentlyActive = false;
             while (true) {
                 std::shared_ptr<IStrand> s;
                 {
                     std::unique_lock<std::mutex> lock(mutex_);
-                    cond_.wait(lock, [this]() {return !ready_.empty();});
-                    s = std::move(ready_.front());
-                    ready_.pop_front();
+                    if (ready_.empty() && recentlyActive && !spinning_ && cfg_.spinWait > std::chrono::nanoseconds::zero()) {
+                        spinning_ = true;
+                        lock.unlock();
+                        realtime_threaded_executor_detail::spinUntil(cfg_.spinWait, [&] {
+                            // Poll a hint, not the global mutex, while empty.
+                            if (!hasReady_.load(std::memory_order_acquire)) {
+                                return false;
+                            }
+                            std::unique_lock<std::mutex> attempt(mutex_, std::try_to_lock);
+                            if (!attempt || ready_.empty()) {
+                                return false;
+                            }
+                            s = std::move(ready_.front());
+                            ready_.pop_front();
+                            hasReady_.store(!ready_.empty(), std::memory_order_release);
+                            spinning_ = false;
+                            // Backlog must wake another worker even if this
+                            // slice is about to block inside a callback.
+                            if (!ready_.empty()) {
+                                cond_.notify_one();
+                            }
+                            return true;
+                        });
+                        if (!s) {
+                            lock.lock();
+                            spinning_ = false;
+                        }
+                    }
+                    if (!s) {
+                        cond_.wait(lock, [this]() { return !ready_.empty(); });
+                        s = std::move(ready_.front());
+                        ready_.pop_front();
+                        hasReady_.store(!ready_.empty(), std::memory_order_release);
+                        if (!ready_.empty() && !spinning_) {
+                            cond_.notify_one();
+                        }
+                    }
                 }
                 //s keeps the strand alive for the whole slice, even if its
                 //executor is destroyed meanwhile
                 realtime_shared_pool_detail::tlCurrentStrand = s.get();
-                s->runSlice();
+                recentlyActive = s->runSliceAndReportData();
                 realtime_shared_pool_detail::tlCurrentStrand = nullptr;
             }
         }
@@ -217,11 +262,18 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             return cfg_;
         }
         void schedule(std::shared_ptr<IStrand> s) {
+            bool notify;
             {
                 std::lock_guard<std::mutex> _(mutex_);
                 ready_.push_back(std::move(s));
+                hasReady_.store(true, std::memory_order_release);
+                notify = !spinning_;
             }
-            cond_.notify_one();
+            // A registered spinner will take the work or recheck under the
+            // mutex before sleeping, so suppressing this wake cannot lose work.
+            if (notify) {
+                cond_.notify_one();
+            }
         }
         void registerStrand(std::shared_ptr<IStrand> const &s) {
             std::lock_guard<std::mutex> lock(registryMutex_);
@@ -279,7 +331,7 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             std::mutex hostMutex_;
             void *host_ = nullptr;
             // Type erasure once per slice, not once per handled item.
-            void (*run_)(Strand *) = nullptr;
+            bool (*run_)(Strand *) = nullptr;
 
             void setWantsIdle(bool wants)
             {
@@ -308,7 +360,7 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 {
                     std::lock_guard<std::mutex> _(hostMutex_);
                     host_ = h;
-                    run_ = [](Strand *self) { self->template runSliceTyped<Host>(); };
+                    run_ = [](Strand *self) { return self->template runSliceTyped<Host>(); };
                 }
                 running_.store(true, std::memory_order_release);
                 //start token: the first slice runs executorWaitForStart
@@ -349,6 +401,10 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             {
                 return running_.load(std::memory_order_acquire) && wantsIdle_.load(std::memory_order_acquire);
             }
+            bool runSliceAndReportData() override
+            {
+                return run_(this);
+            }
             void requestIdle() override {
                 if (running_.load(std::memory_order_acquire) && wantsIdle_.load(std::memory_order_acquire)) {
                     addIdleToken();
@@ -361,8 +417,9 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
 
         private:
             template <class Host>
-            void runSliceTyped()
+            bool runSliceTyped()
             {
+                bool handledData = false;
                 std::int64_t consumed = 0;
                 {
                     std::lock_guard<std::mutex> lock(hostMutex_);
@@ -391,6 +448,7 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                                 h->executorBeforeBatch(item, static_cast<std::size_t>(std::max<std::int64_t>(pending_.load(std::memory_order_relaxed), 0)));
                             }
                             h->executorHandle(std::move(item));
+                            handledData = true;
                         }
                         // After stop(), remaining items are destroyed in place.
                     })) {
@@ -415,6 +473,7 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 if (pending_.fetch_sub(consumed, std::memory_order_acq_rel) - consumed > 0) {
                     pool_->schedule(this->shared_from_this());
                 }
+                return handledData;
             }
         };
 

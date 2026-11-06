@@ -19,6 +19,30 @@ namespace
         std::cout << (value ? "ok: " : "FAIL: ") << name << '\n';
         failures += !value;
     }
+    void boundedSpinTest()
+    {
+        using namespace infra::realtime_threaded_executor_detail;
+        unsigned calls = 0;
+        check(
+            !spinUntil(
+                std::chrono::nanoseconds(0),
+                [&] {
+                    ++calls;
+                    return true;
+                }) &&
+                calls == 0,
+            "zero spin budget preserves blocking policy without polling");
+        check(spinUntil(std::chrono::seconds(1), [] { return true; }), "spin returns immediately for ready work");
+        auto begin = std::chrono::steady_clock::now();
+        check(!spinUntil(std::chrono::microseconds(100), [] { return false; }) && std::chrono::steady_clock::now() - begin >= std::chrono::microseconds(100), "empty spin budget expires");
+        std::atomic<bool> stop{false};
+        std::thread producer([&] {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            stop.store(true, std::memory_order_release);
+        });
+        check(spinUntil(std::chrono::seconds(2), [&] { return stop.load(std::memory_order_acquire); }), "spin observes concurrent stop/work publication");
+        producer.join();
+    }
     struct Item {
         static int moves, live;
         static bool throwMove;
@@ -392,6 +416,7 @@ int main()
     infra::SharedThreadPoolConfig config;
     config.threadCount = 2;
     infra::SharedThreadPool::configure(config);
+    boundedSpinTest();
     queueTest();
     inlineTest();
     poolDestructionTest();

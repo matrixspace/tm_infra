@@ -189,3 +189,5 @@ plain wall +6.2%、CPU +7.1%，符合 ±20% 门限。其他变体受线程调度
 ### 2026-11-06 执行器开销优化后续
 
 已实现 Inline 静态提交、MPSC 原位消费和 SharedPool 批次调用 / idle 活跃集合；上述局部 optional 暂存已消除，节点内 optional 仍保留。最终取舍、独立 profiling 和验证见 [executor-overhead-optimization.md](executor-overhead-optimization.md)。examples 全量编译仍暂停，第二阶段整体验收状态不变。
+
+2026-11-06 后续端到端延迟优化已完成：有限自旋、池级单 spinner 与 ready 提示、周期协作 yield、多跳和开放输入 profiling。取舍、数据及配置见 [executor-latency-optimization.md](executor-latency-optimization.md)，第二阶段整体仍未完成验收。

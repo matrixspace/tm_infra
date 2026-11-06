@@ -2,6 +2,7 @@
 #define TM_KIT_INFRA_REALTIME_THREADED_EXECUTOR_HPP_
 
 #include <atomic>
+#include <algorithm>
 #include <chrono>
 #include <condition_variable>
 #include <cstddef>
@@ -42,10 +43,47 @@ namespace dev
                     //maintain the pending count passed to executorBeforeBatch (one
                     //extra relaxed RMW per push); set for OutputRealTimeThreadBufferSizeComponent
                     bool trackPendingCount = false;
+                    // Dedicated / Moodycamel active wait; SharedPool uses its pool config.
+                    // Bounded active wait after data, then the normal blocking path.
+                    // Zero disables it. Idle timeouts do not renew this budget.
+                    std::chrono::nanoseconds spinWait = std::chrono::microseconds(200);
                 };
 
                 namespace realtime_threaded_executor_detail
                 {
+                    inline void cpuRelax()
+                    {
+#if defined(__i386__) || defined(__x86_64__)
+                        __asm__ __volatile__("pause");
+#elif defined(__aarch64__)
+                        __asm__ __volatile__("yield");
+#else
+                        std::atomic_signal_fence(std::memory_order_seq_cst);
+#endif
+                    }
+
+                    template <class Ready>
+                    bool spinUntil(std::chrono::nanoseconds budget, Ready &&ready)
+                    {
+                        if (budget <= std::chrono::nanoseconds::zero()) {
+                            return false;
+                        }
+                        auto const end = std::chrono::steady_clock::now() + budget;
+                        unsigned checks = 0;
+                        do {
+                            if (ready()) {
+                                return true;
+                            }
+                            cpuRelax();
+                            // Let another runnable consumer progress on a shared CPU.
+                            if ((checks & 255) == 255) {
+                                std::this_thread::yield();
+                            }
+                            // Amortize the clock read, but bound the active wait.
+                        } while ((++checks & 31) != 0 || std::chrono::steady_clock::now() < end);
+                        return false;
+                    }
+
                     //Vyukov intrusive unbounded MPSC queue with a stub node.
                     //link publication uses one exchange + one store; allocation may block.
                     //The global order is
@@ -208,20 +246,29 @@ namespace dev
                     //Blocking mode: returns once there may be work, the idle period has
                     //elapsed, or the executor is stopping
                     template <class Host>
-                    static void waitForWork(State *s, Host *h)
+                    static void waitForWork(State *s, Host *h, bool recentlyActive)
                     {
+                        auto ready = [s]() { return s->queue.maybeNonEmpty() || !s->running.load(std::memory_order_acquire) || s->wakeRequested.load(std::memory_order_acquire); };
+                        bool const hasIdle = h->executorHasIdleWork();
+                        auto const idleDeadline = hasIdle ? std::chrono::steady_clock::now() + Config::idlePeriod : std::chrono::steady_clock::time_point::max();
+                        auto budget = s->opts.spinWait;
+                        if (hasIdle) {
+                            budget = std::min(budget, std::chrono::duration_cast<std::chrono::nanoseconds>(Config::idlePeriod));
+                        }
+                        if (recentlyActive && realtime_threaded_executor_detail::spinUntil(budget, ready)) {
+                            s->wakeRequested.exchange(false, std::memory_order_acq_rel);
+                            return;
+                        }
                         for (unsigned i = 0; i < Config::spinBeforeSleep; ++i) {
                             if (s->queue.maybeNonEmpty() || !s->running.load(std::memory_order_acquire)) {
                                 return;
                             }
                         }
-                        bool const hasIdle = h->executorHasIdleWork();
                         s->sleeping.store(true, std::memory_order_seq_cst);
-                        auto ready = [s]() { return s->queue.maybeNonEmpty() || !s->running.load(std::memory_order_acquire) || s->wakeRequested.load(std::memory_order_acquire); };
                         if (!ready()) {
                             std::unique_lock<std::mutex> lock(s->mutex);
                             if (hasIdle) {
-                                s->cond.wait_for(lock, Config::idlePeriod, ready);
+                                s->cond.wait_until(lock, idleDeadline, ready);
                             } else {
                                 s->cond.wait(lock, ready);
                             }
@@ -236,13 +283,16 @@ namespace dev
                     static void run(std::shared_ptr<State> s, Host *h)
                     {
                         h->executorWaitForStart();
+                        bool recentlyActive = false;
                         while (s->running.load(std::memory_order_acquire)) {
                             if (drainBatch(s.get(), h)) {
+                                recentlyActive = true;
                                 //more data may have arrived while handling; only
                                 //idle / sleep once the queue is really empty
                                 continue;
                             }
-                            waitForWork(s.get(), h);
+                            waitForWork(s.get(), h, recentlyActive);
+                            recentlyActive = false;
                             if (!s->running.load(std::memory_order_acquire)) {
                                 return;
                             }
