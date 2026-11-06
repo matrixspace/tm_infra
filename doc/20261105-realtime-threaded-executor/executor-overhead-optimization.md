@@ -3,7 +3,7 @@
 **日期：** 2026-11-06
 **状态：** 本轮优化完成；第二阶段整体验收仍待 examples / transport 环境验证
 **任务结束时间：** 2026-11-06
-**分支：** `feature/realtime-threaded-executor`
+**分支：** `feature/realtime-threaded-executor`（infra 优化 commit `e2c96aa`；basic 工具 commit `ceaa617`）
 **主记录：** [README.md](README.md)
 **第二阶段：** [phase2-unified-handler-executor.md](phase2-unified-handler-executor.md)
 
@@ -192,7 +192,7 @@ python3 worktrees/realtime-threaded-executor/tm_basic/test/executor_bench/run_pr
 
 ### 整图回归补充
 
-修正后的同一整图工具，baseline / candidate 各 5 次、每次 500000 输入，独立进程交替运行、taskset CPU 20–27；本轮没有并发编译。40 次运行均收到精确期望的输出，bad=0。原始输出见 [graph-comparison.log](profiling/graph-comparison.log)。
+修正后的同一整图工具，baseline / candidate 各 5 次、每次 500000 输入，独立进程交替运行、taskset CPU 20–27；本轮没有并发编译。40 次运行均收到精确期望的输出，bad=0。原始输出见 [graph-comparison.txt](profiling/graph-comparison.txt)。
 
 | 图配置 | wall ns/msg 基线→候选 | CPU ns/msg 基线→候选 |
 |---|---:|---:|
@@ -203,7 +203,7 @@ python3 worktrees/realtime-threaded-executor/tm_basic/test/executor_bench/run_pr
 
 该整图同时包含时钟、TimeChecker、业务 vector 分配、多个独立队列和调度竞争，不能当作隔离 Executor 开销的指标；但全线程 wall 回退也不能省略，优化收益具有负载依赖性，不能宣称所有图加速。为排查原位消费的影响，另做只恢复一次出队移动的实验，结果补记如下。
 
-追加三组对照：只在临时覆盖头文件的 `tryConsume` 中恢复 `Item local(std::move(*next->value))`，提前 reset，再把 local 交给回调；其余候选实现不变。GCC 15.2.1、同编译参数、各 5 次，轮换进程顺序，均精确计数通过。结果见 [graph-move-experiment.log](profiling/graph-move-experiment.log)。实验二进制没有替换最终实现，也没有写入工作区头文件。
+追加三组对照：只在临时覆盖头文件的 `tryConsume` 中恢复 `Item local(std::move(*next->value))`，提前 reset，再把 local 交给回调；其余候选实现不变。GCC 15.2.1、同编译参数、各 5 次，轮换进程顺序，均精确计数通过。结果见 [graph-move-experiment.txt](profiling/graph-move-experiment.txt)。实验二进制没有替换最终实现，也没有写入工作区头文件。
 
 | 配置 | 原基线 wall / CPU ns/msg | 候选 wall / CPU | 恢复移动 wall / CPU |
 |---|---:|---:|---:|
