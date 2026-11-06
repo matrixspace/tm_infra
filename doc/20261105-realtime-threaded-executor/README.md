@@ -3,7 +3,7 @@
 **任务开始时间：** 2026-11-05  
 **任务结束时间：** 2026-11-06  
 **状态：** 完成  
-**分支：** `feature/realtime-threaded-executor`（tm_infra、tm_basic、tm_transport；commit 待填）
+**分支：** `feature/realtime-threaded-executor`（tm_infra、tm_basic、tm_transport；commit：tm_infra `6836234`、tm_basic `437bfcc`、tm_transport `117fdb6`）
 
 ## 背景
 - `ThreadedHandlerBase::runThread`（`tm_kit/infra/RealTimeApp.hpp:243`）使用不带 predicate 的 `cond_.wait_for(1ms)`：处理完一批后即使 `incoming_` 非空也要白等最多 1ms，消费端处理期间的 `notify_one` 会丢失。
