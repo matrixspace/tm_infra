@@ -105,3 +105,5 @@
 执行器额外开销优化已实施并完成本轮定向验证，包含 Inline 静态调用、MPSC 原位消费、SharedPool 批次调用与 idle 活跃集合；profiling 工具、取舍、数据和测试见 [executor-overhead-optimization.md](executor-overhead-optimization.md)。examples 全量编译仍暂停，第二阶段整体状态不变。
 
 端到端延迟的后续优化与有限自旋测量见 [executor-latency-optimization.md](executor-latency-optimization.md)（本轮完成，2026-11-06；第二阶段整体验收状态不变）。
+
+2026-11-07 已完成 deprecated 的历史执行器迁移及重新 profiling（460 行结果全部通过正确性检查），见 [legacy-executor-baseline.md](legacy-executor-baseline.md)。
