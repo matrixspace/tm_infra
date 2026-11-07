@@ -1,9 +1,12 @@
 # LegacyDedicatedThreadExecutor profiling 基线
 
-**任务开始时间：** 2026-11-07  
-**任务结束时间：** 2026-11-07  
-**状态：** 本轮完成；第二阶段整体验收状态不变  
-**分支：** `feature/realtime-threaded-executor`
+**任务开始时间：** 2026-11-07
+
+**任务结束时间：** 2026-11-07
+
+**状态：** 本轮完成；第二阶段整体验收状态不变
+
+**分支：** `feature/realtime-threaded-executor`（infra commit `6333b4a`；basic commit `02079d0`）
 
 ## 背景与目标
 
@@ -114,4 +117,4 @@ Legacy 单跳连续交接时，producer 常在 consumer 尚未重新 wait 时通
 
 ## 收尾
 
-代码、结果和记录一起提交，提交号随后补记。保持 feature 分支，未合并 / 未推送；examples 全量编译仍暂停，transport 环境限制和第二阶段整体验收没有在本轮解除。tm_kit_reference 按既定流程在完成开发验证并推送后再同步。
+代码、结果和记录已一起提交：infra `6333b4a`、basic `02079d0`，本次 doc commit 补记编号。保持 feature 分支，未合并 / 未推送；examples 全量编译仍暂停，transport 环境限制和第二阶段整体验收没有在本轮解除。tm_kit_reference 按既定流程在完成开发验证并推送后再同步。
