@@ -119,3 +119,5 @@ producer 绑 CPU20–23、consumer 绑 CPU24–27（避开 SMT sibling），五�
 - 重建 basic 的 generic/Dedicated/Enhanced/Enhanced counts/latency 五个基准目标成功，独立 Dedicated、Enhanced counts 冒烟正确。
 - `run_profile.py --candidate-only --quick --repeats 1 ...` 37/37 正确；`run_latency.py --candidate-only --engines dedicated,enhanced --messages 20 --warmup 8 --hops 1 --intervals 0 --spins 0 --repeats 1 ...` 2/2 正确。此为工具回归，不作为新性能测量。
 - 修改后的 Python runner 语法检查通过，源码与测试中无 LegacyDedicated 类型/头文件引用；私有 install 已同步，移除旧安装头文件。历史数据和历史说明未重写。
+
+后续提交：tm_infra `a2357d0`（删除兼容 API、测试改名与记录），tm_basic `42d96ae`（删除基准兼容入口与说明）。仍保留 feature 分支，未推送。
