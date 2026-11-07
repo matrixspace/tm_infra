@@ -1,9 +1,9 @@
 # 默认执行器回迁与 Enhanced MPSC 节点复用
 
-**任务开始时间：** 2026-11-07  
-**任务结束时间：** 2026-11-07  
-**状态：** 完成（本轮迁移与节点复用；主任务第二阶段状态不变）  
-**分支：** `feature/realtime-threaded-executor`（tm_infra、tm_basic；提交见收尾记录）
+**任务开始时间：** 2026-11-07
+**任务结束时间：** 2026-11-07
+**状态：** 完成（本轮迁移与节点复用；主任务第二阶段状态不变）
+**分支：** `feature/realtime-threaded-executor`（tm_infra commit `0a9796c`；tm_basic commit `cbfde30`）
 
 ## 背景与需求
 此前 [执行器开销 profiling](executor-overhead-optimization.md) 中，Dedicated 的 malloc/free self cycles 约占 48%，每消息仍有一次节点分配与释放。本次为同一任务的后续工作。
@@ -103,3 +103,8 @@ producer 绑 CPU20–23、consumer 绑 CPU24–27（避开 SMT sibling），五�
 - [Legacy 等待修复](legacy-executor-baseline.md)
 - [Enhanced 测试与用法](../../../tm_basic/test/enhanced_dedicated_executor_test/README.md)
 - [Profiling 工具](../../../tm_basic/test/executor_bench/README.md)
+
+## 提交与收尾
+- tm_infra `0a9796c`：默认执行器回迁、Legacy 兼容别名、SharedPool 队列提取、默认行为回归和本记录/数据。
+- tm_basic `cbfde30`：Enhanced 执行器、Boost 节点缓存、测试与 profiling 工具。
+- 本文在代码提交后单独补记提交号。两仓库保留 feature 分支，未推送；主任务第二阶段整体验收及之后的 reference 同步仍按原任务安排。
