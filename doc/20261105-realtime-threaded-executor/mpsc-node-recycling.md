@@ -157,3 +157,5 @@ python3 worktrees/realtime-threaded-executor/tm_basic/test/executor_bench/run_en
 多跳另测40次全部正确，命令在[原始结果](batch-recycling-profiling/multihop.json)中。1/4跳、spinWait=0/200µs、每轮5000消息、各五轮交替：四跳200µs p50 4509→4577ns、p99 5436→5486ns；四跳无自旋p50 51745→52201ns、p99 61111→62421ns。多跳没有稳定改善，本轮确定收益集中于吞吐与CPU成本，不能宣称解决了前一轮的多跳延迟问题。
 
 本轮仅 basic 执行器头文件有行为改动；测试说明和两仓库索引同步更新，沿用现有feature分支，不推送。缓存上限增加64个空Node是此次吞吐收益的空间代价，无新增vcpkg依赖。第三方接口依据：[Boost SPSC bulk pop](https://www.boost.org/doc/libs/latest/boost/lockfree/spsc_queue.hpp)，同时核对本机Boost1.91源码。
+
+本轮提交：tm_basic `11138a5`（批量回收优化与测试说明）；tm_infra `e642cf3`（方案比较、验证和原始数据）。代码与记录均已提交，私有install头文件已更新，未推送。
