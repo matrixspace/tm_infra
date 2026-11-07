@@ -121,3 +121,39 @@ producer 绑 CPU20–23、consumer 绑 CPU24–27（避开 SMT sibling），五�
 - 修改后的 Python runner 语法检查通过，源码与测试中无 LegacyDedicated 类型/头文件引用；私有 install 已同步，移除旧安装头文件。历史数据和历史说明未重写。
 
 后续提交：tm_infra `a2357d0`（删除兼容 API、测试改名与记录），tm_basic `42d96ae`（删除基准兼容入口与说明）。仍保留 feature 分支，未推送。
+
+## 后续效率优化（2026-11-07，完成）
+比较缓存容量、空缓存快速路径，并结合此前共享环、Boost stack、分片 SPSC 试验评估；保持无界接收和跨生产者 FIFO。Moodycamel 已有独立适配器但不保证跨生产者 FIFO，不能无条件替代。先保存本轮基线，再实测筛选。
+
+本轮初测（相同 GCC15 -O3、生产者CPU20–23/消费者CPU24–27、五轮交替）：容量8/32/128/512没有稳定整体收益，保留32。采用分片内批量取回8个空节点，摊薄 Boost 队列索引同步；批量缓冲由队列持有而非 TLS，生产者退出不会遗留节点；在已有 reading 保护下访问。缓存上限由256变为320节点，析构同时释放批量缓冲。初测单/四生产者 CPU/item 557→317、1116→846ns，完整验证进行中。
+
+已核查 Boost bulk pop API 与本机实现；`read_available()` 要求单读取方，排除在 reading 保护外调用它的快速路径。其他方案：Boost MPMC stack（先前测量额外CAS较重）、直接Boost queue（任意Item类型限制）、Moodycamel（跨生产者FIFO不足）、扩大缓存（本轮无稳定收益）、批量消息提交（需要改变调用方，不适合透明替换）。本轮采用现有成熟库的 bulk 接口，不引入新依赖。
+
+### 批量缓存最终验证与数据
+基线为本轮前 tm_basic `42d96ae` 的逐节点 Boost pop；候选仅将空节点读取改为最多8个的 bulk pop 和受同一 reading 标志保护的分片暂存。消息入队/消费、FIFO、自旋预算和唤醒协议均不变。缓存节点读取次序改变不影响消息 FIFO。析构遍历暂存与Boost队列，节点所有权互斥。
+
+Release：原 direct 与完整 handler 测试2/2通过；包含16生产者碰撞、生产者退出后继续使用同一队列、循环溢出回收、异常与析构、图节点、stop/idle/CheckTime。GCC15 `-O1 -g -fsanitize=thread` 和 `-fsanitize=address,undefined` 均通过；ASan仍使用detect_leaks=0，未宣称LeakSanitizer完成。输出见 [TSan](batch-recycling-profiling/tsan.txt)、[ASan/UBSan](batch-recycling-profiling/asan.txt)。
+
+计时采用同一当前 ExecutorBench.cpp、GCC15 C++17 `-O3 -pthread -DEXECUTOR_BENCH_ENGINE=7`，分别通过 include override 编译基线与候选。counts独立加hooks。CPU20–23 producer、CPU24–27 consumer；五轮交替，测量期间无本任务构建/压力测试。命令：
+
+```sh
+python3 worktrees/realtime-threaded-executor/tm_basic/test/executor_bench/run_enhanced_profile.py \
+  --baseline /tmp/enhanced-next/base/bench --baseline-counts /tmp/enhanced-next/base/counts \
+  --candidate /tmp/enhanced-next/batch/bench --candidate-counts /tmp/enhanced-next/batch/counts \
+  --output /tmp/enhanced-next/final
+```
+
+全部120条正确性通过；[JSONL（含命令与二进制SHA256）](batch-recycling-profiling/results.jsonl)、[完整中位数](batch-recycling-profiling/summary.md)。容量方案40次与批量初筛20次也全部正确，见 [容量](batch-recycling-profiling/capacity.json)、[批量初筛](batch-recycling-profiling/batch.json)。
+
+| 吞吐场景 | CPU ns/item 基线→候选 | wall ns/item 基线→候选 |
+|---|---:|---:|
+| 单生产者，小消息 | 600→338（-44%） | 301→170 |
+| 单生产者，256B payload | 665→452（-32%） | 333→227 |
+| 四生产者，小消息 | 1144→815（-29%） | 267→196 |
+| 四生产者，256B payload | 1225→898（-27%） | 287→212 |
+
+闭环/稀疏计数窗口仍零节点分配；饱和场景分配量受队列积压与计数hook干扰，不把本轮次数和前一轮不同负载窗口直接比较。稀疏p50 889→696ns、p99 1135→1039ns；闭环单生产者大消息CPU 2698→2757ns，保留这项小幅回退。
+
+多跳另测40次全部正确，命令在[原始结果](batch-recycling-profiling/multihop.json)中。1/4跳、spinWait=0/200µs、每轮5000消息、各五轮交替：四跳200µs p50 4509→4577ns、p99 5436→5486ns；四跳无自旋p50 51745→52201ns、p99 61111→62421ns。多跳没有稳定改善，本轮确定收益集中于吞吐与CPU成本，不能宣称解决了前一轮的多跳延迟问题。
+
+本轮仅 basic 执行器头文件有行为改动；测试说明和两仓库索引同步更新，沿用现有feature分支，不推送。缓存上限增加64个空Node是此次吞吐收益的空间代价，无新增vcpkg依赖。第三方接口依据：[Boost SPSC bulk pop](https://www.boost.org/doc/libs/latest/boost/lockfree/spsc_queue.hpp)，同时核对本机Boost1.91源码。
