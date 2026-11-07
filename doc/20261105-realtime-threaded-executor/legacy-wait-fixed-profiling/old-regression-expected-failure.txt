@@ -1,0 +1,15 @@
+ok: reject before start, no native handle
+ok: start barrier and native handle
+ok: startup gates callbacks
+ok: four producers, move-only non-default Item, exact count and FIFO
+ok: splice batch reports its original list size
+ok: historical periodic idle retained even when hasIdleWork is false
+ok: reject after stop
+ok: callback-stop start entered
+ok: callback may stop its executor
+ok: stop drops remainder of an already-spliced batch
+ok: destruction during startup entered
+ok: shared state survives executor destruction and drops pending data
+FAIL: push during processing drains without a 1ms wait per batch
+FAIL: wakeIdle during a callback survives queued data and predicate-based waiting
+FAILED

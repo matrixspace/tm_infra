@@ -14,10 +14,11 @@ namespace dev
             {
 
                 // Profiling baseline from develop f569d42, RealTimeApp::ThreadedHandlerBase.
-                // Intentionally retains the unconditional 1ms wait, two std::lists with
-                // splice, per-push notification and periodic idle calls even without idle
-                // work. Notifications while handling a batch may be lost: DO NOT fix that
-                // historical behavior in this baseline. spinWait is intentionally ignored.
+                // Retains two std::lists with splice, per-push notification and periodic
+                // idle calls even without idle work. Unlike the original develop code,
+                // the wait now checks queued data, stop and explicit idle wakes: a push
+                // while handling a batch must not cause another 1ms wait.
+                // spinWait is intentionally ignored.
                 // Adaptations: shared detached state, Host callbacks, and per-item stop check.
                 // Host lifetime follows the regular DedicatedThreadExecutor contract.
                 template <class Item>
@@ -27,6 +28,7 @@ namespace dev
                         std::mutex mutex;
                         std::condition_variable cond;
                         std::atomic<bool> running{false};
+                        bool wakeRequested = false; // protected by mutex
                         std::list<Item> incoming, processing;
                         explicit State(ThreadedExecOptions const &o)
                             : opts(o)
@@ -43,11 +45,13 @@ namespace dev
                         while (s->running.load(std::memory_order_acquire)) {
                             {
                                 std::unique_lock<std::mutex> lock(s->mutex);
-                                s->cond.wait_for(lock, std::chrono::milliseconds(1));
+                                s->cond.wait_for(lock, std::chrono::milliseconds(1), [&] { return !s->incoming.empty() || !s->running.load(std::memory_order_acquire) || s->wakeRequested; });
                                 if (!s->running.load(std::memory_order_acquire)) {
                                     return;
                                 }
                                 if (s->incoming.empty()) {
+                                    // Consume an idle wake only when delivering idle work.
+                                    s->wakeRequested = false;
                                     lock.unlock();
                                     host->executorIdleWork();
                                     continue;
@@ -102,11 +106,18 @@ namespace dev
                     }
                     void stop()
                     {
-                        state_->running.store(false, std::memory_order_release);
+                        {
+                            std::lock_guard<std::mutex> lock(state_->mutex);
+                            state_->running.store(false, std::memory_order_release);
+                        }
                         state_->cond.notify_one();
                     }
                     void wakeIdle()
                     {
+                        {
+                            std::lock_guard<std::mutex> lock(state_->mutex);
+                            state_->wakeRequested = true;
+                        }
                         state_->cond.notify_one();
                     }
                     std::optional<std::thread::native_handle_type> threadHandle()

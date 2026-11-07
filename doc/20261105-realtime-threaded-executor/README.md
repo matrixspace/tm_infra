@@ -107,3 +107,5 @@
 端到端延迟的后续优化与有限自旋测量见 [executor-latency-optimization.md](executor-latency-optimization.md)（本轮完成，2026-11-06；第二阶段整体验收状态不变）。
 
 2026-11-07 已完成 deprecated 的历史执行器迁移及重新 profiling（460 行结果全部通过正确性检查），见 [legacy-executor-baseline.md](legacy-executor-baseline.md)。
+
+同日已修复 Legacy 的无条件等待并完成 198 条延迟复测；修复前 / 后数据独立保存，见 [等待修复记录](legacy-executor-baseline.md)。

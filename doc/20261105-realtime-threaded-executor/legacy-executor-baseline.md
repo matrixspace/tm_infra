@@ -14,7 +14,7 @@
 
 开始时已读根 CLAUDE.md、当前开发记录、git status / diff / 历史与测试源码。原始代码固定为 tm_infra develop `f569d42` 的 `RealTimeApp.hpp::ThreadedHandlerBase`，不随将来 develop 变化漂移。
 
-## 方案
+## 初始迁移方案（等待修复前）
 
 保留 mutex + incoming / processing 两条 std::list、splice、每次 push 通知，以及无 predicate 的 wait_for(1ms)，包括处理中通知丢失后下一批仍等待的历史成本。不要修复该等待方式，否则无法充当历史算法基线。
 
@@ -69,7 +69,7 @@ Legacy 多跳闭环可能每跳约 1ms，旧默认 20000 条 / 2000 条预热可
 - 首次 basic benchmark 编译发现 generic 工具原来仅间接 include RealTimeThreadedExecutor，迁移时漏加 Legacy 显式 include；已补上并重新定向构建。未修改生产默认 include 路径，也未全局关闭 deprecated 警告。
 - 两个 runner 新增 candidate-only/include-legacy 模式；旧的成对比较默认列表保持不变。延迟 runner 可指定统一 warmup，Legacy 不重复运行无效的自旋配置。吞吐 / 计数 split 模式追加 engine ID 7，不改变旧 ID。
 
-## 最终 profiling（2026-11-07）
+## 初始迁移 profiling（2026-11-07，等待修复前）
 
 所有执行器均来自本轮同一源码版本，不使用旧轮保存的可执行文件混合比较。配置为 release，normal / counts 分离，吞吐使用每后端独立编译的 split 目标。吞吐 5 次重复，闭环 / 固定周期 / 超额订阅各 3 次；普通计时不启用分配计数，分配数据不用于判断延迟 / CPU 收益。perf stat 对各真实执行器保存整进程 counters（含预热、输出），不等同内部测量窗口。
 
@@ -118,3 +118,42 @@ Legacy 单跳连续交接时，producer 常在 consumer 尚未重新 wait 时通
 ## 收尾
 
 代码、结果和记录已一起提交：infra `6333b4a`、basic `02079d0`，本次 doc commit 补记编号。保持 feature 分支，未合并 / 未推送；examples 全量编译仍暂停，transport 环境限制和第二阶段整体验收没有在本轮解除。tm_kit_reference 按既定流程在完成开发验证并推送后再同步。
+
+## 2026-11-07 后续：修复无条件等待（完成）
+
+用户明确要求修复 Legacy 的 1ms 白等，再重测 latency；原先“不要修复历史算法”的限制因此不再适用。保留上述原始测量数据，当前 Legacy 从本轮开始是修复等待后的 list 基线。
+
+方案：wait_for 使用 incoming 非空 / stop / 显式 wakeIdle 的 predicate；队列和唤醒标记在同一 mutex 下发布，避免数据已经排队但还白等，以及 predicate 忽略无数据 wakeIdle 的兼容性问题。仍保留 1ms 空队列 idle 周期，不引入自旋或改变 list/splice。
+
+### 等待修复的验证检查点
+
+- predicate 同时覆盖数据 / stop / wakeIdle；stop 和 wakeIdle 在 queue mutex 下发布，避免 predicate 检查和实际等待之间丢失状态变化。
+- 只在实际交付 idle 工作时清除 wake 标记，数据与 wakeIdle 同时排队时，idle 请求会保留到数据队列清空；正常数据批次不额外写该标记。
+- 新增两个 20000 次连续回归：回调内排入下一条数据；idle 回调内同时提交数据与下一次 wakeIdle。使用原有 10 秒功能 watchdog，避免脆弱的亚毫秒单次断言。原无条件等待版本会超时失败，修复版在常规测试内完成。
+- infra release/debug 4/4 通过，Legacy 新测试 TSan 和 ASan/UBSan 通过（同前，未启用 LeakSanitizer）。仅定向编译 Legacy 测试与 latency 工具，未恢复 examples 编译。
+- 保存修复前可执行文件 `/tmp/legacy-wait-before`，SHA256 与原始 legacy-profiling JSONL 相符；前后使用相同测试源码 / 参数 / 物理核。runner 增加 `--engines` 以便只交替测试 Legacy 的修复前 / 后版本，默认引擎列表保持兼容。
+
+### 最终延迟复测
+
+使用保存的原始二进制与新二进制交替配对；原始二进制 SHA256 与初始迁移 JSONL 一致。每个案例 2000 条、预热 32 条、重复 3 次，CPU 和前轮相同；没有与编译并行。核心对照不使用自旋，两侧均为 Legacy list 执行器。
+
+全部 198 行结果通过正确性检查：Legacy 配对 36 行、当前全引擎 144 行、Legacy 固定周期配对 12 行、四核承载八消费者的配对 6 行。数据与 SHA256 见 [legacy-wait-fixed-profiling](legacy-wait-fixed-profiling/paired/results.jsonl)，命令见 [reproduce.sh](legacy-wait-fixed-profiling/reproduce.sh)。当前全引擎参考保留其他执行器零预算与默认 200 μs 两种配置，未修改其他执行器。
+
+闭环配对结果（每次运行分位数的中位数，单位 μs）：
+
+| 跳数 | 完成后休眠 μs | p50 修复前→后 | p99 修复前→后 |
+|---|---:|---:|---:|
+| 1 | 0 | 5.795→6.940 | 1072.447→22.580 |
+| 1 | 50 | 14.505→14.641 | 17.099→17.606 |
+| 4 | 0 | 42.619→42.163 | 56.620→63.941 |
+| 4 | 50 | 53.484→52.966 | 65.695→65.063 |
+| 8 | 0 | 106.141→106.743 | 119.809→121.688 |
+| 8 | 50 | 107.054→106.789 | 123.674→123.073 |
+
+单跳连续交接的 p99 从 1072.447→22.580 μs，约降低 97.9%。但 p50 是 5.795→6.940 μs，没有改善。旧二进制本轮三次 p50 分别约 5.795、5.786、1064.077 μs，说明通知竞态造成的分布是双峰，不能挑选旧版约 1ms 的一次中位数来宣称稳定的 p50 提速倍数。首轮中间测量的旧版 p50 也约 1ms；最终报告只使用最后这组完整配对数据。
+
+四跳 / 八跳、以及完成后休眠 50 μs 的单跳，没有观察到明确的普遍改善，部分分位数上升；这类输入通常给消费者进入等待留下时间，主要仍包含 OS 唤醒 / 线程切换，修复不会把阻塞式 list 执行器变成自旋执行器。开放输入同时保留 producer lateness 和 scheduled-arrival 结果，见 [periodic/summary.md](legacy-wait-fixed-profiling/periodic/summary.md)。不将小样本 p999 当作 SLA。
+
+回归验证：最终两个连续测试放到旧头文件上均触发 10 秒 watchdog，预期失败记录见 [old-regression-expected-failure.txt](legacy-wait-fixed-profiling/old-regression-expected-failure.txt)。修复后 release/debug 都是 4/4 通过，Legacy 完整测试（含数据+wake 同时排队）TSan、ASan/UBSan 通过。旧版失败是验证用的预期结果，不是当前测试失败。LeakSanitizer 未启用。
+
+原始 `legacy-profiling` 中的吞吐、空闲和计数结果仍属于未修复版本，未覆盖或冒充本轮数据。本轮只重新测量 latency。该类继续 deprecated / benchmark-only，默认执行器、list/splice 和 1ms 空闲周期保留。此次代码和新测量记录一起提交，编号随后补记；主任务整体验收与 examples 暂停状态不变。

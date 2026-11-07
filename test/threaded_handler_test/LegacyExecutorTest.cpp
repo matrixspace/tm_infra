@@ -49,7 +49,7 @@ namespace
         std::atomic<bool> entered{false};
         std::atomic<uint64_t> count{0}, errors{0}, idle{0}, batches{0}, firstBatch{0};
         std::array<uint64_t, 4> expected{};
-        std::function<void()> afterHandle;
+        std::function<void()> afterHandle, afterIdle;
         void executorWaitForStart()
         {
             std::unique_lock<std::mutex> lock(mutex);
@@ -84,7 +84,10 @@ namespace
         }
         void executorIdleWork()
         {
-            idle.fetch_add(1);
+            if (afterIdle) {
+                afterIdle();
+            }
+            idle.fetch_add(1, std::memory_order_release);
         }
     };
     void fifoAndIdleTest()
@@ -134,6 +137,56 @@ namespace
         check(h->count.load() == 1 && !e->push(Item(0, 2)), "stop drops remainder of an already-spliced batch");
         delete e;
     }
+    void queuedContinuationTest()
+    {
+        // Every push happens inside the consumer callback, when no wait exists.
+        // The old unconditional wait takes about 20 seconds for this chain;
+        // the predicate version completes within the normal 10-second watchdog.
+        constexpr uint64_t target = 20000;
+        auto *h = new Host;
+        auto *e = new Exec;
+        auto next = std::make_shared<uint64_t>(1);
+        h->afterHandle = [e, next] {
+            if (*next < target) {
+                e->push(Item(0, (*next)++));
+            } else {
+                e->stop();
+            }
+        };
+        e->start(h);
+        e->push(Item(0, 0));
+        h->release();
+        bool done = wait([&] { return h->count.load(std::memory_order_acquire) == target; });
+        check(done && h->errors.load() == 0, "push during processing drains without a 1ms wait per batch");
+        e->stop();
+        if (done) {
+            delete e;
+        } // Keep a failing fixture alive until process exit.
+    }
+    void idleWakeContinuationTest()
+    {
+        constexpr uint64_t target = 20000;
+        auto *h = new Host;
+        auto *e = new Exec;
+        auto next = std::make_shared<uint64_t>(0);
+        h->afterIdle = [e, next] {
+            if (*next < target) {
+                e->push(Item(0, (*next)++));
+                e->wakeIdle(); // Must survive the simultaneous queued data.
+            } else {
+                e->stop();
+            }
+        };
+        e->start(h);
+        e->wakeIdle();
+        h->release();
+        bool done = wait([&] { return h->idle.load(std::memory_order_acquire) == target + 1; });
+        check(done && h->count.load() == target && h->errors.load() == 0, "wakeIdle during a callback survives queued data and predicate-based waiting");
+        e->stop();
+        if (done) {
+            delete e;
+        }
+    }
     void detachedStateTest()
     {
         auto *h = new Host;
@@ -152,6 +205,8 @@ int main()
     fifoAndIdleTest();
     callbackStopTest();
     detachedStateTest();
+    queuedContinuationTest();
+    idleWakeContinuationTest();
     std::puts(failures ? "FAILED" : "ALL PASSED");
     return failures ? 1 : 0;
 }
