@@ -7,6 +7,7 @@
 #include <condition_variable>
 #include <cstddef>
 #include <memory>
+#include <list>
 #include <mutex>
 #include <optional>
 #include <thread>
@@ -43,7 +44,8 @@ namespace dev
                     //maintain the pending count passed to executorBeforeBatch (one
                     //extra relaxed RMW per push); set for OutputRealTimeThreadBufferSizeComponent
                     bool trackPendingCount = false;
-                    // Dedicated / Moodycamel active wait; SharedPool uses its pool config.
+                    // Enhanced / Moodycamel active wait; SharedPool uses its pool config.
+                    // The default mutex/list Dedicated executor ignores this option.
                     // Bounded active wait after data, then the normal blocking path.
                     // Zero disables it. Idle timeouts do not renew this budget.
                     std::chrono::nanoseconds spinWait = std::chrono::microseconds(200);
@@ -84,221 +86,58 @@ namespace dev
                         return false;
                     }
 
-                    //Vyukov intrusive unbounded MPSC queue with a stub node.
-                    //link publication uses one exchange + one store; allocation may block.
-                    //The global order is
-                    //the exchange order, so items of all producers form one FIFO.
-                    template <class Item>
-                    class MPSCQueue {
-                    private:
-                        struct Node {
-                            std::atomic<Node *> next{nullptr};
-                            std::optional<Item> value;
-                            Node() = default;
-                            explicit Node(Item &&x)
-                                : value(std::in_place, std::move(x))
-                            {
-                            }
-                        };
-                        //written by producers
-                        alignas(64) std::atomic<Node *> head_;
-                        //owned by the single consumer
-                        alignas(64) Node *tail_;
+                } // namespace realtime_threaded_executor_detail
 
-                    public:
-                        MPSCQueue()
-                            : head_(nullptr)
-                            , tail_(nullptr)
-                        {
-                            Node *stub = new Node();
-                            head_.store(stub, std::memory_order_relaxed);
-                            tail_ = stub;
-                        }
-                        ~MPSCQueue()
-                        {
-                            Node *n = tail_;
-                            while (n) {
-                                Node *next = n->next.load(std::memory_order_relaxed);
-                                delete n;
-                                n = next;
-                            }
-                        }
-                        MPSCQueue(MPSCQueue const &) = delete;
-                        MPSCQueue &operator=(MPSCQueue const &) = delete;
-                        //any thread. The exchange is seq_cst: together with the
-                        //seq_cst load of the sleeping flag that follows it in the
-                        //executor, and the consumer's seq_cst store of that flag
-                        //followed by maybeNonEmpty(), it forms a Dekker handshake
-                        //(either the consumer sees the item or the producer sees the
-                        //consumer sleeping). Plain seq_cst operations are used instead of
-                        //atomic_thread_fence so that TSan can check the protocol.
-                        void push(Item &&x)
-                        {
-                            Node *n = new Node(std::move(x));
-                            Node *prev = head_.exchange(n, std::memory_order_seq_cst);
-                            prev->next.store(n, std::memory_order_release);
-                        }
-                        //consumer only; may transiently report empty while a producer
-                        //is between its exchange and its link store, the wake-up
-                        //protocol of the executor covers that window
-                        template <class F>
-                        bool tryConsume(F &&consume)
-                        {
-                            Node *next = tail_->next.load(std::memory_order_acquire);
-                            if (!next) {
-                                return false;
-                            }
-                            Node *old = tail_;
-                            tail_ = next;
-                            delete old;
-                            // The new tail remains the queue's stub. Its item
-                            // can be consumed in place, without a second move.
-                            // Reset also on exceptions, leaving a valid stub.
-                            struct Reset {
-                                std::optional<Item> &value;
-                                ~Reset()
-                                {
-                                    value.reset();
-                                }
-                            } reset{next->value};
-                            std::forward<F>(consume)(std::move(*next->value));
-                            return true;
-                        }
-                        //consumer only. Unlike tryConsume this also reports items whose
-                        //producer has done the exchange but not yet linked the node, so
-                        //the consumer never goes to sleep inside that window
-                        bool maybeNonEmpty() const
-                        {
-                            return head_.load(std::memory_order_seq_cst) != tail_;
-                        }
-                    };
-
-                    //everything the execution thread touches lives here and is shared
-                    //with that (detached) thread, so the executor object itself may be
-                    //destroyed while the thread is still winding down
-                    template <class Item>
-                    struct DedicatedThreadState {
+                // Default dedicated executor: mutex-protected incoming list and
+                // consumer-local processing list, transferred with splice. Predicate
+                // waits prevent lost batch notifications. Periodic idle callbacks are
+                // retained even when HasIdleWork is false; spinWait is ignored.
+                template <class Item, class Config = DedicatedThreadExecutorConfig>
+                class DedicatedThreadExecutor {
+                    struct State {
                         ThreadedExecOptions opts;
-                        MPSCQueue<Item> queue;
-                        alignas(64) std::atomic<bool> running{false};
-                        alignas(64) std::atomic<bool> sleeping{false};
-                        std::atomic<bool> wakeRequested{false};
-                        std::atomic<std::size_t> pending{0};
                         std::mutex mutex;
                         std::condition_variable cond;
-
-                        explicit DedicatedThreadState(ThreadedExecOptions const &o)
+                        std::atomic<bool> running{false};
+                        bool wakeRequested = false; // protected by mutex
+                        std::list<Item> incoming, processing;
+                        explicit State(ThreadedExecOptions const &o)
                             : opts(o)
                         {
                         }
-
-                        void notifyLocked()
-                        {
-                            std::lock_guard<std::mutex> _(mutex);
-                            cond.notify_one();
-                        }
                     };
-                } // namespace realtime_threaded_executor_detail
-
-                //Default executor: one dedicated (detached) thread per node.
-                //Blocking: the producer only takes the mutex / notifies when the consumer
-                //has announced it is about to sleep (eventcount style), so the hot path
-                //avoids per-item notification while the consumer is active; node
-                //allocation still has its own costs. While the host has idle work the
-                //consumer waits at most Config::idlePeriod and then calls the idle work,
-                //otherwise it sleeps until push / stop / wakeIdle.
-
-                template <class Item, class Config = DedicatedThreadExecutorConfig>
-                class DedicatedThreadExecutor {
-                private:
-                    using State = realtime_threaded_executor_detail::DedicatedThreadState<Item>;
-                    std::shared_ptr<State> s_;
+                    std::shared_ptr<State> state_;
                     std::optional<std::thread::native_handle_type> handle_;
 
-                    static void wakeIfSleeping(State *s)
-                    {
-                        //seq_cst load after the seq_cst exchange in queue.push; pairs
-                        //with the seq_cst store + maybeNonEmpty() in waitForWork
-                        if (s->sleeping.load(std::memory_order_seq_cst)) {
-                            s->notifyLocked();
-                        }
-                    }
                     template <class Host>
-                    static bool drainBatch(State *s, Host *h)
+                    static void run(std::shared_ptr<State> s, Host *host)
                     {
-                        bool handled = false;
-                        while (s->queue.tryConsume([&](Item &&item) {
-                            if (s->opts.trackPendingCount) {
-                                if (!handled) {
-                                    h->executorBeforeBatch(item, s->pending.load(std::memory_order_relaxed));
-                                }
-                                s->pending.fetch_sub(1, std::memory_order_relaxed);
-                            }
-                            handled = true;
-                            h->executorHandle(std::move(item));
-                        })) {
-                            if (!s->running.load(std::memory_order_acquire)) {
-                                break;
-                            }
-                        }
-                        return handled;
-                    }
-                    //Blocking mode: returns once there may be work, the idle period has
-                    //elapsed, or the executor is stopping
-                    template <class Host>
-                    static void waitForWork(State *s, Host *h, bool recentlyActive)
-                    {
-                        auto ready = [s]() { return s->queue.maybeNonEmpty() || !s->running.load(std::memory_order_acquire) || s->wakeRequested.load(std::memory_order_acquire); };
-                        bool const hasIdle = h->executorHasIdleWork();
-                        auto const idleDeadline = hasIdle ? std::chrono::steady_clock::now() + Config::idlePeriod : std::chrono::steady_clock::time_point::max();
-                        auto budget = s->opts.spinWait;
-                        if (hasIdle) {
-                            budget = std::min(budget, std::chrono::duration_cast<std::chrono::nanoseconds>(Config::idlePeriod));
-                        }
-                        if (recentlyActive && realtime_threaded_executor_detail::spinUntil(budget, ready)) {
-                            s->wakeRequested.exchange(false, std::memory_order_acq_rel);
-                            return;
-                        }
-                        for (unsigned i = 0; i < Config::spinBeforeSleep; ++i) {
-                            if (s->queue.maybeNonEmpty() || !s->running.load(std::memory_order_acquire)) {
-                                return;
-                            }
-                        }
-                        s->sleeping.store(true, std::memory_order_seq_cst);
-                        if (!ready()) {
-                            std::unique_lock<std::mutex> lock(s->mutex);
-                            if (hasIdle) {
-                                s->cond.wait_until(lock, idleDeadline, ready);
-                            } else {
-                                s->cond.wait(lock, ready);
-                            }
-                        }
-                        s->sleeping.store(false, std::memory_order_relaxed);
-                        //a wakeIdle racing with this reset is not lost: its host state
-                        //change happened before it set the flag, and the next round
-                        //re-reads executorHasIdleWork() before sleeping again
-                        s->wakeRequested.exchange(false, std::memory_order_acq_rel);
-                    }
-                    template <class Host>
-                    static void run(std::shared_ptr<State> s, Host *h)
-                    {
-                        h->executorWaitForStart();
-                        bool recentlyActive = false;
+                        host->executorWaitForStart();
                         while (s->running.load(std::memory_order_acquire)) {
-                            if (drainBatch(s.get(), h)) {
-                                recentlyActive = true;
-                                //more data may have arrived while handling; only
-                                //idle / sleep once the queue is really empty
-                                continue;
+                            {
+                                std::unique_lock<std::mutex> lock(s->mutex);
+                                s->cond.wait_for(lock, Config::idlePeriod, [&] { return !s->incoming.empty() || !s->running.load(std::memory_order_acquire) || s->wakeRequested; });
+                                if (!s->running.load(std::memory_order_acquire)) {
+                                    return;
+                                }
+                                if (s->incoming.empty()) {
+                                    // Consume an idle wake only when delivering idle work.
+                                    s->wakeRequested = false;
+                                    lock.unlock();
+                                    host->executorIdleWork();
+                                    continue;
+                                }
+                                s->processing.splice(s->processing.end(), s->incoming);
                             }
-                            waitForWork(s.get(), h, recentlyActive);
-                            recentlyActive = false;
-                            if (!s->running.load(std::memory_order_acquire)) {
-                                return;
+                            if (s->opts.trackPendingCount) {
+                                host->executorBeforeBatch(s->processing.front(), s->processing.size());
                             }
-                            if (!s->queue.maybeNonEmpty()) {
-                                //timed out (or woken by wakeIdle) with nothing pending
-                                h->executorIdleWork();
+                            while (!s->processing.empty()) {
+                                if (!s->running.load(std::memory_order_acquire)) {
+                                    return;
+                                }
+                                host->executorHandle(std::move(s->processing.front()));
+                                s->processing.pop_front();
                             }
                         }
                     }
@@ -307,8 +146,7 @@ namespace dev
                     static constexpr bool kOwnContext = true;
                     static constexpr bool kSerialCallbacks = true;
                     explicit DedicatedThreadExecutor(ThreadedExecOptions const &opts = ThreadedExecOptions{})
-                        : s_(std::make_shared<State>(opts))
-                        , handle_(std::nullopt)
+                        : state_(std::make_shared<State>(opts))
                     {
                     }
                     DedicatedThreadExecutor(DedicatedThreadExecutor const &) = delete;
@@ -318,36 +156,40 @@ namespace dev
                         stop();
                     }
                     template <class Host>
-                    void start(Host *h)
+                    void start(Host *host)
                     {
-                        s_->running.store(true, std::memory_order_release);
-                        std::thread th(&DedicatedThreadExecutor::run<Host>, s_, h);
-                        handle_ = th.native_handle();
-                        //same lifecycle as the old handler bases: the thread is detached
-                        th.detach();
+                        state_->running.store(true, std::memory_order_release);
+                        std::thread thread(&DedicatedThreadExecutor::run<Host>, state_, host);
+                        handle_ = thread.native_handle();
+                        thread.detach();
                     }
-                    bool push(Item &&x)
+                    bool push(Item &&item)
                     {
-                        State *s = s_.get();
-                        if (!s->running.load(std::memory_order_acquire)) {
+                        if (!state_->running.load(std::memory_order_acquire)) {
                             return false;
                         }
-                        if (s->opts.trackPendingCount) {
-                            s->pending.fetch_add(1, std::memory_order_relaxed);
+                        {
+                            std::lock_guard<std::mutex> lock(state_->mutex);
+                            state_->incoming.push_back(std::move(item));
                         }
-                        s->queue.push(std::move(x));
-                        wakeIfSleeping(s);
+                        state_->cond.notify_one();
                         return true;
                     }
                     void stop()
                     {
-                        s_->running.store(false, std::memory_order_release);
-                        s_->notifyLocked();
+                        {
+                            std::lock_guard<std::mutex> lock(state_->mutex);
+                            state_->running.store(false, std::memory_order_release);
+                        }
+                        state_->cond.notify_one();
                     }
                     void wakeIdle()
                     {
-                        s_->wakeRequested.store(true, std::memory_order_release);
-                        s_->notifyLocked();
+                        {
+                            std::lock_guard<std::mutex> lock(state_->mutex);
+                            state_->wakeRequested = true;
+                        }
+                        state_->cond.notify_one();
                     }
                     std::optional<std::thread::native_handle_type> threadHandle()
                     {

@@ -39,7 +39,10 @@ namespace
         Item(Item &&) = default;
         Item &operator=(Item &&) = default;
     };
-    using Exec = LegacyDedicatedThreadExecutor<Item>;
+    using Exec = DedicatedThreadExecutor<Item>;
+    struct DefaultEnv {};
+    static_assert(std::is_same_v<RealTimeThreadedExecutorFor<DefaultEnv, Item>, Exec>);
+    static_assert(std::is_same_v<LegacyDedicatedThreadExecutor<Item>, Exec>);
     struct Env : RealTimeThreadedExecutorComponent<LegacyDedicatedThreadExecutor> {};
     static_assert(std::is_same_v<RealTimeThreadedExecutorFor<Env, Item>, Exec>);
     struct Host {

@@ -5,6 +5,7 @@ tm_infra_headers = [
     , 'RealTimeApp.hpp'
     , 'RealTimeThreadedExecutor.hpp'
     , 'LegacyDedicatedThreadExecutor.hpp'
+    , 'RealTimeMPSCQueue.hpp'
     , 'RealTimeSharedPoolExecutor.hpp'
     , 'SinglePassIterationApp.hpp'
     , 'TopDownSinglePassIterationApp.hpp'

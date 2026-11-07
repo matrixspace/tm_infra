@@ -2,6 +2,7 @@
 #define TM_KIT_INFRA_REALTIME_SHARED_POOL_EXECUTOR_HPP_
 
 #include <tm_kit/infra/RealTimeThreadedExecutor.hpp>
+#include <tm_kit/infra/RealTimeMPSCQueue.hpp>
 
 #include <atomic>
 #include <chrono>

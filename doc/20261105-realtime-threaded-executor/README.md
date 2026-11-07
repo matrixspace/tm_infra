@@ -109,3 +109,5 @@
 2026-11-07 已完成 deprecated 的历史执行器迁移及重新 profiling（460 行结果全部通过正确性检查），见 [legacy-executor-baseline.md](legacy-executor-baseline.md)。
 
 同日已修复 Legacy 的无条件等待并完成 198 条延迟复测；修复前 / 后数据独立保存，见 [等待修复记录](legacy-executor-baseline.md)。
+
+2026-11-07 按用户新要求完成 [默认执行器回迁与 Enhanced MPSC 节点复用](mpsc-node-recycling.md)：infra 默认恢复 mutex/list Dedicated，MPSC 移至 basic Enhanced，以 Boost.Lockfree 分片缓存减少节点分配。早期章节中“默认 MPSC”的描述为历史方案，当前实现以新记录为准。第二阶段整体状态不变。

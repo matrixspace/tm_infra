@@ -252,7 +252,11 @@ namespace {
         std::string tag = tagOf(Pool);
         //about 100 at a 1ms rhythm; loose bounds for loaded machines
         check(withIdle >= 20 && withIdle <= 150, "idle work periodic while hasIdleWork() (" + std::to_string(withIdle) + "/100ms)" + tag);
-        check(withoutIdle <= 1, "no idle work while hasIdleWork() is false (" + std::to_string(withoutIdle) + "/100ms)" + tag);
+        if constexpr (Pool) {
+            check(withoutIdle <= 1, "no idle work while hasIdleWork() is false (" + std::to_string(withoutIdle) + "/100ms)" + tag);
+        } else {
+            check(withoutIdle >= 20 && withoutIdle <= 150, "default retains historical periodic idle callbacks (" + std::to_string(withoutIdle) + "/100ms)" + tag);
+        }
         check(resumed >= 20, "idle work resumes after wakeIdle() (" + std::to_string(resumed) + "/100ms)" + tag);
         h->stopNow();
         //leaked on purpose: the handler thread is detached (pre-existing lifecycle, see task record)
