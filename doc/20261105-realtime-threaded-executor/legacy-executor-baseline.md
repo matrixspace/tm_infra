@@ -156,4 +156,4 @@ Legacy 单跳连续交接时，producer 常在 consumer 尚未重新 wait 时通
 
 回归验证：最终两个连续测试放到旧头文件上均触发 10 秒 watchdog，预期失败记录见 [old-regression-expected-failure.txt](legacy-wait-fixed-profiling/old-regression-expected-failure.txt)。修复后 release/debug 都是 4/4 通过，Legacy 完整测试（含数据+wake 同时排队）TSan、ASan/UBSan 通过。旧版失败是验证用的预期结果，不是当前测试失败。LeakSanitizer 未启用。
 
-原始 `legacy-profiling` 中的吞吐、空闲和计数结果仍属于未修复版本，未覆盖或冒充本轮数据。本轮只重新测量 latency。该类继续 deprecated / benchmark-only，默认执行器、list/splice 和 1ms 空闲周期保留。此次代码和新测量记录一起提交，编号随后补记；主任务整体验收与 examples 暂停状态不变。
+原始 `legacy-profiling` 中的吞吐、空闲和计数结果仍属于未修复版本，未覆盖或冒充本轮数据。本轮只重新测量 latency。该类继续 deprecated / benchmark-only，默认执行器、list/splice 和 1ms 空闲周期保留。此次修复、回归与新测量记录已提交：infra `7b6cac7`，工具更新 basic `6f3443e`；主任务整体验收与 examples 暂停状态不变。
