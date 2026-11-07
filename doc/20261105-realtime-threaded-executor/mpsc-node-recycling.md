@@ -8,7 +8,7 @@
 ## 背景与需求
 此前 [执行器开销 profiling](executor-overhead-optimization.md) 中，Dedicated 的 malloc/free self cycles 约占 48%，每消息仍有一次节点分配与释放。本次为同一任务的后续工作。
 
-用户在实现过程中调整需求：infra 默认执行器改为 Legacy 实现，去掉 deprecated 后改名；旧 MPSC 执行器移到 basic，命名为 `EnhancedDedicatedThreadedExecutor`，继续优化延迟和吞吐，优先使用成熟第三方库。默认名称按原正确拼写保留 `DedicatedThreadExecutor`，Legacy 名称作为无 deprecated 的兼容别名。
+用户在实现过程中调整需求：infra 默认执行器改为 Legacy 实现，去掉 deprecated 后改名；旧 MPSC 执行器移到 basic，命名为 `EnhancedDedicatedThreadedExecutor`，继续优化延迟和吞吐，优先使用成熟第三方库。默认名称按原正确拼写保留 `DedicatedThreadExecutor`，最初暂留 Legacy 别名，后续按用户要求删除（见文末）。
 
 ## 最终方案
 - infra 默认：原 Legacy 的 mutex + incoming/processing 两个 list + splice，实现保留已经修复的 predicate wait、wakeIdle 和每条 stop 检查。仍约每 1ms 调用 idle，即使 Host 的 hasIdleWork=false；忽略 spinWait。保留默认类型的第二 Config 模板参数，idlePeriod 使用 Config 值。
@@ -33,16 +33,16 @@
 ## 代码改动
 ### tm_infra
 - `RealTimeThreadedExecutor.hpp`：默认 Dedicated 改为 mutex/list 实现；Inline、选择器与公共契约保留。
-- `LegacyDedicatedThreadExecutor.hpp`：转为兼容别名，无 deprecated 标记。
+- `LegacyDedicatedThreadExecutor.hpp`：初版为兼容别名；后续删除该头文件和安装项。
 - `RealTimeMPSCQueue.hpp`：提取原始未池化队列，仅供 infra SharedPool 使用；加入安装清单。
 - `RealTimeSharedPoolExecutor.hpp`：包含提取后的队列头文件。
-- `LegacyExecutorTest.cpp`：验证默认 Environment 和 Legacy 别名均选择新默认。
+- `DedicatedExecutorTest.cpp`（原 `LegacyExecutorTest.cpp`）：验证默认和显式 Environment 选择 Dedicated。
 - `ThreadedHandlerTest.cpp`：分别验证默认历史 idle 节奏和 SharedPool 按需 idle。
 ### tm_basic
 - `EnhancedDedicatedThreadedExecutor.hpp`：迁入原 MPSC 执行器，加入 Boost 缓存和 Environment component；加入安装清单。
 - `test/enhanced_dedicated_executor_test/`：独立压力、异常和 executor 契约测试；复用既有 handler suite 覆盖完整图路径。
 - `MoodycamelExecutorTest.cpp`：测试源码支持选择 Enhanced，更新默认后端的 idle 断言。
-- `ExecutorBench.cpp` / `ExecutorLatencyBench.cpp`：新增 enhanced 引擎，dedicated 表示当前默认，legacy 为同实现兼容名称；历史结果的引擎含义保持历史解释。
+- `ExecutorBench.cpp` / `ExecutorLatencyBench.cpp`：新增 enhanced 引擎，dedicated 表示当前默认，legacy 引擎后续已删除；历史结果的引擎含义保持历史解释。
 - profiling 脚本：重建历史未池化 Enhanced include override；独立计时/计数、五轮交替测量、保存命令与 SHA256。
 
 ## 测试与验证
@@ -93,7 +93,7 @@ producer 绑 CPU20–23、consumer 绑 CPU24–27（避开 SMT sibling），五�
 四跳自旋场景 p50 回退约19%、p99约16%，不能仅用单跳p99改善推断端到端延迟改善。复用缓存引入额外同步与节点访问，当前版本的确定收益是减少分配及部分吞吐场景改善，尚未消除多跳自旋场景回退；默认仍按用户指定使用 mutex/list，Enhanced 为显式 opt-in，不把这项代价隐藏在默认执行器中。没有因本轮测量修改自旋默认值或消息顺序。
 
 ## 兼容性与注意事项
-用户明确授权切换默认实现与移动 MPSC 执行器。默认类型名、构造/stop/wakeIdle/threadHandle、Environment 选择和 Inline 不变。直接使用原 Dedicated 想继续走 MPSC 时须显式引入 basic Enhanced。Legacy 名称保留兼容；SharedPool 行为不变。默认重新采用历史周期 idle；Enhanced 继续按需 idle 和 spinWait。原有 detached 生命周期约束不变。
+用户明确授权切换默认实现与移动 MPSC 执行器。默认类型名、构造/stop/wakeIdle/threadHandle、Environment 选择和 Inline 不变。直接使用原 Dedicated 想继续走 MPSC 时须显式引入 basic Enhanced。后续已按用户要求删除 Legacy 类型、头文件及基准入口，不提供兼容；SharedPool 行为不变。默认重新采用历史周期 idle；Enhanced 继续按需 idle 和 spinWait。原有 detached 生命周期约束不变。
 
 本轮不合并/推送：原任务第二阶段仍未整体验收，保留 feature worktree。tm_kit_reference 按既有约束待远程推送后同步；[现行 App 类型参考](../../../../../tm_kit_reference/tm_infra/01-app-types.md) 尚描述旧默认，应以本记录和源码为准。
 
@@ -108,3 +108,14 @@ producer 绑 CPU20–23、consumer 绑 CPU24–27（避开 SMT sibling），五�
 - tm_infra `0a9796c`：默认执行器回迁、Legacy 兼容别名、SharedPool 队列提取、默认行为回归和本记录/数据。
 - tm_basic `cbfde30`：Enhanced 执行器、Boost 节点缓存、测试与 profiling 工具。
 - 本文在代码提交后单独补记提交号。两仓库保留 feature 分支，未推送；主任务第二阶段整体验收及之后的 reference 同步仍按原任务安排。
+
+## 后续：删除 Legacy 兼容入口（2026-11-07，完成）
+用户明确要求无需保留 Legacy 向前兼容。删除 Legacy 别名头文件及安装项，专用回归测试改用 Dedicated 命名；基准工具删除 legacy 后端和 include-legacy 选项，历史测量数据保留原标签。此为用户授权的 API 删除，不改变 Dedicated/Enhanced 的运行算法，追加到原记录。
+
+删除后 Enhanced 的独立 benchmark engine ID 为7（历史测量提交中的8仍保留在原始记录），README 与 Meson/C++ 分发同步更新。
+
+验证（Release，GCC15，先 source 工作区环境）：
+- `ninja -j2 -C .../tm_infra/builddir_release test/threaded_handler_test/dedicated_executor_test`，对应 `meson test --no-rebuild dedicated_executor_test` 1/1 通过。
+- 重建 basic 的 generic/Dedicated/Enhanced/Enhanced counts/latency 五个基准目标成功，独立 Dedicated、Enhanced counts 冒烟正确。
+- `run_profile.py --candidate-only --quick --repeats 1 ...` 37/37 正确；`run_latency.py --candidate-only --engines dedicated,enhanced --messages 20 --warmup 8 --hops 1 --intervals 0 --spins 0 --repeats 1 ...` 2/2 正确。此为工具回归，不作为新性能测量。
+- 修改后的 Python runner 语法检查通过，源码与测试中无 LegacyDedicated 类型/头文件引用；私有 install 已同步，移除旧安装头文件。历史数据和历史说明未重写。

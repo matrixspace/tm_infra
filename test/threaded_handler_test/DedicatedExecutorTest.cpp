@@ -1,4 +1,4 @@
-#include <tm_kit/infra/LegacyDedicatedThreadExecutor.hpp>
+#include <tm_kit/infra/RealTimeThreadedExecutor.hpp>
 #include <array>
 #include <cstdio>
 #include <cstdlib>
@@ -42,8 +42,7 @@ namespace
     using Exec = DedicatedThreadExecutor<Item>;
     struct DefaultEnv {};
     static_assert(std::is_same_v<RealTimeThreadedExecutorFor<DefaultEnv, Item>, Exec>);
-    static_assert(std::is_same_v<LegacyDedicatedThreadExecutor<Item>, Exec>);
-    struct Env : RealTimeThreadedExecutorComponent<LegacyDedicatedThreadExecutor> {};
+    struct Env : RealTimeThreadedExecutorComponent<DedicatedThreadExecutor> {};
     static_assert(std::is_same_v<RealTimeThreadedExecutorFor<Env, Item>, Exec>);
     struct Host {
         std::mutex mutex;
