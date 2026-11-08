@@ -1,0 +1,93 @@
+{
+  "baseline_commit": "tm_basic 11138a5",
+  "final_variant": "control-local",
+  "compiler_flags": "GCC15 -std=c++17 -O3 -pthread; ExecutorBench adds -DEXECUTOR_BENCH_ENGINE=7; counts adds -DEXECUTOR_BENCH_COUNTS=1 -Wl,--wrap=malloc -Wl,--wrap=free",
+  "variants": {
+    "base": {
+      "header_sha256": "66a9f8a3134e8b596e43b2d63d7d130a073238be6d0aae50e1b36752bb510f06",
+      "binaries": {
+        "bench": "3b52eae430cd7f4d087aa81c02cb7b822cfa32ad55dcf3260edc085eb105f14e",
+        "normal": "c318f58fcd9281ac306d2aebc0fcfb890f74edf9df620f5446835216c06da2f6",
+        "counts": "df771c61014d2052e61074c4722efb23c02f172fcbe0948d8e37d57163b1207d"
+      }
+    },
+    "defer": {
+      "header_sha256": "66015b5bd8425377075ca27991d3adf6a8d990813b167c3c5e188a0a3b69c8fb",
+      "binaries": {
+        "bench": "5038dc5a0b5821c61d0b3405d3c7d2fae6e791dce194412e354ab6ae6d4d4778"
+      }
+    },
+    "wake": {
+      "header_sha256": "8ec96c9583f9c00617772e2a26de987ae9308fff7855e419a2d7d22f38fc9d98",
+      "binaries": {
+        "bench": "c433d75e8c6ac35d6120b31d4bc6ef38f103a929f84093f0830d37c68a41ac96",
+        "normal": "31ad1f227461c668426b453f4a4767651a338645f775480d1f5d3686b03ba557"
+      }
+    },
+    "published": {
+      "header_sha256": "44074df3a79a27de282d2dafdb46c630007825db9b1aee7205a626fc09d79919",
+      "binaries": {
+        "bench": "49fdb0f5213dfe23ca0aa61a9b95d9dbbc16979e6f8df2c211b2f74b74fad08f"
+      }
+    },
+    "combined": {
+      "header_sha256": "3d6976fa22f22b9901c3dfd021f3813c88a7b5b4c63bf574efd2e7e12e52f423",
+      "binaries": {
+        "bench": "ce386dac29160f7c3cd155c661af531669447bf7b0f5df5930215e23f8acaf9f",
+        "normal": "6cd8f8e615bab1b7fdc4ae39229710fc14d2f3ae329713cef4a0070539b3a53e",
+        "counts": "816368459bc5f3349b2d15134d4a1a260fde9690b745cecef1961798319fab42"
+      }
+    },
+    "isolated": {
+      "header_sha256": "eefdfaf56c7b86f9128ea31f9f0d4ee24e083332fb76c4f202bf55f7b960f68b",
+      "binaries": {
+        "bench": "9622f6d86b5a590a4484d0e779a698ca78eb4f325b4fc57b3b6fd0fc547eaa49"
+      }
+    },
+    "snapshot": {
+      "header_sha256": "4956cf22de860b4c90d47620ae241cdfca2f4314dcd880ddba25c977857aef18",
+      "binaries": {
+        "bench": "fdacbdac89f1dc2f84b8dbdffb110bc8d18dcc99caae2a4e9a4d452f2b60d568",
+        "normal": "5f712800955b1727da960c6a04949ad9a5167d0c80540e2c691cba54018bc046",
+        "tsan": "289cc61b3f9868544f96d214c998f151562523c80ef7fe231649acd6a6481cd8"
+      }
+    },
+    "adaptive": {
+      "header_sha256": "06abbe281efd7b1a18705ba56a1e050daefe8c4b2b0cab31cc804313aa63eb25",
+      "binaries": {
+        "bench": "ff2beba87c7e321c4a9279c6c0ac828d4ebe15b8020315456da275ed9e02f4ec",
+        "normal": "fd6a9733d3af60622bf28920c84a63044f44b5b3031a277ae7493fcc09909bea",
+        "counts": "32b4f4f9a2c1566a3fe24934a03afc636476be53f9bec7a3e6ebf4b15b1ecf54"
+      }
+    },
+    "adaptive-aligned": {
+      "header_sha256": "4372bb9bf9e0b5a7f81af27b57897ff4b17349c07466a91ca11e81a82afc7a4a",
+      "binaries": {
+        "normal": "144de32592f10dc0c65223097524052aab50bc1e1a45511d7af5d6b319104a0c",
+        "bench": "40b03795e1c94ebb340dd4f7de50a8f41f2bf12a2cb612dc4d2c87af852653db"
+      }
+    },
+    "control": {
+      "header_sha256": "bfc918bf5c950c69ee231021a4871e7edd48402f8e5ea10e1be4ac03bc69c0fc",
+      "binaries": {
+        "normal": "194d65c2b9d5c3e4804e111285a79170a04505b5b06b161bdd2aa3702ab532fb",
+        "bench": "3c35c47dce26232cbeb61370381a0cb0b5997916d1d44237e14186a55b32c9e4"
+      }
+    },
+    "control-local": {
+      "header_sha256": "a6bf0aa328b657fa7e2bfa1192ac22c31ee189797f83435dff1c95ce2f8a381b",
+      "binaries": {
+        "normal": "5593a52ac6dd04e53048faa9598f6ab2370fa8f84126f1d134261133fdc20bab",
+        "bench": "adbbd80e22f71d6866c736ca39cc14a3eb2cd9e8072cf312b09bed5732a30ce0",
+        "counts": "76ced062bfe284ae977489ba1f970c7d6ec42bfb32c8539da98959bbd6746fa7"
+      }
+    },
+    "control-early": {
+      "header_sha256": "8bff3d6c9dcfc802bd137e273ca5d25b10a771660c4be5723aaca36db0540aad",
+      "binaries": {
+        "normal": "57fd83c2adaddf0cbdfb0ac3a870f4e1b78c2f550813208ae8935dad33a3b5e1",
+        "bench": "1ab86e3b119f6387866bd92a36a111be0812233758c05ff70135f9637f2414c6"
+      }
+    }
+  }
+}

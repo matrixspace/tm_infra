@@ -1,7 +1,7 @@
 # 默认执行器回迁与 Enhanced MPSC 节点复用
 
 **任务开始时间：** 2026-11-07
-**任务结束时间：** 2026-11-07
+**任务结束时间：** 2026-11-08
 **状态：** 完成（本轮迁移与节点复用；主任务第二阶段状态不变）
 **分支：** `feature/realtime-threaded-executor`（tm_infra commit `0a9796c`；tm_basic commit `cbfde30`）
 
@@ -159,3 +159,56 @@ python3 worktrees/realtime-threaded-executor/tm_basic/test/executor_bench/run_en
 本轮仅 basic 执行器头文件有行为改动；测试说明和两仓库索引同步更新，沿用现有feature分支，不推送。缓存上限增加64个空Node是此次吞吐收益的空间代价，无新增vcpkg依赖。第三方接口依据：[Boost SPSC bulk pop](https://www.boost.org/doc/libs/latest/boost/lockfree/spsc_queue.hpp)，同时核对本机Boost1.91源码。
 
 本轮提交：tm_basic `11138a5`（批量回收优化与测试说明）；tm_infra `e642cf3`（方案比较、验证和原始数据）。代码与记录均已提交，私有install头文件已更新，未推送。
+
+## 继续降低异步延迟（2026-11-07 至 2026-11-08，完成）
+目标逼近 Inline 延迟，保留异步执行与串行回调契约。评估回收操作移出回调前关键路径、避免无请求时的 wakeRequested RMW、自旋观察已发布链接而非尚未链接的 head。保持原睡眠 seq_cst 握手，先用同工具测 Inline 和现有 Enhanced，再逐项消融。
+
+消融进展：单独推迟回收、条件化wake清理、观察已发布链接及组合均完成1/4跳五轮测量。组合单跳p50约737→469ns、四跳4496→3765ns，Inline同工具约71–77ns。隔离Node.next与value缓存行单跳略退、四跳略好但增加节点内存，暂不采用。
+
+进一步原型：将MPSC改为生产者CAS发布链表、消费者exchange批量接管后反转，证明批次内/批次间FIFO并通过TSan压力测试。它减少单生产者吞吐CPU（约328→182ns/item），但单跳p50约470→614ns，四生产者CPU也退化，故不作为低延迟默认方案。原型仅保留实验数据与说明，不进入最终头文件。
+
+硬件布局进展：本机/sys确认CPU20/48为SMT同胞，24/52为另一物理核。同工具五轮配对：组合版独立核心单跳p50约510ns、SMT约147ns，Inline此前约71ns；单生产者饱和CPU/item约307→80ns。该收益属于线程布局，不归因于代码；SMT可能与真实业务争用执行单元，不作为默认绑定策略。拓扑试验首轮因为工具默认检查连续4个consumer CPU而拒绝狭窄affinity，改用显式 `--consumer-cpus` 列表后通过，没有把失败结果计入。
+
+完整组合方案回归发现四生产者小消息CPU约924→1006ns/item（其他吞吐场景改善），因此追加按积压情况选择回收时机的原型：若next->next已经发布，则回调前归还旧哨兵，否则延后归还；只读取当前消息节点上的原子链接，不额外读取生产者head。正在与无条件延后方案配对验证，不因单跳收益忽略吞吐回退。
+
+积压自适应原型五轮结果：四生产者小消息 CPU/item 基线828、无条件延后969、自适应821ns；四跳p50分别4629、3746、3580ns。单生产者小消息CPU321/296/298ns，四生产者大消息1064/921/1001ns。选择自适应版本，以较均衡的吞吐/延迟替代无条件延后。保持缓存容量和全局FIFO，回收时机提示即使读到旧值也只改变性能，不改变节点所有权；RAII仍负责异常路径。
+
+自适应长窗口复核未保持初测收益：四生产者小消息CPU约811→1012ns/item，故不能凭短测定案。追加两组：自适应+控制/数据缓存行隔离，以及只改变唤醒/轮询而保持原回收时机。最终方案待此轮筛选，保留所有回退数据，不宣称自适应已稳定消除吞吐回退。
+
+最终筛选改为保留原回收时机，只优化唤醒/轮询（control-local）。在原组合基础上，run中的idle判断先看已发布链接；有消息时省掉对producer head缓存行的再次读取，无链接时仍用原head判断覆盖发布窗口。独立五轮对照：单跳p50约618→480ns，四跳4587→4122ns；单生产者吞吐CPU342→254ns，四生产者802→822ns。自适应加缓存行隔离虽然四跳约3582ns，但四生产者CPU约869ns并增加节点内存，未采用。回收前/后与批次反转等试验不进入最终实现。
+
+### 本轮最终实现与验证（2026-11-08）
+最终采用 `control-local`，基线为 tm_basic `11138a5`。三项修改：
+1. 自旋观察已发布的 tail->next，减少 head 已交换但链接尚未发布时的空 drain。
+2. 没有显式 idle wake 时不做 wakeRequested.exchange，避免无意义地写入与 sleeping 共用的缓存行。
+3. 自旋返回后的 idle 判断先检查已发布链接；已有消息时无需再读生产者 head 缓存行，无链接时仍读取 head 覆盖发布窗口。
+
+原 seq_cst 睡眠握手保留；FIFO、异步上下文、串行回调、默认200µs自旋、缓存容量和回收时机均保持原契约。代码与测试仅改 basic，infra 为记录更新。新增零自旋/200µs两种配置下各20000次数据提交与20000次idle开关/唤醒并发，检查最终idle激活与stop。Release direct/handler测试2/2通过；最新TSan、ASan/UBSan均无报告，ASan仍明确关闭泄漏检测。私有安装前缀同步，未改公共install或第三方代码。
+
+实验同时覆盖延后回收、按积压回收、控制/数据缓存行隔离、CAS链表批量接管反转、不同自旋判据、SMT布局和自旋预算。最终未采用增加节点内存或改变队列结构的原型。所有候选与基线的差异见 [variants.patch](latency-critical-path-profiling/variants.patch)，编译参数及SHA256见 [metadata.json](latency-critical-path-profiling/metadata.json)。基线头文件可用 `git show 11138a5:tm_kit/basic/EnhancedDedicatedThreadedExecutor.hpp` 重建；最终源码相对于 control-local 实验头文件仅格式与注释不同。
+
+消融/筛选数据：[单项与组合](latency-critical-path-profiling/ablation.json)、[节点对齐](latency-critical-path-profiling/alignment.json)、[链表批次接管](latency-critical-path-profiling/snapshot-comparison.json)、[积压自适应](latency-critical-path-profiling/adaptive-comparison.json)、[只优化控制路径](latency-critical-path-profiling/control-comparison.json)、[保留早期head判据](latency-critical-path-profiling/early-comparison.json)。各轮输入、命令、正确性结果均在原始数据中；原型的局部优势不等于最终实现的收益。
+
+### 最终性能结果与不确定性
+采用现有两套工具，GCC15、C++17、`-O3 -pthread`，计数与计时分离。本任务测量期间无并发编译或sanitizer压力测试。
+
+- pipeline工具（每轮10000条、五轮交替、producer CPU20、consumer CPU24–27，200µs自旋）：control-comparison中单跳p50 **618→480ns**、四跳 **4587→4122ns**。独立early-comparison复核为 **586→502ns**、四跳 **4444→4000ns**。不同轮有波动，单跳改善约14%–22%、四跳约10%，不挑选最小值作为保证。
+- 完整微基准120条正确性通过：[结果](latency-critical-path-profiling/results.jsonl)、[五次中位数](latency-critical-path-profiling/summary.md)。单生产者小/大消息CPU/item **337→241ns / 436→329ns**；四生产者大消息 **1053→913ns**。闭环与稀疏计数窗口继续为零节点分配。该工具的消息结构及ack路径与pipeline不同，不能混合解释两套工具的p50。
+- 四生产者小消息在五轮矩阵中曾显示明显回退，但逐次结果存在约800/1000ns两档，同一基线也如此。追加**30轮随机顺序、每轮两个同一基线二进制及一个候选，共90次**对照，全部正确。两个基线标签中位数分别1023和824ns，证明少量样本中位数会误导。合并基线平均CPU/item **934.8ns**，候选 **917.8ns**（-1.8%）；按轮成对bootstrap的95%区间约 **-7.5%至+4.0%**，本轮不能确认稳定提升或明显回退。原始数据：[90次对照](latency-critical-path-profiling/p4-noise-control.jsonl)、[均值/分位数/区间](latency-critical-path-profiling/p4-noise-summary.json)。区间是当前共享机器与此负载的统计结果，不是所有部署的性能承诺。保留前面所有回退结果，不据此追改算法。
+
+### 与 Inline 的距离及 CPU 代价
+最终版本按本机SMT拓扑CPU20/48复测，五轮交替；[完整结果](latency-critical-path-profiling/control-smt.json)。所有消息正确，保持两个线程的异步执行。
+
+| 输入与配置 | Inline p50 / p99 | Enhanced p50 / p99 | 进程CPU时间 / wall时间 |
+|---|---:|---:|---:|
+| 连续闭环，Enhanced自旋200µs | 87 / 97ns | 224 / 297ns | Inline约1.00、Enhanced约1.86逻辑CPU |
+| 闭环sleep间隔1ms，Enhanced自旋200µs | 194 / 222ns | 14270 / 16139ns | Inline约0.007、Enhanced约0.22逻辑CPU |
+| 闭环sleep间隔1ms，Enhanced自旋2ms | 194 / 222ns | 206 / 375ns | Inline约0.007、Enhanced约1.00逻辑CPU |
+
+在**SMT同胞+2ms自旋+此小消息负载**下，稀疏输入p50已接近Inline；连续闭环仍约2.6倍，不能宣称异步执行器普遍达到Inline延迟。百纳秒绝对值包含计时/缓存影响，早期轮次甚至出现稀疏Inline比持续自旋的Enhanced更慢，不能解释为异步执行本质更快。SMT共用执行资源，真实业务计算可能改变结论；有idle worker时spinWait还受idlePeriod限制。默认不强制绑核，也不提高默认自旋预算。
+
+可通过已有 `ThreadedExecOptions::spinWait` 配置直接执行器；复现命令及拓扑核查说明已写入 [benchmark README](../../../tm_basic/test/executor_bench/README.md)。前期布局与预算数据另见 [placement](latency-critical-path-profiling/placement.json)、[sparse-budget](latency-critical-path-profiling/sparse-budget.json)，其 combined/adaptive 原型结果不冒充最终版本。
+
+最终验证输出：[TSan](latency-critical-path-profiling/tsan.txt)、[ASan/UBSan](latency-critical-path-profiling/asan.txt)。保留feature分支，主任务第二阶段整体状态不变，reference仍待推送后同步。
+
+复现工具：basic `test/executor_bench/run_contention_profile.py` 保存随机双基线实验并支持 `--summarize-only`。用记录中的90条数据复算，输出与已归档的 `p4-noise-summary.json` 完全一致；无需重新运行负载即可核查统计过程。Release测试输出另存 [tests.txt](latency-critical-path-profiling/tests.txt)。
