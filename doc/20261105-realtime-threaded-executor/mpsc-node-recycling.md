@@ -3,7 +3,7 @@
 **任务开始时间：** 2026-11-07
 **任务结束时间：** 2026-11-08
 **状态：** 完成（本轮迁移与节点复用；主任务第二阶段状态不变）
-**分支：** `feature/realtime-threaded-executor`（tm_infra commit `0a9796c`；tm_basic commit `cbfde30`）
+**分支：** `feature/realtime-threaded-executor`（本轮 tm_basic commit `a33c7be`；实验记录 tm_infra commit `b92ef6f`；此前提交见各节）
 
 ## 背景与需求
 此前 [执行器开销 profiling](executor-overhead-optimization.md) 中，Dedicated 的 malloc/free self cycles 约占 48%，每消息仍有一次节点分配与释放。本次为同一任务的后续工作。
@@ -212,3 +212,5 @@ python3 worktrees/realtime-threaded-executor/tm_basic/test/executor_bench/run_en
 最终验证输出：[TSan](latency-critical-path-profiling/tsan.txt)、[ASan/UBSan](latency-critical-path-profiling/asan.txt)。保留feature分支，主任务第二阶段整体状态不变，reference仍待推送后同步。
 
 复现工具：basic `test/executor_bench/run_contention_profile.py` 保存随机双基线实验并支持 `--summarize-only`。用记录中的90条数据复算，输出与已归档的 `p4-noise-summary.json` 完全一致；无需重新运行负载即可核查统计过程。Release测试输出另存 [tests.txt](latency-critical-path-profiling/tests.txt)。
+
+本轮提交：tm_basic `a33c7be`（轮询/唤醒优化、并发回归与噪声复现工具）；tm_infra `b92ef6f`（实验原始数据、方案取舍与验证记录）。已更新worktree私有安装，未合并或推送，整体执行器改造待验收。
