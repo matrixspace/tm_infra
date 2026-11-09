@@ -21,3 +21,5 @@
 Release定向构建成功，最终两项测试2/2通过；私有worktree安装已同步。未合并/推送，reference待推送后同步。
 
 [测试输出](default-time-check-tests.txt)。
+
+代码与记录提交：tm_infra `771ca25`。
