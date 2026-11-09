@@ -3,7 +3,7 @@
 **任务开始时间：** 2026-11-09  
 **任务结束时间：** 2026-11-09  
 **状态：** 完成  
-**分支：** `feature/realtime-threaded-executor`
+**分支：** `feature/realtime-threaded-executor`（修复 commit `a5fda59`）
 
 ## 背景
 评审发现第二阶段把公开类模板 `ThreadedHandler` 改为 `ExecHandler` 的别名后，具体 Environment 下的派生类无法继续通过 `H() : ThreadedHandler() {}` 构造基类，也无法用 `ThreadedHandler::` 访问继承成员。原有源码兼容性承诺要求保留这些写法。
