@@ -123,3 +123,5 @@
 2026-11-09：[moodycamel执行器合并](moodycamel-unification.md)，替代Enhanced与旧BlockingQueue两套实现。
 
 2026-11-09：[ThreadedHandler 继承兼容性修复](threaded-handler-compatibility.md)：评审确认别名丢失注入类名；恢复薄类包装，补充具体 Environment 下旧写法的回归测试。
+
+2026-11-09：用户要求合并四仓库 develop 并推送；[合并与交付状态](develop-integration.md) 记录分支检查、验证与网络阻塞，examples 无待合并提交。

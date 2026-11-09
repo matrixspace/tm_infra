@@ -13,3 +13,5 @@
 - 2026-11-09：[moodycamel执行器合并](20261105-realtime-threaded-executor/moodycamel-unification.md)：只保留MoodycamelThreadedExecutor，以可用性探测控制相关目标编译。
 
 - 2026-11-09：[ThreadedHandler 继承兼容性修复](20261105-realtime-threaded-executor/threaded-handler-compatibility.md)：恢复公开类包装，兼容旧的基类初始化与限定成员访问。
+
+- 2026-11-09：[合并 develop 与交付状态](20261105-realtime-threaded-executor/develop-integration.md)：按用户要求整合三个库；examples 无源码差异，远程访问受环境限制。
