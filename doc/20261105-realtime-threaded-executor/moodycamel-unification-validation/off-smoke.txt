@@ -1,0 +1,1 @@
+{"executor":"dedicated","mode":"closed","hops":1,"messages":100,"warmup":10,"spin_us":0,"interval_us":0,"pool_threads":2,"producer_cpu":20,"consumer_cpu":24,"consumer_cpus":"","wall_ns":1794482,"process_cpu_ns":3290437,"producer_cpu_ns":1781781,"p50_ns":18614,"p99_ns":19902,"p999_ns":19902,"arrival_p99_ns":19902,"late_p99_ns":0,"errors":0,"ok":true}

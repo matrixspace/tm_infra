@@ -3,6 +3,7 @@ tm_infra_headers = [
     , 'WithTimeData.hpp'
     , 'BasicWithTimeApp.hpp'
     , 'RealTimeApp.hpp'
+    , 'RealTimeThreadedExecutor.hpp'
     , 'SinglePassIterationApp.hpp'
     , 'TopDownSinglePassIterationApp.hpp'
     , 'BasicWithTimeApp_ExecuteAction_Piece.hpp'

@@ -1,0 +1,17 @@
+{
+  "baseline_commit": "7edf028",
+  "final": "moodycamel ConcurrentQueue, ConsumerToken, BLOCK_SIZE=256, 8 publication shards",
+  "compiler": "gcc-toolset-15 C++17 -O3 -pthread",
+  "timing_counts_separate": true,
+  "sha256": {
+    "base": "5593a52ac6dd04e53048faa9598f6ab2370fa8f84126f1d134261133fdc20bab",
+    "single": "7cb54d85cdcc7bfed11a05ad3d54b435ce425f6a27a514054ba0cd06274193b5",
+    "bulk": "90a2228c4340461f0bc81e5516a40d8c8188616bf6f41e0eb54c7180952e8c8d",
+    "notoken": "df54d701bc061e5703012804183e449ceb35620acf6e871cdd29b447b53662f7",
+    "fence": "b08f5f2457cb122c00e643559f961d3a9733991280bbe21b5b40516afea37ca8",
+    "sharded": "5467c60c47e78495344ca8243c9415a7fc37a2748cb9d6f4c4a672a7bad6bf74",
+    "block128": "5711e804b6b0ae3d0d832eef555523e97cd0da490654650c3cde4eb5e5583334",
+    "block256": "64e4715b2a3ee722590b96eba852995eed2bcebd207d733ec5f7b5cbfc25ec41",
+    "final": "66a268a4885ee00c868e50e216020cf3ba38935e2b44e0a4f695887b5ee31c89"
+  }
+}

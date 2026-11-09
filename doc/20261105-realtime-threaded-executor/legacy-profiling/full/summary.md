@@ -1,0 +1,49 @@
+| Case | wall ns/item | CPU ns/item |
+|---|---:|---:|
+| direct-p1-b0 | 12.8 | 12.7 |
+| direct-p1-b256 | 14.7 | 14.7 |
+| direct-p4-b0 | 3.2 | 12.7 |
+| direct-p4-b256 | 3.7 | 14.8 |
+| inline-p1-b0 | 12.7 | 12.7 |
+| inline-p1-b256 | 14.4 | 14.3 |
+| inline-p4-b0 | 3.2 | 12.7 |
+| inline-p4-b256 | 3.6 | 14.3 |
+| inline-erased-p1-b0 | 15.7 | 15.7 |
+| inline-erased-p1-b256 | 17.2 | 17.2 |
+| inline-erased-p4-b0 | 4.0 | 15.9 |
+| inline-erased-p4-b256 | 4.4 | 17.3 |
+| dedicated-p1-b0 | 299.2 | 597.4 |
+| dedicated-p1-b256 | 605.4 | 886.0 |
+| dedicated-p4-b0 | 163.0 | 699.3 |
+| dedicated-p4-b256 | 263.3 | 831.5 |
+| pool-p1-b0 | 387.9 | 825.8 |
+| pool-p1-b256 | 647.1 | 985.4 |
+| pool-p4-b0 | 253.1 | 1215.6 |
+| pool-p4-b256 | 328.4 | 1090.4 |
+| moody-p1-b0 | 199.0 | 397.3 |
+| moody-p1-b256 | 161.7 | 322.8 |
+| moody-p4-b0 | 100.0 | 494.8 |
+| moody-p4-b256 | 109.4 | 512.8 |
+| legacy-p1-b0 | 585.3 | 1098.0 |
+| legacy-p1-b256 | 748.0 | 1189.6 |
+| legacy-p4-b0 | 654.9 | 2841.3 |
+| legacy-p4-b256 | 854.4 | 3499.9 |
+| pool-strands | 111.5 | 619.7 |
+| dedicated-strands | 117.5 | 836.1 |
+| moody-strands | 43.8 | 324.8 |
+| legacy-strands | 388.5 | 3003.5 |
+| inline-latency | 109472.7 | 6096.7 |
+| dedicated-latency | 111015.1 | 119675.3 |
+| pool-latency | 111053.8 | 120170.9 |
+| moody-latency | 111065.3 | 119658.2 |
+| legacy-latency | 124642.3 | 35852.2 |
+| pool-idle-0 | 1000000000.0 | 95222.0 |
+| pool-idle-1 | 1000000000.0 | 779788440.4 |
+| dedicated-idle-0 | 1000000000.0 | 187969.9 |
+| dedicated-idle-1 | 1000000000.0 | 992310993.6 |
+| moody-idle-0 | 1000000000.0 | 195176.2 |
+| moody-idle-1 | 1000000000.0 | 1343071350.6 |
+| legacy-idle-0 | 1000000000.0 | 987358172.1 |
+| legacy-idle-1 | 1000000000.0 | 987987447.8 |
+
+Idle rows report CPU ns/second and wall ns/second. See JSONL for producer/background CPU, latency percentiles, context switches, allocation/move counts and correctness.

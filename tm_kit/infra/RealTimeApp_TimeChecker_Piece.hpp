@@ -16,7 +16,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -30,7 +30,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -67,7 +67,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -81,7 +81,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -119,7 +119,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -133,7 +133,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -147,7 +147,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -186,7 +186,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -200,7 +200,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -214,7 +214,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -254,7 +254,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -268,7 +268,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -282,7 +282,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -296,7 +296,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -337,7 +337,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -351,7 +351,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -365,7 +365,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -379,7 +379,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -421,7 +421,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -435,7 +435,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -449,7 +449,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -463,7 +463,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -477,7 +477,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -520,7 +520,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -534,7 +534,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -548,7 +548,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -562,7 +562,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -576,7 +576,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -620,7 +620,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -634,7 +634,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -648,7 +648,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -662,7 +662,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -676,7 +676,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -690,7 +690,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -735,7 +735,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -749,7 +749,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -763,7 +763,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -777,7 +777,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -791,7 +791,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -805,7 +805,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -851,7 +851,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -865,7 +865,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -879,7 +879,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -893,7 +893,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -907,7 +907,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -921,7 +921,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -935,7 +935,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -982,7 +982,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -996,7 +996,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -1010,7 +1010,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -1024,7 +1024,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -1038,7 +1038,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -1052,7 +1052,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -1066,7 +1066,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -1114,7 +1114,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -1128,7 +1128,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -1142,7 +1142,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -1156,7 +1156,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -1170,7 +1170,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -1184,7 +1184,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -1198,7 +1198,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -1212,7 +1212,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -1261,7 +1261,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -1275,7 +1275,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -1289,7 +1289,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -1303,7 +1303,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -1317,7 +1317,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -1331,7 +1331,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -1345,7 +1345,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -1359,7 +1359,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -1409,7 +1409,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -1423,7 +1423,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -1437,7 +1437,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -1451,7 +1451,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -1465,7 +1465,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -1479,7 +1479,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -1493,7 +1493,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -1507,7 +1507,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -1521,7 +1521,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -1572,7 +1572,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -1586,7 +1586,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -1600,7 +1600,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -1614,7 +1614,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -1628,7 +1628,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -1642,7 +1642,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -1656,7 +1656,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -1670,7 +1670,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -1684,7 +1684,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -1736,7 +1736,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -1750,7 +1750,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -1764,7 +1764,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -1778,7 +1778,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -1792,7 +1792,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -1806,7 +1806,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -1820,7 +1820,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -1834,7 +1834,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -1848,7 +1848,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -1862,7 +1862,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -1915,7 +1915,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -1929,7 +1929,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -1943,7 +1943,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -1957,7 +1957,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -1971,7 +1971,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -1985,7 +1985,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -1999,7 +1999,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -2013,7 +2013,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -2027,7 +2027,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -2041,7 +2041,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -2095,7 +2095,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -2109,7 +2109,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -2123,7 +2123,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -2137,7 +2137,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -2151,7 +2151,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -2165,7 +2165,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -2179,7 +2179,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -2193,7 +2193,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -2207,7 +2207,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -2221,7 +2221,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -2235,7 +2235,7 @@ public:
             if (!versionChecker10_.checkVersion(std::get<10>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp10_ && data.timedData.timePoint < *tp10_) {
                     return false;
                 }
@@ -2290,7 +2290,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -2304,7 +2304,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -2318,7 +2318,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -2332,7 +2332,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -2346,7 +2346,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -2360,7 +2360,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -2374,7 +2374,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -2388,7 +2388,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -2402,7 +2402,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -2416,7 +2416,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -2430,7 +2430,7 @@ public:
             if (!versionChecker10_.checkVersion(std::get<10>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp10_ && data.timedData.timePoint < *tp10_) {
                     return false;
                 }
@@ -2486,7 +2486,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -2500,7 +2500,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -2514,7 +2514,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -2528,7 +2528,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -2542,7 +2542,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -2556,7 +2556,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -2570,7 +2570,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -2584,7 +2584,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -2598,7 +2598,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -2612,7 +2612,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -2626,7 +2626,7 @@ public:
             if (!versionChecker10_.checkVersion(std::get<10>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp10_ && data.timedData.timePoint < *tp10_) {
                     return false;
                 }
@@ -2640,7 +2640,7 @@ public:
             if (!versionChecker11_.checkVersion(std::get<11>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp11_ && data.timedData.timePoint < *tp11_) {
                     return false;
                 }
@@ -2697,7 +2697,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -2711,7 +2711,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -2725,7 +2725,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -2739,7 +2739,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -2753,7 +2753,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -2767,7 +2767,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -2781,7 +2781,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -2795,7 +2795,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -2809,7 +2809,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -2823,7 +2823,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -2837,7 +2837,7 @@ public:
             if (!versionChecker10_.checkVersion(std::get<10>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp10_ && data.timedData.timePoint < *tp10_) {
                     return false;
                 }
@@ -2851,7 +2851,7 @@ public:
             if (!versionChecker11_.checkVersion(std::get<11>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp11_ && data.timedData.timePoint < *tp11_) {
                     return false;
                 }
@@ -2909,7 +2909,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -2923,7 +2923,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -2937,7 +2937,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -2951,7 +2951,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -2965,7 +2965,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -2979,7 +2979,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -2993,7 +2993,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -3007,7 +3007,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -3021,7 +3021,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -3035,7 +3035,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -3049,7 +3049,7 @@ public:
             if (!versionChecker10_.checkVersion(std::get<10>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp10_ && data.timedData.timePoint < *tp10_) {
                     return false;
                 }
@@ -3063,7 +3063,7 @@ public:
             if (!versionChecker11_.checkVersion(std::get<11>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp11_ && data.timedData.timePoint < *tp11_) {
                     return false;
                 }
@@ -3077,7 +3077,7 @@ public:
             if (!versionChecker12_.checkVersion(std::get<12>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp12_ && data.timedData.timePoint < *tp12_) {
                     return false;
                 }
@@ -3136,7 +3136,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -3150,7 +3150,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -3164,7 +3164,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -3178,7 +3178,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -3192,7 +3192,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -3206,7 +3206,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -3220,7 +3220,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -3234,7 +3234,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -3248,7 +3248,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -3262,7 +3262,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -3276,7 +3276,7 @@ public:
             if (!versionChecker10_.checkVersion(std::get<10>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp10_ && data.timedData.timePoint < *tp10_) {
                     return false;
                 }
@@ -3290,7 +3290,7 @@ public:
             if (!versionChecker11_.checkVersion(std::get<11>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp11_ && data.timedData.timePoint < *tp11_) {
                     return false;
                 }
@@ -3304,7 +3304,7 @@ public:
             if (!versionChecker12_.checkVersion(std::get<12>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp12_ && data.timedData.timePoint < *tp12_) {
                     return false;
                 }
@@ -3364,7 +3364,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -3378,7 +3378,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -3392,7 +3392,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -3406,7 +3406,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -3420,7 +3420,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -3434,7 +3434,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -3448,7 +3448,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -3462,7 +3462,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -3476,7 +3476,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -3490,7 +3490,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -3504,7 +3504,7 @@ public:
             if (!versionChecker10_.checkVersion(std::get<10>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp10_ && data.timedData.timePoint < *tp10_) {
                     return false;
                 }
@@ -3518,7 +3518,7 @@ public:
             if (!versionChecker11_.checkVersion(std::get<11>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp11_ && data.timedData.timePoint < *tp11_) {
                     return false;
                 }
@@ -3532,7 +3532,7 @@ public:
             if (!versionChecker12_.checkVersion(std::get<12>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp12_ && data.timedData.timePoint < *tp12_) {
                     return false;
                 }
@@ -3546,7 +3546,7 @@ public:
             if (!versionChecker13_.checkVersion(std::get<13>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp13_ && data.timedData.timePoint < *tp13_) {
                     return false;
                 }
@@ -3607,7 +3607,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -3621,7 +3621,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -3635,7 +3635,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -3649,7 +3649,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -3663,7 +3663,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -3677,7 +3677,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -3691,7 +3691,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -3705,7 +3705,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -3719,7 +3719,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -3733,7 +3733,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -3747,7 +3747,7 @@ public:
             if (!versionChecker10_.checkVersion(std::get<10>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp10_ && data.timedData.timePoint < *tp10_) {
                     return false;
                 }
@@ -3761,7 +3761,7 @@ public:
             if (!versionChecker11_.checkVersion(std::get<11>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp11_ && data.timedData.timePoint < *tp11_) {
                     return false;
                 }
@@ -3775,7 +3775,7 @@ public:
             if (!versionChecker12_.checkVersion(std::get<12>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp12_ && data.timedData.timePoint < *tp12_) {
                     return false;
                 }
@@ -3789,7 +3789,7 @@ public:
             if (!versionChecker13_.checkVersion(std::get<13>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp13_ && data.timedData.timePoint < *tp13_) {
                     return false;
                 }
@@ -3851,7 +3851,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -3865,7 +3865,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -3879,7 +3879,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -3893,7 +3893,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -3907,7 +3907,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -3921,7 +3921,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -3935,7 +3935,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -3949,7 +3949,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -3963,7 +3963,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -3977,7 +3977,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -3991,7 +3991,7 @@ public:
             if (!versionChecker10_.checkVersion(std::get<10>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp10_ && data.timedData.timePoint < *tp10_) {
                     return false;
                 }
@@ -4005,7 +4005,7 @@ public:
             if (!versionChecker11_.checkVersion(std::get<11>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp11_ && data.timedData.timePoint < *tp11_) {
                     return false;
                 }
@@ -4019,7 +4019,7 @@ public:
             if (!versionChecker12_.checkVersion(std::get<12>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp12_ && data.timedData.timePoint < *tp12_) {
                     return false;
                 }
@@ -4033,7 +4033,7 @@ public:
             if (!versionChecker13_.checkVersion(std::get<13>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp13_ && data.timedData.timePoint < *tp13_) {
                     return false;
                 }
@@ -4047,7 +4047,7 @@ public:
             if (!versionChecker14_.checkVersion(std::get<14>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp14_ && data.timedData.timePoint < *tp14_) {
                     return false;
                 }
@@ -4110,7 +4110,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -4124,7 +4124,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -4138,7 +4138,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -4152,7 +4152,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -4166,7 +4166,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -4180,7 +4180,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -4194,7 +4194,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -4208,7 +4208,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -4222,7 +4222,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -4236,7 +4236,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -4250,7 +4250,7 @@ public:
             if (!versionChecker10_.checkVersion(std::get<10>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp10_ && data.timedData.timePoint < *tp10_) {
                     return false;
                 }
@@ -4264,7 +4264,7 @@ public:
             if (!versionChecker11_.checkVersion(std::get<11>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp11_ && data.timedData.timePoint < *tp11_) {
                     return false;
                 }
@@ -4278,7 +4278,7 @@ public:
             if (!versionChecker12_.checkVersion(std::get<12>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp12_ && data.timedData.timePoint < *tp12_) {
                     return false;
                 }
@@ -4292,7 +4292,7 @@ public:
             if (!versionChecker13_.checkVersion(std::get<13>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp13_ && data.timedData.timePoint < *tp13_) {
                     return false;
                 }
@@ -4306,7 +4306,7 @@ public:
             if (!versionChecker14_.checkVersion(std::get<14>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp14_ && data.timedData.timePoint < *tp14_) {
                     return false;
                 }
@@ -4370,7 +4370,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -4384,7 +4384,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -4398,7 +4398,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -4412,7 +4412,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -4426,7 +4426,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -4440,7 +4440,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -4454,7 +4454,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -4468,7 +4468,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -4482,7 +4482,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -4496,7 +4496,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -4510,7 +4510,7 @@ public:
             if (!versionChecker10_.checkVersion(std::get<10>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp10_ && data.timedData.timePoint < *tp10_) {
                     return false;
                 }
@@ -4524,7 +4524,7 @@ public:
             if (!versionChecker11_.checkVersion(std::get<11>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp11_ && data.timedData.timePoint < *tp11_) {
                     return false;
                 }
@@ -4538,7 +4538,7 @@ public:
             if (!versionChecker12_.checkVersion(std::get<12>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp12_ && data.timedData.timePoint < *tp12_) {
                     return false;
                 }
@@ -4552,7 +4552,7 @@ public:
             if (!versionChecker13_.checkVersion(std::get<13>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp13_ && data.timedData.timePoint < *tp13_) {
                     return false;
                 }
@@ -4566,7 +4566,7 @@ public:
             if (!versionChecker14_.checkVersion(std::get<14>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp14_ && data.timedData.timePoint < *tp14_) {
                     return false;
                 }
@@ -4580,7 +4580,7 @@ public:
             if (!versionChecker15_.checkVersion(std::get<15>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp15_ && data.timedData.timePoint < *tp15_) {
                     return false;
                 }
@@ -4645,7 +4645,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -4659,7 +4659,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -4673,7 +4673,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -4687,7 +4687,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -4701,7 +4701,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -4715,7 +4715,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -4729,7 +4729,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -4743,7 +4743,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -4757,7 +4757,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -4771,7 +4771,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -4785,7 +4785,7 @@ public:
             if (!versionChecker10_.checkVersion(std::get<10>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp10_ && data.timedData.timePoint < *tp10_) {
                     return false;
                 }
@@ -4799,7 +4799,7 @@ public:
             if (!versionChecker11_.checkVersion(std::get<11>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp11_ && data.timedData.timePoint < *tp11_) {
                     return false;
                 }
@@ -4813,7 +4813,7 @@ public:
             if (!versionChecker12_.checkVersion(std::get<12>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp12_ && data.timedData.timePoint < *tp12_) {
                     return false;
                 }
@@ -4827,7 +4827,7 @@ public:
             if (!versionChecker13_.checkVersion(std::get<13>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp13_ && data.timedData.timePoint < *tp13_) {
                     return false;
                 }
@@ -4841,7 +4841,7 @@ public:
             if (!versionChecker14_.checkVersion(std::get<14>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp14_ && data.timedData.timePoint < *tp14_) {
                     return false;
                 }
@@ -4855,7 +4855,7 @@ public:
             if (!versionChecker15_.checkVersion(std::get<15>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp15_ && data.timedData.timePoint < *tp15_) {
                     return false;
                 }
@@ -4921,7 +4921,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -4935,7 +4935,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -4949,7 +4949,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -4963,7 +4963,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -4977,7 +4977,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -4991,7 +4991,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -5005,7 +5005,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -5019,7 +5019,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -5033,7 +5033,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -5047,7 +5047,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -5061,7 +5061,7 @@ public:
             if (!versionChecker10_.checkVersion(std::get<10>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp10_ && data.timedData.timePoint < *tp10_) {
                     return false;
                 }
@@ -5075,7 +5075,7 @@ public:
             if (!versionChecker11_.checkVersion(std::get<11>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp11_ && data.timedData.timePoint < *tp11_) {
                     return false;
                 }
@@ -5089,7 +5089,7 @@ public:
             if (!versionChecker12_.checkVersion(std::get<12>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp12_ && data.timedData.timePoint < *tp12_) {
                     return false;
                 }
@@ -5103,7 +5103,7 @@ public:
             if (!versionChecker13_.checkVersion(std::get<13>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp13_ && data.timedData.timePoint < *tp13_) {
                     return false;
                 }
@@ -5117,7 +5117,7 @@ public:
             if (!versionChecker14_.checkVersion(std::get<14>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp14_ && data.timedData.timePoint < *tp14_) {
                     return false;
                 }
@@ -5131,7 +5131,7 @@ public:
             if (!versionChecker15_.checkVersion(std::get<15>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp15_ && data.timedData.timePoint < *tp15_) {
                     return false;
                 }
@@ -5145,7 +5145,7 @@ public:
             if (!versionChecker16_.checkVersion(std::get<16>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp16_ && data.timedData.timePoint < *tp16_) {
                     return false;
                 }
@@ -5212,7 +5212,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -5226,7 +5226,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -5240,7 +5240,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -5254,7 +5254,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -5268,7 +5268,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -5282,7 +5282,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -5296,7 +5296,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -5310,7 +5310,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -5324,7 +5324,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -5338,7 +5338,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -5352,7 +5352,7 @@ public:
             if (!versionChecker10_.checkVersion(std::get<10>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp10_ && data.timedData.timePoint < *tp10_) {
                     return false;
                 }
@@ -5366,7 +5366,7 @@ public:
             if (!versionChecker11_.checkVersion(std::get<11>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp11_ && data.timedData.timePoint < *tp11_) {
                     return false;
                 }
@@ -5380,7 +5380,7 @@ public:
             if (!versionChecker12_.checkVersion(std::get<12>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp12_ && data.timedData.timePoint < *tp12_) {
                     return false;
                 }
@@ -5394,7 +5394,7 @@ public:
             if (!versionChecker13_.checkVersion(std::get<13>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp13_ && data.timedData.timePoint < *tp13_) {
                     return false;
                 }
@@ -5408,7 +5408,7 @@ public:
             if (!versionChecker14_.checkVersion(std::get<14>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp14_ && data.timedData.timePoint < *tp14_) {
                     return false;
                 }
@@ -5422,7 +5422,7 @@ public:
             if (!versionChecker15_.checkVersion(std::get<15>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp15_ && data.timedData.timePoint < *tp15_) {
                     return false;
                 }
@@ -5436,7 +5436,7 @@ public:
             if (!versionChecker16_.checkVersion(std::get<16>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp16_ && data.timedData.timePoint < *tp16_) {
                     return false;
                 }
@@ -5504,7 +5504,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -5518,7 +5518,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -5532,7 +5532,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -5546,7 +5546,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -5560,7 +5560,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -5574,7 +5574,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -5588,7 +5588,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -5602,7 +5602,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -5616,7 +5616,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -5630,7 +5630,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -5644,7 +5644,7 @@ public:
             if (!versionChecker10_.checkVersion(std::get<10>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp10_ && data.timedData.timePoint < *tp10_) {
                     return false;
                 }
@@ -5658,7 +5658,7 @@ public:
             if (!versionChecker11_.checkVersion(std::get<11>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp11_ && data.timedData.timePoint < *tp11_) {
                     return false;
                 }
@@ -5672,7 +5672,7 @@ public:
             if (!versionChecker12_.checkVersion(std::get<12>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp12_ && data.timedData.timePoint < *tp12_) {
                     return false;
                 }
@@ -5686,7 +5686,7 @@ public:
             if (!versionChecker13_.checkVersion(std::get<13>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp13_ && data.timedData.timePoint < *tp13_) {
                     return false;
                 }
@@ -5700,7 +5700,7 @@ public:
             if (!versionChecker14_.checkVersion(std::get<14>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp14_ && data.timedData.timePoint < *tp14_) {
                     return false;
                 }
@@ -5714,7 +5714,7 @@ public:
             if (!versionChecker15_.checkVersion(std::get<15>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp15_ && data.timedData.timePoint < *tp15_) {
                     return false;
                 }
@@ -5728,7 +5728,7 @@ public:
             if (!versionChecker16_.checkVersion(std::get<16>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp16_ && data.timedData.timePoint < *tp16_) {
                     return false;
                 }
@@ -5742,7 +5742,7 @@ public:
             if (!versionChecker17_.checkVersion(std::get<17>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp17_ && data.timedData.timePoint < *tp17_) {
                     return false;
                 }
@@ -5811,7 +5811,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -5825,7 +5825,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -5839,7 +5839,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -5853,7 +5853,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -5867,7 +5867,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -5881,7 +5881,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -5895,7 +5895,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -5909,7 +5909,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -5923,7 +5923,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -5937,7 +5937,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -5951,7 +5951,7 @@ public:
             if (!versionChecker10_.checkVersion(std::get<10>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp10_ && data.timedData.timePoint < *tp10_) {
                     return false;
                 }
@@ -5965,7 +5965,7 @@ public:
             if (!versionChecker11_.checkVersion(std::get<11>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp11_ && data.timedData.timePoint < *tp11_) {
                     return false;
                 }
@@ -5979,7 +5979,7 @@ public:
             if (!versionChecker12_.checkVersion(std::get<12>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp12_ && data.timedData.timePoint < *tp12_) {
                     return false;
                 }
@@ -5993,7 +5993,7 @@ public:
             if (!versionChecker13_.checkVersion(std::get<13>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp13_ && data.timedData.timePoint < *tp13_) {
                     return false;
                 }
@@ -6007,7 +6007,7 @@ public:
             if (!versionChecker14_.checkVersion(std::get<14>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp14_ && data.timedData.timePoint < *tp14_) {
                     return false;
                 }
@@ -6021,7 +6021,7 @@ public:
             if (!versionChecker15_.checkVersion(std::get<15>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp15_ && data.timedData.timePoint < *tp15_) {
                     return false;
                 }
@@ -6035,7 +6035,7 @@ public:
             if (!versionChecker16_.checkVersion(std::get<16>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp16_ && data.timedData.timePoint < *tp16_) {
                     return false;
                 }
@@ -6049,7 +6049,7 @@ public:
             if (!versionChecker17_.checkVersion(std::get<17>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp17_ && data.timedData.timePoint < *tp17_) {
                     return false;
                 }
@@ -6119,7 +6119,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -6133,7 +6133,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -6147,7 +6147,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -6161,7 +6161,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -6175,7 +6175,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -6189,7 +6189,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -6203,7 +6203,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -6217,7 +6217,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -6231,7 +6231,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -6245,7 +6245,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -6259,7 +6259,7 @@ public:
             if (!versionChecker10_.checkVersion(std::get<10>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp10_ && data.timedData.timePoint < *tp10_) {
                     return false;
                 }
@@ -6273,7 +6273,7 @@ public:
             if (!versionChecker11_.checkVersion(std::get<11>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp11_ && data.timedData.timePoint < *tp11_) {
                     return false;
                 }
@@ -6287,7 +6287,7 @@ public:
             if (!versionChecker12_.checkVersion(std::get<12>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp12_ && data.timedData.timePoint < *tp12_) {
                     return false;
                 }
@@ -6301,7 +6301,7 @@ public:
             if (!versionChecker13_.checkVersion(std::get<13>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp13_ && data.timedData.timePoint < *tp13_) {
                     return false;
                 }
@@ -6315,7 +6315,7 @@ public:
             if (!versionChecker14_.checkVersion(std::get<14>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp14_ && data.timedData.timePoint < *tp14_) {
                     return false;
                 }
@@ -6329,7 +6329,7 @@ public:
             if (!versionChecker15_.checkVersion(std::get<15>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp15_ && data.timedData.timePoint < *tp15_) {
                     return false;
                 }
@@ -6343,7 +6343,7 @@ public:
             if (!versionChecker16_.checkVersion(std::get<16>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp16_ && data.timedData.timePoint < *tp16_) {
                     return false;
                 }
@@ -6357,7 +6357,7 @@ public:
             if (!versionChecker17_.checkVersion(std::get<17>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp17_ && data.timedData.timePoint < *tp17_) {
                     return false;
                 }
@@ -6371,7 +6371,7 @@ public:
             if (!versionChecker18_.checkVersion(std::get<18>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp18_ && data.timedData.timePoint < *tp18_) {
                     return false;
                 }
@@ -6442,7 +6442,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -6456,7 +6456,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -6470,7 +6470,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -6484,7 +6484,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -6498,7 +6498,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -6512,7 +6512,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -6526,7 +6526,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -6540,7 +6540,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -6554,7 +6554,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -6568,7 +6568,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -6582,7 +6582,7 @@ public:
             if (!versionChecker10_.checkVersion(std::get<10>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp10_ && data.timedData.timePoint < *tp10_) {
                     return false;
                 }
@@ -6596,7 +6596,7 @@ public:
             if (!versionChecker11_.checkVersion(std::get<11>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp11_ && data.timedData.timePoint < *tp11_) {
                     return false;
                 }
@@ -6610,7 +6610,7 @@ public:
             if (!versionChecker12_.checkVersion(std::get<12>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp12_ && data.timedData.timePoint < *tp12_) {
                     return false;
                 }
@@ -6624,7 +6624,7 @@ public:
             if (!versionChecker13_.checkVersion(std::get<13>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp13_ && data.timedData.timePoint < *tp13_) {
                     return false;
                 }
@@ -6638,7 +6638,7 @@ public:
             if (!versionChecker14_.checkVersion(std::get<14>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp14_ && data.timedData.timePoint < *tp14_) {
                     return false;
                 }
@@ -6652,7 +6652,7 @@ public:
             if (!versionChecker15_.checkVersion(std::get<15>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp15_ && data.timedData.timePoint < *tp15_) {
                     return false;
                 }
@@ -6666,7 +6666,7 @@ public:
             if (!versionChecker16_.checkVersion(std::get<16>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp16_ && data.timedData.timePoint < *tp16_) {
                     return false;
                 }
@@ -6680,7 +6680,7 @@ public:
             if (!versionChecker17_.checkVersion(std::get<17>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp17_ && data.timedData.timePoint < *tp17_) {
                     return false;
                 }
@@ -6694,7 +6694,7 @@ public:
             if (!versionChecker18_.checkVersion(std::get<18>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp18_ && data.timedData.timePoint < *tp18_) {
                     return false;
                 }
@@ -6766,7 +6766,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -6780,7 +6780,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -6794,7 +6794,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -6808,7 +6808,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -6822,7 +6822,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -6836,7 +6836,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -6850,7 +6850,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -6864,7 +6864,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -6878,7 +6878,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -6892,7 +6892,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -6906,7 +6906,7 @@ public:
             if (!versionChecker10_.checkVersion(std::get<10>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp10_ && data.timedData.timePoint < *tp10_) {
                     return false;
                 }
@@ -6920,7 +6920,7 @@ public:
             if (!versionChecker11_.checkVersion(std::get<11>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp11_ && data.timedData.timePoint < *tp11_) {
                     return false;
                 }
@@ -6934,7 +6934,7 @@ public:
             if (!versionChecker12_.checkVersion(std::get<12>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp12_ && data.timedData.timePoint < *tp12_) {
                     return false;
                 }
@@ -6948,7 +6948,7 @@ public:
             if (!versionChecker13_.checkVersion(std::get<13>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp13_ && data.timedData.timePoint < *tp13_) {
                     return false;
                 }
@@ -6962,7 +6962,7 @@ public:
             if (!versionChecker14_.checkVersion(std::get<14>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp14_ && data.timedData.timePoint < *tp14_) {
                     return false;
                 }
@@ -6976,7 +6976,7 @@ public:
             if (!versionChecker15_.checkVersion(std::get<15>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp15_ && data.timedData.timePoint < *tp15_) {
                     return false;
                 }
@@ -6990,7 +6990,7 @@ public:
             if (!versionChecker16_.checkVersion(std::get<16>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp16_ && data.timedData.timePoint < *tp16_) {
                     return false;
                 }
@@ -7004,7 +7004,7 @@ public:
             if (!versionChecker17_.checkVersion(std::get<17>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp17_ && data.timedData.timePoint < *tp17_) {
                     return false;
                 }
@@ -7018,7 +7018,7 @@ public:
             if (!versionChecker18_.checkVersion(std::get<18>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp18_ && data.timedData.timePoint < *tp18_) {
                     return false;
                 }
@@ -7032,7 +7032,7 @@ public:
             if (!versionChecker19_.checkVersion(std::get<19>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp19_ && data.timedData.timePoint < *tp19_) {
                     return false;
                 }
@@ -7105,7 +7105,7 @@ public:
             if (!versionChecker0_.checkVersion(std::get<0>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp0_ && data.timedData.timePoint < *tp0_) {
                     return false;
                 }
@@ -7119,7 +7119,7 @@ public:
             if (!versionChecker1_.checkVersion(std::get<1>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp1_ && data.timedData.timePoint < *tp1_) {
                     return false;
                 }
@@ -7133,7 +7133,7 @@ public:
             if (!versionChecker2_.checkVersion(std::get<2>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp2_ && data.timedData.timePoint < *tp2_) {
                     return false;
                 }
@@ -7147,7 +7147,7 @@ public:
             if (!versionChecker3_.checkVersion(std::get<3>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp3_ && data.timedData.timePoint < *tp3_) {
                     return false;
                 }
@@ -7161,7 +7161,7 @@ public:
             if (!versionChecker4_.checkVersion(std::get<4>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp4_ && data.timedData.timePoint < *tp4_) {
                     return false;
                 }
@@ -7175,7 +7175,7 @@ public:
             if (!versionChecker5_.checkVersion(std::get<5>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp5_ && data.timedData.timePoint < *tp5_) {
                     return false;
                 }
@@ -7189,7 +7189,7 @@ public:
             if (!versionChecker6_.checkVersion(std::get<6>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp6_ && data.timedData.timePoint < *tp6_) {
                     return false;
                 }
@@ -7203,7 +7203,7 @@ public:
             if (!versionChecker7_.checkVersion(std::get<7>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp7_ && data.timedData.timePoint < *tp7_) {
                     return false;
                 }
@@ -7217,7 +7217,7 @@ public:
             if (!versionChecker8_.checkVersion(std::get<8>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp8_ && data.timedData.timePoint < *tp8_) {
                     return false;
                 }
@@ -7231,7 +7231,7 @@ public:
             if (!versionChecker9_.checkVersion(std::get<9>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp9_ && data.timedData.timePoint < *tp9_) {
                     return false;
                 }
@@ -7245,7 +7245,7 @@ public:
             if (!versionChecker10_.checkVersion(std::get<10>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp10_ && data.timedData.timePoint < *tp10_) {
                     return false;
                 }
@@ -7259,7 +7259,7 @@ public:
             if (!versionChecker11_.checkVersion(std::get<11>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp11_ && data.timedData.timePoint < *tp11_) {
                     return false;
                 }
@@ -7273,7 +7273,7 @@ public:
             if (!versionChecker12_.checkVersion(std::get<12>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp12_ && data.timedData.timePoint < *tp12_) {
                     return false;
                 }
@@ -7287,7 +7287,7 @@ public:
             if (!versionChecker13_.checkVersion(std::get<13>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp13_ && data.timedData.timePoint < *tp13_) {
                     return false;
                 }
@@ -7301,7 +7301,7 @@ public:
             if (!versionChecker14_.checkVersion(std::get<14>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp14_ && data.timedData.timePoint < *tp14_) {
                     return false;
                 }
@@ -7315,7 +7315,7 @@ public:
             if (!versionChecker15_.checkVersion(std::get<15>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp15_ && data.timedData.timePoint < *tp15_) {
                     return false;
                 }
@@ -7329,7 +7329,7 @@ public:
             if (!versionChecker16_.checkVersion(std::get<16>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp16_ && data.timedData.timePoint < *tp16_) {
                     return false;
                 }
@@ -7343,7 +7343,7 @@ public:
             if (!versionChecker17_.checkVersion(std::get<17>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp17_ && data.timedData.timePoint < *tp17_) {
                     return false;
                 }
@@ -7357,7 +7357,7 @@ public:
             if (!versionChecker18_.checkVersion(std::get<18>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp18_ && data.timedData.timePoint < *tp18_) {
                     return false;
                 }
@@ -7371,7 +7371,7 @@ public:
             if (!versionChecker19_.checkVersion(std::get<19>(data.timedData.value))) {
                 return false;
             }
-            if (StateT::CheckTime) {
+            if (CheckTimeEnabled<StateT>::value) {
                 if (tp19_ && data.timedData.timePoint < *tp19_) {
                     return false;
                 }

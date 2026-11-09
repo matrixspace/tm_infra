@@ -1,0 +1,8 @@
+1/2 TM_kit_basic:executor_mechanism_test OK               0.14s
+2/2 TM_kit_basic:threaded_handler_test   OK               3.21s
+
+Ok:                2
+Fail:              0
+
+Full log written to /data/hxli/codes/tm_kit/worktrees/realtime-threaded-executor/tm_basic/builddir_release/meson-logs/testlog.txt
+NOTICE: You are using Python 3.9 which is EOL. Starting with v1.12.0, Meson will require Python 3.10 or newer

@@ -36,7 +36,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -86,7 +86,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -188,7 +188,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -238,7 +238,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -698,7 +698,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -748,7 +748,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -798,7 +798,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -906,7 +906,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -956,7 +956,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -1006,7 +1006,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -1472,7 +1472,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -1522,7 +1522,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -1572,7 +1572,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -1622,7 +1622,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -1736,7 +1736,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -1786,7 +1786,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -1836,7 +1836,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -1886,7 +1886,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -2358,7 +2358,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -2408,7 +2408,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -2458,7 +2458,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -2508,7 +2508,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -2558,7 +2558,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -2678,7 +2678,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -2728,7 +2728,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -2778,7 +2778,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -2828,7 +2828,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -2878,7 +2878,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -3356,7 +3356,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -3406,7 +3406,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -3456,7 +3456,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -3506,7 +3506,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -3556,7 +3556,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -3606,7 +3606,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -3732,7 +3732,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -3782,7 +3782,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -3832,7 +3832,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -3882,7 +3882,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -3932,7 +3932,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -3982,7 +3982,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -4466,7 +4466,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -4516,7 +4516,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -4566,7 +4566,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -4616,7 +4616,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -4666,7 +4666,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -4716,7 +4716,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -4766,7 +4766,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -4898,7 +4898,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -4948,7 +4948,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -4998,7 +4998,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -5048,7 +5048,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -5098,7 +5098,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -5148,7 +5148,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -5198,7 +5198,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -5688,7 +5688,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -5738,7 +5738,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -5788,7 +5788,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -5838,7 +5838,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -5888,7 +5888,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -5938,7 +5938,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -5988,7 +5988,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -6038,7 +6038,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -6176,7 +6176,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -6226,7 +6226,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -6276,7 +6276,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -6326,7 +6326,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -6376,7 +6376,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -6426,7 +6426,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -6476,7 +6476,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -6526,7 +6526,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -7022,7 +7022,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -7072,7 +7072,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -7122,7 +7122,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -7172,7 +7172,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -7222,7 +7222,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -7272,7 +7272,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -7322,7 +7322,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -7372,7 +7372,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -7422,7 +7422,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -7566,7 +7566,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -7616,7 +7616,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -7666,7 +7666,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -7716,7 +7716,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -7766,7 +7766,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -7816,7 +7816,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -7866,7 +7866,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -7916,7 +7916,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -7966,7 +7966,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -8468,7 +8468,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -8518,7 +8518,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -8568,7 +8568,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -8618,7 +8618,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -8668,7 +8668,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -8718,7 +8718,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -8768,7 +8768,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -8818,7 +8818,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -8868,7 +8868,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -8918,7 +8918,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -9068,7 +9068,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -9118,7 +9118,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -9168,7 +9168,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -9218,7 +9218,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -9268,7 +9268,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -9318,7 +9318,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -9368,7 +9368,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -9418,7 +9418,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -9468,7 +9468,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -9518,7 +9518,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -10026,7 +10026,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -10076,7 +10076,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -10126,7 +10126,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -10176,7 +10176,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -10226,7 +10226,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -10276,7 +10276,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -10326,7 +10326,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -10376,7 +10376,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -10426,7 +10426,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -10476,7 +10476,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -10526,7 +10526,7 @@ protected:
                     if (!versionChecker10_.checkVersion(x10->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp10_ || x10->timedData.timePoint >= *tp10_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp10_ || x10->timedData.timePoint >= *tp10_) {
                         tp10_ = x10->timedData.timePoint;
                         StateT *env = x10->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -10682,7 +10682,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -10732,7 +10732,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -10782,7 +10782,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -10832,7 +10832,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -10882,7 +10882,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -10932,7 +10932,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -10982,7 +10982,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -11032,7 +11032,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -11082,7 +11082,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -11132,7 +11132,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -11182,7 +11182,7 @@ protected:
                     if (!versionChecker10_.checkVersion(x10->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp10_ || x10->timedData.timePoint >= *tp10_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp10_ || x10->timedData.timePoint >= *tp10_) {
                         tp10_ = x10->timedData.timePoint;
                         StateT *env = x10->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -11696,7 +11696,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -11746,7 +11746,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -11796,7 +11796,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -11846,7 +11846,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -11896,7 +11896,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -11946,7 +11946,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -11996,7 +11996,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -12046,7 +12046,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -12096,7 +12096,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -12146,7 +12146,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -12196,7 +12196,7 @@ protected:
                     if (!versionChecker10_.checkVersion(x10->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp10_ || x10->timedData.timePoint >= *tp10_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp10_ || x10->timedData.timePoint >= *tp10_) {
                         tp10_ = x10->timedData.timePoint;
                         StateT *env = x10->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -12246,7 +12246,7 @@ protected:
                     if (!versionChecker11_.checkVersion(x11->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp11_ || x11->timedData.timePoint >= *tp11_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp11_ || x11->timedData.timePoint >= *tp11_) {
                         tp11_ = x11->timedData.timePoint;
                         StateT *env = x11->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -12408,7 +12408,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -12458,7 +12458,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -12508,7 +12508,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -12558,7 +12558,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -12608,7 +12608,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -12658,7 +12658,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -12708,7 +12708,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -12758,7 +12758,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -12808,7 +12808,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -12858,7 +12858,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -12908,7 +12908,7 @@ protected:
                     if (!versionChecker10_.checkVersion(x10->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp10_ || x10->timedData.timePoint >= *tp10_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp10_ || x10->timedData.timePoint >= *tp10_) {
                         tp10_ = x10->timedData.timePoint;
                         StateT *env = x10->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -12958,7 +12958,7 @@ protected:
                     if (!versionChecker11_.checkVersion(x11->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp11_ || x11->timedData.timePoint >= *tp11_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp11_ || x11->timedData.timePoint >= *tp11_) {
                         tp11_ = x11->timedData.timePoint;
                         StateT *env = x11->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -13478,7 +13478,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -13528,7 +13528,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -13578,7 +13578,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -13628,7 +13628,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -13678,7 +13678,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -13728,7 +13728,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -13778,7 +13778,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -13828,7 +13828,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -13878,7 +13878,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -13928,7 +13928,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -13978,7 +13978,7 @@ protected:
                     if (!versionChecker10_.checkVersion(x10->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp10_ || x10->timedData.timePoint >= *tp10_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp10_ || x10->timedData.timePoint >= *tp10_) {
                         tp10_ = x10->timedData.timePoint;
                         StateT *env = x10->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -14028,7 +14028,7 @@ protected:
                     if (!versionChecker11_.checkVersion(x11->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp11_ || x11->timedData.timePoint >= *tp11_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp11_ || x11->timedData.timePoint >= *tp11_) {
                         tp11_ = x11->timedData.timePoint;
                         StateT *env = x11->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -14078,7 +14078,7 @@ protected:
                     if (!versionChecker12_.checkVersion(x12->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp12_ || x12->timedData.timePoint >= *tp12_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp12_ || x12->timedData.timePoint >= *tp12_) {
                         tp12_ = x12->timedData.timePoint;
                         StateT *env = x12->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -14246,7 +14246,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -14296,7 +14296,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -14346,7 +14346,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -14396,7 +14396,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -14446,7 +14446,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -14496,7 +14496,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -14546,7 +14546,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -14596,7 +14596,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -14646,7 +14646,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -14696,7 +14696,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -14746,7 +14746,7 @@ protected:
                     if (!versionChecker10_.checkVersion(x10->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp10_ || x10->timedData.timePoint >= *tp10_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp10_ || x10->timedData.timePoint >= *tp10_) {
                         tp10_ = x10->timedData.timePoint;
                         StateT *env = x10->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -14796,7 +14796,7 @@ protected:
                     if (!versionChecker11_.checkVersion(x11->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp11_ || x11->timedData.timePoint >= *tp11_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp11_ || x11->timedData.timePoint >= *tp11_) {
                         tp11_ = x11->timedData.timePoint;
                         StateT *env = x11->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -14846,7 +14846,7 @@ protected:
                     if (!versionChecker12_.checkVersion(x12->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp12_ || x12->timedData.timePoint >= *tp12_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp12_ || x12->timedData.timePoint >= *tp12_) {
                         tp12_ = x12->timedData.timePoint;
                         StateT *env = x12->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -15372,7 +15372,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -15422,7 +15422,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -15472,7 +15472,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -15522,7 +15522,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -15572,7 +15572,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -15622,7 +15622,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -15672,7 +15672,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -15722,7 +15722,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -15772,7 +15772,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -15822,7 +15822,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -15872,7 +15872,7 @@ protected:
                     if (!versionChecker10_.checkVersion(x10->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp10_ || x10->timedData.timePoint >= *tp10_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp10_ || x10->timedData.timePoint >= *tp10_) {
                         tp10_ = x10->timedData.timePoint;
                         StateT *env = x10->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -15922,7 +15922,7 @@ protected:
                     if (!versionChecker11_.checkVersion(x11->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp11_ || x11->timedData.timePoint >= *tp11_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp11_ || x11->timedData.timePoint >= *tp11_) {
                         tp11_ = x11->timedData.timePoint;
                         StateT *env = x11->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -15972,7 +15972,7 @@ protected:
                     if (!versionChecker12_.checkVersion(x12->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp12_ || x12->timedData.timePoint >= *tp12_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp12_ || x12->timedData.timePoint >= *tp12_) {
                         tp12_ = x12->timedData.timePoint;
                         StateT *env = x12->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -16022,7 +16022,7 @@ protected:
                     if (!versionChecker13_.checkVersion(x13->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp13_ || x13->timedData.timePoint >= *tp13_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp13_ || x13->timedData.timePoint >= *tp13_) {
                         tp13_ = x13->timedData.timePoint;
                         StateT *env = x13->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -16196,7 +16196,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -16246,7 +16246,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -16296,7 +16296,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -16346,7 +16346,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -16396,7 +16396,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -16446,7 +16446,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -16496,7 +16496,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -16546,7 +16546,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -16596,7 +16596,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -16646,7 +16646,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -16696,7 +16696,7 @@ protected:
                     if (!versionChecker10_.checkVersion(x10->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp10_ || x10->timedData.timePoint >= *tp10_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp10_ || x10->timedData.timePoint >= *tp10_) {
                         tp10_ = x10->timedData.timePoint;
                         StateT *env = x10->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -16746,7 +16746,7 @@ protected:
                     if (!versionChecker11_.checkVersion(x11->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp11_ || x11->timedData.timePoint >= *tp11_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp11_ || x11->timedData.timePoint >= *tp11_) {
                         tp11_ = x11->timedData.timePoint;
                         StateT *env = x11->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -16796,7 +16796,7 @@ protected:
                     if (!versionChecker12_.checkVersion(x12->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp12_ || x12->timedData.timePoint >= *tp12_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp12_ || x12->timedData.timePoint >= *tp12_) {
                         tp12_ = x12->timedData.timePoint;
                         StateT *env = x12->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -16846,7 +16846,7 @@ protected:
                     if (!versionChecker13_.checkVersion(x13->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp13_ || x13->timedData.timePoint >= *tp13_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp13_ || x13->timedData.timePoint >= *tp13_) {
                         tp13_ = x13->timedData.timePoint;
                         StateT *env = x13->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -17378,7 +17378,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -17428,7 +17428,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -17478,7 +17478,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -17528,7 +17528,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -17578,7 +17578,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -17628,7 +17628,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -17678,7 +17678,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -17728,7 +17728,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -17778,7 +17778,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -17828,7 +17828,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -17878,7 +17878,7 @@ protected:
                     if (!versionChecker10_.checkVersion(x10->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp10_ || x10->timedData.timePoint >= *tp10_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp10_ || x10->timedData.timePoint >= *tp10_) {
                         tp10_ = x10->timedData.timePoint;
                         StateT *env = x10->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -17928,7 +17928,7 @@ protected:
                     if (!versionChecker11_.checkVersion(x11->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp11_ || x11->timedData.timePoint >= *tp11_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp11_ || x11->timedData.timePoint >= *tp11_) {
                         tp11_ = x11->timedData.timePoint;
                         StateT *env = x11->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -17978,7 +17978,7 @@ protected:
                     if (!versionChecker12_.checkVersion(x12->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp12_ || x12->timedData.timePoint >= *tp12_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp12_ || x12->timedData.timePoint >= *tp12_) {
                         tp12_ = x12->timedData.timePoint;
                         StateT *env = x12->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -18028,7 +18028,7 @@ protected:
                     if (!versionChecker13_.checkVersion(x13->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp13_ || x13->timedData.timePoint >= *tp13_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp13_ || x13->timedData.timePoint >= *tp13_) {
                         tp13_ = x13->timedData.timePoint;
                         StateT *env = x13->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -18078,7 +18078,7 @@ protected:
                     if (!versionChecker14_.checkVersion(x14->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp14_ || x14->timedData.timePoint >= *tp14_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp14_ || x14->timedData.timePoint >= *tp14_) {
                         tp14_ = x14->timedData.timePoint;
                         StateT *env = x14->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -18258,7 +18258,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -18308,7 +18308,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -18358,7 +18358,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -18408,7 +18408,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -18458,7 +18458,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -18508,7 +18508,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -18558,7 +18558,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -18608,7 +18608,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -18658,7 +18658,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -18708,7 +18708,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -18758,7 +18758,7 @@ protected:
                     if (!versionChecker10_.checkVersion(x10->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp10_ || x10->timedData.timePoint >= *tp10_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp10_ || x10->timedData.timePoint >= *tp10_) {
                         tp10_ = x10->timedData.timePoint;
                         StateT *env = x10->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -18808,7 +18808,7 @@ protected:
                     if (!versionChecker11_.checkVersion(x11->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp11_ || x11->timedData.timePoint >= *tp11_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp11_ || x11->timedData.timePoint >= *tp11_) {
                         tp11_ = x11->timedData.timePoint;
                         StateT *env = x11->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -18858,7 +18858,7 @@ protected:
                     if (!versionChecker12_.checkVersion(x12->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp12_ || x12->timedData.timePoint >= *tp12_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp12_ || x12->timedData.timePoint >= *tp12_) {
                         tp12_ = x12->timedData.timePoint;
                         StateT *env = x12->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -18908,7 +18908,7 @@ protected:
                     if (!versionChecker13_.checkVersion(x13->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp13_ || x13->timedData.timePoint >= *tp13_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp13_ || x13->timedData.timePoint >= *tp13_) {
                         tp13_ = x13->timedData.timePoint;
                         StateT *env = x13->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -18958,7 +18958,7 @@ protected:
                     if (!versionChecker14_.checkVersion(x14->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp14_ || x14->timedData.timePoint >= *tp14_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp14_ || x14->timedData.timePoint >= *tp14_) {
                         tp14_ = x14->timedData.timePoint;
                         StateT *env = x14->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -19496,7 +19496,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -19546,7 +19546,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -19596,7 +19596,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -19646,7 +19646,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -19696,7 +19696,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -19746,7 +19746,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -19796,7 +19796,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -19846,7 +19846,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -19896,7 +19896,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -19946,7 +19946,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -19996,7 +19996,7 @@ protected:
                     if (!versionChecker10_.checkVersion(x10->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp10_ || x10->timedData.timePoint >= *tp10_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp10_ || x10->timedData.timePoint >= *tp10_) {
                         tp10_ = x10->timedData.timePoint;
                         StateT *env = x10->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -20046,7 +20046,7 @@ protected:
                     if (!versionChecker11_.checkVersion(x11->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp11_ || x11->timedData.timePoint >= *tp11_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp11_ || x11->timedData.timePoint >= *tp11_) {
                         tp11_ = x11->timedData.timePoint;
                         StateT *env = x11->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -20096,7 +20096,7 @@ protected:
                     if (!versionChecker12_.checkVersion(x12->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp12_ || x12->timedData.timePoint >= *tp12_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp12_ || x12->timedData.timePoint >= *tp12_) {
                         tp12_ = x12->timedData.timePoint;
                         StateT *env = x12->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -20146,7 +20146,7 @@ protected:
                     if (!versionChecker13_.checkVersion(x13->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp13_ || x13->timedData.timePoint >= *tp13_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp13_ || x13->timedData.timePoint >= *tp13_) {
                         tp13_ = x13->timedData.timePoint;
                         StateT *env = x13->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -20196,7 +20196,7 @@ protected:
                     if (!versionChecker14_.checkVersion(x14->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp14_ || x14->timedData.timePoint >= *tp14_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp14_ || x14->timedData.timePoint >= *tp14_) {
                         tp14_ = x14->timedData.timePoint;
                         StateT *env = x14->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -20246,7 +20246,7 @@ protected:
                     if (!versionChecker15_.checkVersion(x15->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp15_ || x15->timedData.timePoint >= *tp15_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp15_ || x15->timedData.timePoint >= *tp15_) {
                         tp15_ = x15->timedData.timePoint;
                         StateT *env = x15->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -20432,7 +20432,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -20482,7 +20482,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -20532,7 +20532,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -20582,7 +20582,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -20632,7 +20632,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -20682,7 +20682,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -20732,7 +20732,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -20782,7 +20782,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -20832,7 +20832,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -20882,7 +20882,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -20932,7 +20932,7 @@ protected:
                     if (!versionChecker10_.checkVersion(x10->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp10_ || x10->timedData.timePoint >= *tp10_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp10_ || x10->timedData.timePoint >= *tp10_) {
                         tp10_ = x10->timedData.timePoint;
                         StateT *env = x10->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -20982,7 +20982,7 @@ protected:
                     if (!versionChecker11_.checkVersion(x11->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp11_ || x11->timedData.timePoint >= *tp11_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp11_ || x11->timedData.timePoint >= *tp11_) {
                         tp11_ = x11->timedData.timePoint;
                         StateT *env = x11->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -21032,7 +21032,7 @@ protected:
                     if (!versionChecker12_.checkVersion(x12->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp12_ || x12->timedData.timePoint >= *tp12_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp12_ || x12->timedData.timePoint >= *tp12_) {
                         tp12_ = x12->timedData.timePoint;
                         StateT *env = x12->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -21082,7 +21082,7 @@ protected:
                     if (!versionChecker13_.checkVersion(x13->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp13_ || x13->timedData.timePoint >= *tp13_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp13_ || x13->timedData.timePoint >= *tp13_) {
                         tp13_ = x13->timedData.timePoint;
                         StateT *env = x13->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -21132,7 +21132,7 @@ protected:
                     if (!versionChecker14_.checkVersion(x14->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp14_ || x14->timedData.timePoint >= *tp14_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp14_ || x14->timedData.timePoint >= *tp14_) {
                         tp14_ = x14->timedData.timePoint;
                         StateT *env = x14->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -21182,7 +21182,7 @@ protected:
                     if (!versionChecker15_.checkVersion(x15->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp15_ || x15->timedData.timePoint >= *tp15_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp15_ || x15->timedData.timePoint >= *tp15_) {
                         tp15_ = x15->timedData.timePoint;
                         StateT *env = x15->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -21726,7 +21726,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -21776,7 +21776,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -21826,7 +21826,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -21876,7 +21876,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -21926,7 +21926,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -21976,7 +21976,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -22026,7 +22026,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -22076,7 +22076,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -22126,7 +22126,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -22176,7 +22176,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -22226,7 +22226,7 @@ protected:
                     if (!versionChecker10_.checkVersion(x10->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp10_ || x10->timedData.timePoint >= *tp10_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp10_ || x10->timedData.timePoint >= *tp10_) {
                         tp10_ = x10->timedData.timePoint;
                         StateT *env = x10->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -22276,7 +22276,7 @@ protected:
                     if (!versionChecker11_.checkVersion(x11->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp11_ || x11->timedData.timePoint >= *tp11_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp11_ || x11->timedData.timePoint >= *tp11_) {
                         tp11_ = x11->timedData.timePoint;
                         StateT *env = x11->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -22326,7 +22326,7 @@ protected:
                     if (!versionChecker12_.checkVersion(x12->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp12_ || x12->timedData.timePoint >= *tp12_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp12_ || x12->timedData.timePoint >= *tp12_) {
                         tp12_ = x12->timedData.timePoint;
                         StateT *env = x12->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -22376,7 +22376,7 @@ protected:
                     if (!versionChecker13_.checkVersion(x13->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp13_ || x13->timedData.timePoint >= *tp13_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp13_ || x13->timedData.timePoint >= *tp13_) {
                         tp13_ = x13->timedData.timePoint;
                         StateT *env = x13->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -22426,7 +22426,7 @@ protected:
                     if (!versionChecker14_.checkVersion(x14->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp14_ || x14->timedData.timePoint >= *tp14_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp14_ || x14->timedData.timePoint >= *tp14_) {
                         tp14_ = x14->timedData.timePoint;
                         StateT *env = x14->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -22476,7 +22476,7 @@ protected:
                     if (!versionChecker15_.checkVersion(x15->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp15_ || x15->timedData.timePoint >= *tp15_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp15_ || x15->timedData.timePoint >= *tp15_) {
                         tp15_ = x15->timedData.timePoint;
                         StateT *env = x15->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -22526,7 +22526,7 @@ protected:
                     if (!versionChecker16_.checkVersion(x16->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp16_ || x16->timedData.timePoint >= *tp16_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp16_ || x16->timedData.timePoint >= *tp16_) {
                         tp16_ = x16->timedData.timePoint;
                         StateT *env = x16->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -22718,7 +22718,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -22768,7 +22768,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -22818,7 +22818,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -22868,7 +22868,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -22918,7 +22918,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -22968,7 +22968,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -23018,7 +23018,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -23068,7 +23068,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -23118,7 +23118,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -23168,7 +23168,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -23218,7 +23218,7 @@ protected:
                     if (!versionChecker10_.checkVersion(x10->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp10_ || x10->timedData.timePoint >= *tp10_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp10_ || x10->timedData.timePoint >= *tp10_) {
                         tp10_ = x10->timedData.timePoint;
                         StateT *env = x10->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -23268,7 +23268,7 @@ protected:
                     if (!versionChecker11_.checkVersion(x11->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp11_ || x11->timedData.timePoint >= *tp11_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp11_ || x11->timedData.timePoint >= *tp11_) {
                         tp11_ = x11->timedData.timePoint;
                         StateT *env = x11->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -23318,7 +23318,7 @@ protected:
                     if (!versionChecker12_.checkVersion(x12->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp12_ || x12->timedData.timePoint >= *tp12_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp12_ || x12->timedData.timePoint >= *tp12_) {
                         tp12_ = x12->timedData.timePoint;
                         StateT *env = x12->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -23368,7 +23368,7 @@ protected:
                     if (!versionChecker13_.checkVersion(x13->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp13_ || x13->timedData.timePoint >= *tp13_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp13_ || x13->timedData.timePoint >= *tp13_) {
                         tp13_ = x13->timedData.timePoint;
                         StateT *env = x13->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -23418,7 +23418,7 @@ protected:
                     if (!versionChecker14_.checkVersion(x14->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp14_ || x14->timedData.timePoint >= *tp14_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp14_ || x14->timedData.timePoint >= *tp14_) {
                         tp14_ = x14->timedData.timePoint;
                         StateT *env = x14->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -23468,7 +23468,7 @@ protected:
                     if (!versionChecker15_.checkVersion(x15->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp15_ || x15->timedData.timePoint >= *tp15_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp15_ || x15->timedData.timePoint >= *tp15_) {
                         tp15_ = x15->timedData.timePoint;
                         StateT *env = x15->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -23518,7 +23518,7 @@ protected:
                     if (!versionChecker16_.checkVersion(x16->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp16_ || x16->timedData.timePoint >= *tp16_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp16_ || x16->timedData.timePoint >= *tp16_) {
                         tp16_ = x16->timedData.timePoint;
                         StateT *env = x16->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -24068,7 +24068,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -24118,7 +24118,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -24168,7 +24168,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -24218,7 +24218,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -24268,7 +24268,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -24318,7 +24318,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -24368,7 +24368,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -24418,7 +24418,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -24468,7 +24468,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -24518,7 +24518,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -24568,7 +24568,7 @@ protected:
                     if (!versionChecker10_.checkVersion(x10->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp10_ || x10->timedData.timePoint >= *tp10_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp10_ || x10->timedData.timePoint >= *tp10_) {
                         tp10_ = x10->timedData.timePoint;
                         StateT *env = x10->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -24618,7 +24618,7 @@ protected:
                     if (!versionChecker11_.checkVersion(x11->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp11_ || x11->timedData.timePoint >= *tp11_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp11_ || x11->timedData.timePoint >= *tp11_) {
                         tp11_ = x11->timedData.timePoint;
                         StateT *env = x11->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -24668,7 +24668,7 @@ protected:
                     if (!versionChecker12_.checkVersion(x12->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp12_ || x12->timedData.timePoint >= *tp12_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp12_ || x12->timedData.timePoint >= *tp12_) {
                         tp12_ = x12->timedData.timePoint;
                         StateT *env = x12->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -24718,7 +24718,7 @@ protected:
                     if (!versionChecker13_.checkVersion(x13->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp13_ || x13->timedData.timePoint >= *tp13_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp13_ || x13->timedData.timePoint >= *tp13_) {
                         tp13_ = x13->timedData.timePoint;
                         StateT *env = x13->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -24768,7 +24768,7 @@ protected:
                     if (!versionChecker14_.checkVersion(x14->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp14_ || x14->timedData.timePoint >= *tp14_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp14_ || x14->timedData.timePoint >= *tp14_) {
                         tp14_ = x14->timedData.timePoint;
                         StateT *env = x14->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -24818,7 +24818,7 @@ protected:
                     if (!versionChecker15_.checkVersion(x15->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp15_ || x15->timedData.timePoint >= *tp15_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp15_ || x15->timedData.timePoint >= *tp15_) {
                         tp15_ = x15->timedData.timePoint;
                         StateT *env = x15->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -24868,7 +24868,7 @@ protected:
                     if (!versionChecker16_.checkVersion(x16->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp16_ || x16->timedData.timePoint >= *tp16_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp16_ || x16->timedData.timePoint >= *tp16_) {
                         tp16_ = x16->timedData.timePoint;
                         StateT *env = x16->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -24918,7 +24918,7 @@ protected:
                     if (!versionChecker17_.checkVersion(x17->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp17_ || x17->timedData.timePoint >= *tp17_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp17_ || x17->timedData.timePoint >= *tp17_) {
                         tp17_ = x17->timedData.timePoint;
                         StateT *env = x17->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -25116,7 +25116,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -25166,7 +25166,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -25216,7 +25216,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -25266,7 +25266,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -25316,7 +25316,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -25366,7 +25366,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -25416,7 +25416,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -25466,7 +25466,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -25516,7 +25516,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -25566,7 +25566,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -25616,7 +25616,7 @@ protected:
                     if (!versionChecker10_.checkVersion(x10->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp10_ || x10->timedData.timePoint >= *tp10_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp10_ || x10->timedData.timePoint >= *tp10_) {
                         tp10_ = x10->timedData.timePoint;
                         StateT *env = x10->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -25666,7 +25666,7 @@ protected:
                     if (!versionChecker11_.checkVersion(x11->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp11_ || x11->timedData.timePoint >= *tp11_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp11_ || x11->timedData.timePoint >= *tp11_) {
                         tp11_ = x11->timedData.timePoint;
                         StateT *env = x11->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -25716,7 +25716,7 @@ protected:
                     if (!versionChecker12_.checkVersion(x12->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp12_ || x12->timedData.timePoint >= *tp12_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp12_ || x12->timedData.timePoint >= *tp12_) {
                         tp12_ = x12->timedData.timePoint;
                         StateT *env = x12->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -25766,7 +25766,7 @@ protected:
                     if (!versionChecker13_.checkVersion(x13->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp13_ || x13->timedData.timePoint >= *tp13_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp13_ || x13->timedData.timePoint >= *tp13_) {
                         tp13_ = x13->timedData.timePoint;
                         StateT *env = x13->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -25816,7 +25816,7 @@ protected:
                     if (!versionChecker14_.checkVersion(x14->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp14_ || x14->timedData.timePoint >= *tp14_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp14_ || x14->timedData.timePoint >= *tp14_) {
                         tp14_ = x14->timedData.timePoint;
                         StateT *env = x14->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -25866,7 +25866,7 @@ protected:
                     if (!versionChecker15_.checkVersion(x15->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp15_ || x15->timedData.timePoint >= *tp15_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp15_ || x15->timedData.timePoint >= *tp15_) {
                         tp15_ = x15->timedData.timePoint;
                         StateT *env = x15->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -25916,7 +25916,7 @@ protected:
                     if (!versionChecker16_.checkVersion(x16->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp16_ || x16->timedData.timePoint >= *tp16_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp16_ || x16->timedData.timePoint >= *tp16_) {
                         tp16_ = x16->timedData.timePoint;
                         StateT *env = x16->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -25966,7 +25966,7 @@ protected:
                     if (!versionChecker17_.checkVersion(x17->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp17_ || x17->timedData.timePoint >= *tp17_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp17_ || x17->timedData.timePoint >= *tp17_) {
                         tp17_ = x17->timedData.timePoint;
                         StateT *env = x17->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -26522,7 +26522,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -26572,7 +26572,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -26622,7 +26622,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -26672,7 +26672,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -26722,7 +26722,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -26772,7 +26772,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -26822,7 +26822,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -26872,7 +26872,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -26922,7 +26922,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -26972,7 +26972,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -27022,7 +27022,7 @@ protected:
                     if (!versionChecker10_.checkVersion(x10->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp10_ || x10->timedData.timePoint >= *tp10_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp10_ || x10->timedData.timePoint >= *tp10_) {
                         tp10_ = x10->timedData.timePoint;
                         StateT *env = x10->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -27072,7 +27072,7 @@ protected:
                     if (!versionChecker11_.checkVersion(x11->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp11_ || x11->timedData.timePoint >= *tp11_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp11_ || x11->timedData.timePoint >= *tp11_) {
                         tp11_ = x11->timedData.timePoint;
                         StateT *env = x11->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -27122,7 +27122,7 @@ protected:
                     if (!versionChecker12_.checkVersion(x12->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp12_ || x12->timedData.timePoint >= *tp12_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp12_ || x12->timedData.timePoint >= *tp12_) {
                         tp12_ = x12->timedData.timePoint;
                         StateT *env = x12->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -27172,7 +27172,7 @@ protected:
                     if (!versionChecker13_.checkVersion(x13->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp13_ || x13->timedData.timePoint >= *tp13_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp13_ || x13->timedData.timePoint >= *tp13_) {
                         tp13_ = x13->timedData.timePoint;
                         StateT *env = x13->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -27222,7 +27222,7 @@ protected:
                     if (!versionChecker14_.checkVersion(x14->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp14_ || x14->timedData.timePoint >= *tp14_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp14_ || x14->timedData.timePoint >= *tp14_) {
                         tp14_ = x14->timedData.timePoint;
                         StateT *env = x14->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -27272,7 +27272,7 @@ protected:
                     if (!versionChecker15_.checkVersion(x15->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp15_ || x15->timedData.timePoint >= *tp15_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp15_ || x15->timedData.timePoint >= *tp15_) {
                         tp15_ = x15->timedData.timePoint;
                         StateT *env = x15->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -27322,7 +27322,7 @@ protected:
                     if (!versionChecker16_.checkVersion(x16->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp16_ || x16->timedData.timePoint >= *tp16_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp16_ || x16->timedData.timePoint >= *tp16_) {
                         tp16_ = x16->timedData.timePoint;
                         StateT *env = x16->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -27372,7 +27372,7 @@ protected:
                     if (!versionChecker17_.checkVersion(x17->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp17_ || x17->timedData.timePoint >= *tp17_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp17_ || x17->timedData.timePoint >= *tp17_) {
                         tp17_ = x17->timedData.timePoint;
                         StateT *env = x17->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -27422,7 +27422,7 @@ protected:
                     if (!versionChecker18_.checkVersion(x18->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp18_ || x18->timedData.timePoint >= *tp18_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp18_ || x18->timedData.timePoint >= *tp18_) {
                         tp18_ = x18->timedData.timePoint;
                         StateT *env = x18->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -27626,7 +27626,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -27676,7 +27676,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -27726,7 +27726,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -27776,7 +27776,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -27826,7 +27826,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -27876,7 +27876,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -27926,7 +27926,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -27976,7 +27976,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -28026,7 +28026,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -28076,7 +28076,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -28126,7 +28126,7 @@ protected:
                     if (!versionChecker10_.checkVersion(x10->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp10_ || x10->timedData.timePoint >= *tp10_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp10_ || x10->timedData.timePoint >= *tp10_) {
                         tp10_ = x10->timedData.timePoint;
                         StateT *env = x10->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -28176,7 +28176,7 @@ protected:
                     if (!versionChecker11_.checkVersion(x11->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp11_ || x11->timedData.timePoint >= *tp11_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp11_ || x11->timedData.timePoint >= *tp11_) {
                         tp11_ = x11->timedData.timePoint;
                         StateT *env = x11->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -28226,7 +28226,7 @@ protected:
                     if (!versionChecker12_.checkVersion(x12->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp12_ || x12->timedData.timePoint >= *tp12_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp12_ || x12->timedData.timePoint >= *tp12_) {
                         tp12_ = x12->timedData.timePoint;
                         StateT *env = x12->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -28276,7 +28276,7 @@ protected:
                     if (!versionChecker13_.checkVersion(x13->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp13_ || x13->timedData.timePoint >= *tp13_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp13_ || x13->timedData.timePoint >= *tp13_) {
                         tp13_ = x13->timedData.timePoint;
                         StateT *env = x13->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -28326,7 +28326,7 @@ protected:
                     if (!versionChecker14_.checkVersion(x14->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp14_ || x14->timedData.timePoint >= *tp14_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp14_ || x14->timedData.timePoint >= *tp14_) {
                         tp14_ = x14->timedData.timePoint;
                         StateT *env = x14->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -28376,7 +28376,7 @@ protected:
                     if (!versionChecker15_.checkVersion(x15->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp15_ || x15->timedData.timePoint >= *tp15_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp15_ || x15->timedData.timePoint >= *tp15_) {
                         tp15_ = x15->timedData.timePoint;
                         StateT *env = x15->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -28426,7 +28426,7 @@ protected:
                     if (!versionChecker16_.checkVersion(x16->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp16_ || x16->timedData.timePoint >= *tp16_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp16_ || x16->timedData.timePoint >= *tp16_) {
                         tp16_ = x16->timedData.timePoint;
                         StateT *env = x16->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -28476,7 +28476,7 @@ protected:
                     if (!versionChecker17_.checkVersion(x17->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp17_ || x17->timedData.timePoint >= *tp17_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp17_ || x17->timedData.timePoint >= *tp17_) {
                         tp17_ = x17->timedData.timePoint;
                         StateT *env = x17->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -28526,7 +28526,7 @@ protected:
                     if (!versionChecker18_.checkVersion(x18->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp18_ || x18->timedData.timePoint >= *tp18_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp18_ || x18->timedData.timePoint >= *tp18_) {
                         tp18_ = x18->timedData.timePoint;
                         StateT *env = x18->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -29088,7 +29088,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -29138,7 +29138,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -29188,7 +29188,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -29238,7 +29238,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -29288,7 +29288,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -29338,7 +29338,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -29388,7 +29388,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -29438,7 +29438,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -29488,7 +29488,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -29538,7 +29538,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -29588,7 +29588,7 @@ protected:
                     if (!versionChecker10_.checkVersion(x10->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp10_ || x10->timedData.timePoint >= *tp10_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp10_ || x10->timedData.timePoint >= *tp10_) {
                         tp10_ = x10->timedData.timePoint;
                         StateT *env = x10->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -29638,7 +29638,7 @@ protected:
                     if (!versionChecker11_.checkVersion(x11->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp11_ || x11->timedData.timePoint >= *tp11_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp11_ || x11->timedData.timePoint >= *tp11_) {
                         tp11_ = x11->timedData.timePoint;
                         StateT *env = x11->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -29688,7 +29688,7 @@ protected:
                     if (!versionChecker12_.checkVersion(x12->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp12_ || x12->timedData.timePoint >= *tp12_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp12_ || x12->timedData.timePoint >= *tp12_) {
                         tp12_ = x12->timedData.timePoint;
                         StateT *env = x12->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -29738,7 +29738,7 @@ protected:
                     if (!versionChecker13_.checkVersion(x13->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp13_ || x13->timedData.timePoint >= *tp13_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp13_ || x13->timedData.timePoint >= *tp13_) {
                         tp13_ = x13->timedData.timePoint;
                         StateT *env = x13->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -29788,7 +29788,7 @@ protected:
                     if (!versionChecker14_.checkVersion(x14->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp14_ || x14->timedData.timePoint >= *tp14_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp14_ || x14->timedData.timePoint >= *tp14_) {
                         tp14_ = x14->timedData.timePoint;
                         StateT *env = x14->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -29838,7 +29838,7 @@ protected:
                     if (!versionChecker15_.checkVersion(x15->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp15_ || x15->timedData.timePoint >= *tp15_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp15_ || x15->timedData.timePoint >= *tp15_) {
                         tp15_ = x15->timedData.timePoint;
                         StateT *env = x15->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -29888,7 +29888,7 @@ protected:
                     if (!versionChecker16_.checkVersion(x16->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp16_ || x16->timedData.timePoint >= *tp16_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp16_ || x16->timedData.timePoint >= *tp16_) {
                         tp16_ = x16->timedData.timePoint;
                         StateT *env = x16->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -29938,7 +29938,7 @@ protected:
                     if (!versionChecker17_.checkVersion(x17->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp17_ || x17->timedData.timePoint >= *tp17_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp17_ || x17->timedData.timePoint >= *tp17_) {
                         tp17_ = x17->timedData.timePoint;
                         StateT *env = x17->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -29988,7 +29988,7 @@ protected:
                     if (!versionChecker18_.checkVersion(x18->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp18_ || x18->timedData.timePoint >= *tp18_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp18_ || x18->timedData.timePoint >= *tp18_) {
                         tp18_ = x18->timedData.timePoint;
                         StateT *env = x18->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -30038,7 +30038,7 @@ protected:
                     if (!versionChecker19_.checkVersion(x19->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp19_ || x19->timedData.timePoint >= *tp19_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp19_ || x19->timedData.timePoint >= *tp19_) {
                         tp19_ = x19->timedData.timePoint;
                         StateT *env = x19->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -30248,7 +30248,7 @@ protected:
                     if (!versionChecker0_.checkVersion(x0->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp0_ || x0->timedData.timePoint >= *tp0_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp0_ || x0->timedData.timePoint >= *tp0_) {
                         tp0_ = x0->timedData.timePoint;
                         StateT *env = x0->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -30298,7 +30298,7 @@ protected:
                     if (!versionChecker1_.checkVersion(x1->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp1_ || x1->timedData.timePoint >= *tp1_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp1_ || x1->timedData.timePoint >= *tp1_) {
                         tp1_ = x1->timedData.timePoint;
                         StateT *env = x1->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -30348,7 +30348,7 @@ protected:
                     if (!versionChecker2_.checkVersion(x2->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp2_ || x2->timedData.timePoint >= *tp2_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp2_ || x2->timedData.timePoint >= *tp2_) {
                         tp2_ = x2->timedData.timePoint;
                         StateT *env = x2->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -30398,7 +30398,7 @@ protected:
                     if (!versionChecker3_.checkVersion(x3->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp3_ || x3->timedData.timePoint >= *tp3_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp3_ || x3->timedData.timePoint >= *tp3_) {
                         tp3_ = x3->timedData.timePoint;
                         StateT *env = x3->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -30448,7 +30448,7 @@ protected:
                     if (!versionChecker4_.checkVersion(x4->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp4_ || x4->timedData.timePoint >= *tp4_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp4_ || x4->timedData.timePoint >= *tp4_) {
                         tp4_ = x4->timedData.timePoint;
                         StateT *env = x4->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -30498,7 +30498,7 @@ protected:
                     if (!versionChecker5_.checkVersion(x5->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp5_ || x5->timedData.timePoint >= *tp5_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp5_ || x5->timedData.timePoint >= *tp5_) {
                         tp5_ = x5->timedData.timePoint;
                         StateT *env = x5->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -30548,7 +30548,7 @@ protected:
                     if (!versionChecker6_.checkVersion(x6->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp6_ || x6->timedData.timePoint >= *tp6_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp6_ || x6->timedData.timePoint >= *tp6_) {
                         tp6_ = x6->timedData.timePoint;
                         StateT *env = x6->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -30598,7 +30598,7 @@ protected:
                     if (!versionChecker7_.checkVersion(x7->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp7_ || x7->timedData.timePoint >= *tp7_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp7_ || x7->timedData.timePoint >= *tp7_) {
                         tp7_ = x7->timedData.timePoint;
                         StateT *env = x7->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -30648,7 +30648,7 @@ protected:
                     if (!versionChecker8_.checkVersion(x8->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp8_ || x8->timedData.timePoint >= *tp8_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp8_ || x8->timedData.timePoint >= *tp8_) {
                         tp8_ = x8->timedData.timePoint;
                         StateT *env = x8->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -30698,7 +30698,7 @@ protected:
                     if (!versionChecker9_.checkVersion(x9->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp9_ || x9->timedData.timePoint >= *tp9_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp9_ || x9->timedData.timePoint >= *tp9_) {
                         tp9_ = x9->timedData.timePoint;
                         StateT *env = x9->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -30748,7 +30748,7 @@ protected:
                     if (!versionChecker10_.checkVersion(x10->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp10_ || x10->timedData.timePoint >= *tp10_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp10_ || x10->timedData.timePoint >= *tp10_) {
                         tp10_ = x10->timedData.timePoint;
                         StateT *env = x10->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -30798,7 +30798,7 @@ protected:
                     if (!versionChecker11_.checkVersion(x11->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp11_ || x11->timedData.timePoint >= *tp11_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp11_ || x11->timedData.timePoint >= *tp11_) {
                         tp11_ = x11->timedData.timePoint;
                         StateT *env = x11->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -30848,7 +30848,7 @@ protected:
                     if (!versionChecker12_.checkVersion(x12->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp12_ || x12->timedData.timePoint >= *tp12_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp12_ || x12->timedData.timePoint >= *tp12_) {
                         tp12_ = x12->timedData.timePoint;
                         StateT *env = x12->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -30898,7 +30898,7 @@ protected:
                     if (!versionChecker13_.checkVersion(x13->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp13_ || x13->timedData.timePoint >= *tp13_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp13_ || x13->timedData.timePoint >= *tp13_) {
                         tp13_ = x13->timedData.timePoint;
                         StateT *env = x13->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -30948,7 +30948,7 @@ protected:
                     if (!versionChecker14_.checkVersion(x14->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp14_ || x14->timedData.timePoint >= *tp14_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp14_ || x14->timedData.timePoint >= *tp14_) {
                         tp14_ = x14->timedData.timePoint;
                         StateT *env = x14->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -30998,7 +30998,7 @@ protected:
                     if (!versionChecker15_.checkVersion(x15->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp15_ || x15->timedData.timePoint >= *tp15_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp15_ || x15->timedData.timePoint >= *tp15_) {
                         tp15_ = x15->timedData.timePoint;
                         StateT *env = x15->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -31048,7 +31048,7 @@ protected:
                     if (!versionChecker16_.checkVersion(x16->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp16_ || x16->timedData.timePoint >= *tp16_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp16_ || x16->timedData.timePoint >= *tp16_) {
                         tp16_ = x16->timedData.timePoint;
                         StateT *env = x16->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -31098,7 +31098,7 @@ protected:
                     if (!versionChecker17_.checkVersion(x17->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp17_ || x17->timedData.timePoint >= *tp17_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp17_ || x17->timedData.timePoint >= *tp17_) {
                         tp17_ = x17->timedData.timePoint;
                         StateT *env = x17->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -31148,7 +31148,7 @@ protected:
                     if (!versionChecker18_.checkVersion(x18->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp18_ || x18->timedData.timePoint >= *tp18_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp18_ || x18->timedData.timePoint >= *tp18_) {
                         tp18_ = x18->timedData.timePoint;
                         StateT *env = x18->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -31198,7 +31198,7 @@ protected:
                     if (!versionChecker19_.checkVersion(x19->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !tp19_ || x19->timedData.timePoint >= *tp19_) {
+                    if (!CheckTimeEnabled<StateT>::value || !tp19_ || x19->timedData.timePoint >= *tp19_) {
                         tp19_ = x19->timedData.timePoint;
                         StateT *env = x19->environment;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(

@@ -166,7 +166,7 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 if (!versionChecker_.checkVersion(data.timedData.value)) {
                     return false;
                 }
-                if (StateT::CheckTime) {
+                if (CheckTimeEnabled<StateT>::value) {
                     if (hasData_ && data.timedData.timePoint < lastTime_) {
                         return false;
                     }

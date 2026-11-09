@@ -1,0 +1,35 @@
+The Meson build system
+Version: 1.11.2
+Source dir: /data/hxli/codes/tm_kit/worktrees/realtime-threaded-executor/tm_basic
+Build dir: /data/hxli/codes/tm_kit/worktrees/realtime-threaded-executor/tm_basic/builddir_optional_off
+Build type: native build
+Project name: TM kit basic
+Project version: undefined
+C++ compiler for the host machine: c++ (gcc 15.2.1 "c++ (GCC) 15.2.1 20260123 (Red Hat 15.2.1-7)")
+C++ linker for the host machine: c++ ld.bfd 2.44-3
+Host machine cpu family: x86_64
+Host machine cpu: x86_64
+Run-time dependency threads found: YES
+Run-time dependency Boost (found: filesystem, iostreams, log, log_setup, thread) for cpp found: YES 1.91.0 (/data1/dev/rockylinux8.6/vcpkg/installed/x64-linux)
+Found pkg-config: YES (/usr/bin/pkg-config) 1.4.2
+Run-time dependency spdlog found: YES 1.17.0
+Run-time dependency tm_kit_infra found: YES undefined
+Run-time dependency nlohmann-json found: YES 3.12.0
+Run-time dependency simdjson found: YES 4.6.4
+Message: Optional moodycamel executor: false
+Run-time dependency date_tz found: YES 3.0.1
+Found pkg-config: YES (/usr/bin/pkg-config) 1.4.2
+Dependency date_tz for host machine found: YES 3.0.1 (cached)
+Dependency date_tz for host machine found: YES 3.0.1 (cached)
+Build targets in project: 20
+
+TM kit basic undefined
+
+  User defined options
+    buildtype          : release
+    cmake_prefix_path  : /data1/dev/rockylinux8.6/vcpkg//installed/x64-linux
+    moodycamel_executor: disabled
+    prefix             : /data/hxli/codes/tm_kit/worktrees/realtime-threaded-executor/install
+
+Found ninja-1.13.2.git.kitware.jobserver-pipe-1 at /home/hxli/.local/bin/ninja
+NOTICE: You are using Python 3.9 which is EOL. Starting with v1.12.0, Meson will require Python 3.10 or newer

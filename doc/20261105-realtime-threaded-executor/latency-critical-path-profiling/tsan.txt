@@ -1,0 +1,21 @@
+ok: empty queue never invokes consumer
+ok: throwing enqueue leaves queue unchanged
+ok: enqueue constructs move-only non-default item once
+ok: consume in place has no extra move and destroys queued item
+ok: cached-node construction exception releases node without retaining Item
+ok: throwing consumer leaves valid FIFO stub
+ok: queue drains/destroys all item lifetimes
+ok: recycle contention preserves exact counts and producer FIFO
+ok: recycle cache wraps and evicts excess nodes without changing FIFO
+ok: enhanced rejects pushes before start
+ok: enhanced starts once and drains concurrent producers in FIFO order
+ok: enhanced preserves batch counts and native handle
+ok: enhanced sleeps without periodic idle work
+ok: enhanced wakeIdle activates periodic idle work
+ok: enhanced stop is callback safe and rejects later pushes
+ok: concurrent idle wakes and publications drain without lost wakeups
+ok: final idle activation survives wake acknowledgement race
+ok: stop remains effective after wake stress
+ok: concurrent idle wakes and publications drain without lost wakeups
+ok: final idle activation survives wake acknowledgement race
+ok: stop remains effective after wake stress

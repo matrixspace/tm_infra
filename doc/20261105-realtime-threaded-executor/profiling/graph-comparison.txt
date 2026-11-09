@@ -1,0 +1,239 @@
+baseline repeat=0 case=plain
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=0 actions=0 facility=0
+plain                    pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2557 ns/msg cpu=   4669 ns/msg    391 kpush/s
+
+candidate repeat=0 case=plain
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=0 actions=0 facility=0
+plain                    pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2617 ns/msg cpu=   4798 ns/msg    382 kpush/s
+
+baseline repeat=0 case=src threaded
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=1 actions=0 facility=0
+src threaded             pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   1424 ns/msg cpu=   2951 ns/msg    702 kpush/s
+
+candidate repeat=0 case=src threaded
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=1 actions=0 facility=0
+src threaded             pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   1422 ns/msg cpu=   2964 ns/msg    703 kpush/s
+
+baseline repeat=0 case=action+facility threaded
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=0 actions=1 facility=1
+action+facility threaded pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2200 ns/msg cpu=  11058 ns/msg    454 kpush/s
+
+candidate repeat=0 case=action+facility threaded
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=0 actions=1 facility=1
+action+facility threaded pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2355 ns/msg cpu=  10853 ns/msg    425 kpush/s
+
+baseline repeat=0 case=src+action+facility
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=1 actions=1 facility=1
+src+action+facility      pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2947 ns/msg cpu=  12418 ns/msg    339 kpush/s
+
+candidate repeat=0 case=src+action+facility
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=1 actions=1 facility=1
+src+action+facility      pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   1888 ns/msg cpu=   8332 ns/msg    530 kpush/s
+
+candidate repeat=1 case=plain
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=0 actions=0 facility=0
+plain                    pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2509 ns/msg cpu=   4588 ns/msg    399 kpush/s
+
+baseline repeat=1 case=plain
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=0 actions=0 facility=0
+plain                    pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2552 ns/msg cpu=   4665 ns/msg    392 kpush/s
+
+candidate repeat=1 case=src threaded
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=1 actions=0 facility=0
+src threaded             pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   1398 ns/msg cpu=   2917 ns/msg    715 kpush/s
+
+baseline repeat=1 case=src threaded
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=1 actions=0 facility=0
+src threaded             pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   1439 ns/msg cpu=   2929 ns/msg    695 kpush/s
+
+candidate repeat=1 case=action+facility threaded
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=0 actions=1 facility=1
+action+facility threaded pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2249 ns/msg cpu=  12302 ns/msg    445 kpush/s
+
+baseline repeat=1 case=action+facility threaded
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=0 actions=1 facility=1
+action+facility threaded pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   1990 ns/msg cpu=  10007 ns/msg    503 kpush/s
+
+candidate repeat=1 case=src+action+facility
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=1 actions=1 facility=1
+src+action+facility      pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2873 ns/msg cpu=   9894 ns/msg    348 kpush/s
+
+baseline repeat=1 case=src+action+facility
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=1 actions=1 facility=1
+src+action+facility      pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   1779 ns/msg cpu=   7229 ns/msg    562 kpush/s
+
+baseline repeat=2 case=plain
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=0 actions=0 facility=0
+plain                    pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2497 ns/msg cpu=   4574 ns/msg    401 kpush/s
+
+candidate repeat=2 case=plain
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=0 actions=0 facility=0
+plain                    pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2461 ns/msg cpu=   4519 ns/msg    406 kpush/s
+
+baseline repeat=2 case=src threaded
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=1 actions=0 facility=0
+src threaded             pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   1368 ns/msg cpu=   2867 ns/msg    731 kpush/s
+
+candidate repeat=2 case=src threaded
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=1 actions=0 facility=0
+src threaded             pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   1361 ns/msg cpu=   2900 ns/msg    735 kpush/s
+
+baseline repeat=2 case=action+facility threaded
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=0 actions=1 facility=1
+action+facility threaded pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2266 ns/msg cpu=  12070 ns/msg    441 kpush/s
+
+candidate repeat=2 case=action+facility threaded
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=0 actions=1 facility=1
+action+facility threaded pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2005 ns/msg cpu=   9178 ns/msg    499 kpush/s
+
+baseline repeat=2 case=src+action+facility
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=1 actions=1 facility=1
+src+action+facility      pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2912 ns/msg cpu=  10476 ns/msg    343 kpush/s
+
+candidate repeat=2 case=src+action+facility
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=1 actions=1 facility=1
+src+action+facility      pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2855 ns/msg cpu=  10891 ns/msg    350 kpush/s
+
+candidate repeat=3 case=plain
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=0 actions=0 facility=0
+plain                    pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2496 ns/msg cpu=   4580 ns/msg    401 kpush/s
+
+baseline repeat=3 case=plain
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=0 actions=0 facility=0
+plain                    pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2540 ns/msg cpu=   4661 ns/msg    394 kpush/s
+
+candidate repeat=3 case=src threaded
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=1 actions=0 facility=0
+src threaded             pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   1394 ns/msg cpu=   2914 ns/msg    717 kpush/s
+
+baseline repeat=3 case=src threaded
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=1 actions=0 facility=0
+src threaded             pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   1385 ns/msg cpu=   2872 ns/msg    722 kpush/s
+
+candidate repeat=3 case=action+facility threaded
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=0 actions=1 facility=1
+action+facility threaded pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   3213 ns/msg cpu=  12413 ns/msg    311 kpush/s
+
+baseline repeat=3 case=action+facility threaded
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=0 actions=1 facility=1
+action+facility threaded pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   1512 ns/msg cpu=   6529 ns/msg    661 kpush/s
+
+candidate repeat=3 case=src+action+facility
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=1 actions=1 facility=1
+src+action+facility      pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   1850 ns/msg cpu=   7301 ns/msg    540 kpush/s
+
+baseline repeat=3 case=src+action+facility
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=1 actions=1 facility=1
+src+action+facility      pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2087 ns/msg cpu=   9641 ns/msg    479 kpush/s
+
+baseline repeat=4 case=plain
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=0 actions=0 facility=0
+plain                    pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2579 ns/msg cpu=   4709 ns/msg    388 kpush/s
+
+candidate repeat=4 case=plain
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=0 actions=0 facility=0
+plain                    pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2501 ns/msg cpu=   4584 ns/msg    400 kpush/s
+
+baseline repeat=4 case=src threaded
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=1 actions=0 facility=0
+src threaded             pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   1460 ns/msg cpu=   3062 ns/msg    685 kpush/s
+
+candidate repeat=4 case=src threaded
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=1 actions=0 facility=0
+src threaded             pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   1418 ns/msg cpu=   2955 ns/msg    705 kpush/s
+
+baseline repeat=4 case=action+facility threaded
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=0 actions=1 facility=1
+action+facility threaded pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   1907 ns/msg cpu=   7552 ns/msg    524 kpush/s
+
+candidate repeat=4 case=action+facility threaded
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=0 actions=1 facility=1
+action+facility threaded pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   1950 ns/msg cpu=   8723 ns/msg    513 kpush/s
+
+baseline repeat=4 case=src+action+facility
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=1 actions=1 facility=1
+src+action+facility      pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2029 ns/msg cpu=   8342 ns/msg    493 kpush/s
+
+candidate repeat=4 case=src+action+facility
+RealTimeApp graph overhead, graph: pure -> maybe -> multi -> split -> dispatch -> join (+ on-order facility)
+messages per variant: 500000
+config src=1 actions=1 facility=1
+src+action+facility      pushes= 500000 joinOut=1333336 facilityOut= 500000 bad=0  wall=   2654 ns/msg cpu=  11694 ns/msg    377 kpush/s

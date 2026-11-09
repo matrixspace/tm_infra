@@ -279,6 +279,21 @@ namespace {
 } // namespace
 
 int main() {
+    using DefaultEnv = infra::Environment<infra::TrivialExitControlComponent, TestClockComponent>;
+    static_assert(!infra::CheckTimeComponent<>::CheckTime);
+    static_assert(!infra::CheckTimeEnabled<DefaultEnv>::value);
+    static_assert(infra::CheckTimeEnabled<TestEnv<true, false>>::value);
+    TC<DefaultEnv, int> defaultChecker;
+    auto now = std::chrono::system_clock::now();
+    check(defaultChecker({nullptr, {now, 1, false}})
+        && defaultChecker({nullptr, {now-std::chrono::seconds(1), 2, false}}),
+        "missing time policy accepts decreasing timestamps");
+
+    TC<DefaultEnv, Versioned> defaultVersionChecker;
+    DefaultEnv defaultEnv;
+    check(defaultVersionChecker(make<DefaultEnv, Versioned>(&defaultEnv, now, Versioned{5, 0}))
+        && !defaultVersionChecker(make<DefaultEnv, Versioned>(&defaultEnv, now, Versioned{4, 0})),
+        "default policy preserves version checks");
     testModes();
     testSingleThreadEquivalence<false,false>();
     testSingleThreadEquivalence<true,false>();

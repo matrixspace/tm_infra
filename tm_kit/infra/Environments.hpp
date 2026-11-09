@@ -5,6 +5,7 @@
 #include <chrono>
 #include <cstdlib>
 #include <atomic>
+#include <type_traits>
 
 namespace dev { namespace cd606 { namespace tm { namespace infra {
     //an environment is simply a mixture of components
@@ -38,10 +39,17 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
     };
 
     //The "checktime" component
-    template <bool DoCheck>
+    template <bool DoCheck = false>
     struct CheckTimeComponent {
         static constexpr bool CheckTime = DoCheck;
     };
+    // An environment without an explicit time policy accepts out-of-order times.
+    template <class State, class = void>
+    struct CheckTimeEnabled : std::false_type {};
+    template <class State>
+    struct CheckTimeEnabled<State, std::void_t<decltype(State::CheckTime)>>
+        : std::bool_constant<State::CheckTime> {};
+
     //The "lock-free time checker" component (opt-in, realtime mode only)
     //Without it, a non-threaded node that can be fed from several threads
     //checks its input under a std::mutex, as it always did. With it in the

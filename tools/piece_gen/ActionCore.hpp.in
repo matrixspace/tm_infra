@@ -1,0 +1,92 @@
+template <@TYPE_PARAMS@, class B, bool Threaded, bool FireOnceOnly, class T>
+class ActionCore<@VARIANT@, B, Threaded, FireOnceOnly, T> : public RealTimeAppComponents<StateT>::template AbstractAction<@VARIANT@,B>, public RealTimeAppComponents<StateT>::template ExecHandler<@VARIANT@, ActionCore<@VARIANT@, B, Threaded, FireOnceOnly, T>, typename RealTimeAppComponents<StateT>::template HandlerPolicy<Threaded>> {
+private:
+    using Base = typename RealTimeAppComponents<StateT>::template ExecHandler<@VARIANT@, ActionCore<@VARIANT@, B, Threaded, FireOnceOnly, T>, typename RealTimeAppComponents<StateT>::template HandlerPolicy<Threaded>>;
+    std::conditional_t<FireOnceOnly && !Base::kSerialCallbacks, std::atomic<bool>, bool> done_;
+    std::function<void(void *)> idleWorker_;
+    std::mutex idleWorkerMutex_;
+    //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+    std::atomic<bool> hasIdleWorker_ {false};
+    T t_;
+    std::function<void()> startWaiter_;
+    std::mutex startWaiterMutex_;
+public:
+    void *getIdleHandlerParam() {return nullptr;}
+    void actuallyHandle(InnerData<@VARIANT@> &&data) {
+        if constexpr (FireOnceOnly) {
+            if (done_) {
+                return;
+            }
+        }
+        if (!this->timeCheckGood(data)) {
+            return;
+        }
+        GraphStructureBasedResourceHolderComponent_CurrentNodeSetter ns(
+            data.environment, static_cast<AbstractAction<@VARIANT@,B> *>(this)
+        );
+        TraceNodesComponentWrapper<StateT,typename RealTimeAppComponents<StateT>::template AbstractAction<@VARIANT@,B>> tracer(
+            data.environment
+            , this
+        );
+        data.timedData.finalFlag = this->timeChecker().isFinalUpdate();
+        auto res = t_.action(std::move(data));
+        if (res) {
+            if constexpr (FireOnceOnly) {
+                res->timedData.finalFlag = true;
+            }
+            Producer<B>::publish(std::move(*res));
+            if constexpr (FireOnceOnly) {
+                done_ = true;
+                this->stop();
+            }
+        }
+    }
+public:
+    template <class F>
+    ActionCore(F &&f) : RealTimeAppComponents<StateT>::template AbstractAction<@VARIANT@,B>(), RealTimeAppComponents<StateT>::template ExecHandler<@VARIANT@,ActionCore<@VARIANT@,B,Threaded,FireOnceOnly,T>, typename RealTimeAppComponents<StateT>::template HandlerPolicy<Threaded>>(), done_(false), idleWorker_(), idleWorkerMutex_(), t_(std::move(f)), startWaiter_(), startWaiterMutex_() {
+        this->startThread();
+    }
+    virtual ~ActionCore() {
+    }
+    virtual bool isThreaded() const override final {
+        return Base::kOwnContext;
+    }
+    virtual bool isOneTimeOnly() const override final {
+        return FireOnceOnly;
+    }
+    virtual void setIdleWorker(std::function<void(void *)> worker) override final {
+        if constexpr (!Base::kOwnContext) {return;}
+        {
+            std::lock_guard<std::mutex> _(idleWorkerMutex_);
+            hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+            idleWorker_ = worker;
+        }
+        //the thread may already be sleeping without an idle period
+        this->wakeIdle();
+    }
+    bool hasIdleWork() {
+        return hasIdleWorker_.load(std::memory_order_acquire);
+    }
+    void idleWork() {
+        if constexpr (!Base::kOwnContext) {return;}
+        if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+            return;
+        }
+        std::lock_guard<std::mutex> _(idleWorkerMutex_);
+        if (idleWorker_) {
+            idleWorker_(t_.getIdleHandlerParam());
+        }
+    }
+    virtual void setStartWaiter(std::function<void()> waiter) override final {
+        if constexpr (!Base::kOwnContext) {return;}
+        std::lock_guard<std::mutex> _(startWaiterMutex_);
+        startWaiter_ = waiter;
+    }
+    void waitForStart() {
+        if constexpr (!Base::kOwnContext) {return;}
+        std::lock_guard<std::mutex> _(startWaiterMutex_);
+        if (startWaiter_) {
+            startWaiter_();
+        }
+    }
+};

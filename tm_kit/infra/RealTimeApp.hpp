@@ -7,6 +7,7 @@
 #include <tm_kit/infra/ObservableNode.hpp>
 #include <tm_kit/infra/StoppableProducer.hpp>
 #include <tm_kit/infra/GraphStructureBasedResourceHolderComponent.hpp>
+#include <tm_kit/infra/RealTimeThreadedExecutor.hpp>
 
 #include <vector>
 #include <list>
@@ -71,7 +72,7 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 if (!versionChecker_.checkVersion(data.timedData.value)) {
                     return false;
                 }
-                if (StateT::CheckTime) {
+                if (CheckTimeEnabled<StateT>::value) {
                     if (hasData_ && data.timedData.timePoint < lastTime_) {
                         return false;
                     }
@@ -127,14 +128,14 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 }
             }
             //checked here (not at class level) so that StateT only needs to be
-            //complete where a node is instantiated, as for StateT::CheckTime
+            //complete where a node is instantiated, as for CheckTimeEnabled<StateT>::value
             static constexpr bool lockFreeEnabled = std::is_base_of_v<LockFreeTimeCheckerComponent, StateT>;
         public:
             static constexpr TimeCheckerMode value =
                 (!lockFreeEnabled || !VersionCheckerIsTrivial<T>::value)
                 ? TimeCheckerMode::Mutex
                 : (
-                    (!StateT::CheckTime)
+                    (!CheckTimeEnabled<StateT>::value)
                     ? TimeCheckerMode::Trivial
                     : (lockFreeTime() ? TimeCheckerMode::AtomicCAS : TimeCheckerMode::Mutex)
                 );
@@ -200,7 +201,7 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 if (!versionChecker_.checkVersion(data.timedData.value)) {
                     return false;
                 }
-                if (StateT::CheckTime) {
+                if (CheckTimeEnabled<StateT>::value) {
                     if (hasData_ && data.timedData.timePoint < lastTime_) {
                         return false;
                     }
@@ -220,205 +221,139 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
         };
         #include <tm_kit/infra/RealTimeApp_TimeChecker_Piece.hpp>
 
-    private:
-        template <class T, class W>
-        class ThreadedHandlerBase : public IRealTimeAppPossiblyThreadedNode {
-        private:
-            TimeChecker<false, T> timeChecker_;
-            std::mutex mutex_;
-            std::condition_variable cond_;
-            std::thread th_;
-            std::atomic<bool> running_;
-            std::list<TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType>> incoming_, processing_;  
-
-            void stopThread() {
-                running_ = false;
-                cond_.notify_one();
-            }
-            void runThread() {
-                static_cast<W *>(this)->waitForStart();
-                while (running_) {
-                    {
-                        std::unique_lock<std::mutex> lock(mutex_);
-                        cond_.wait_for(lock, std::chrono::milliseconds(1));
-                        if (!running_) {
-                            lock.unlock();
-                            return;
-                        }
-                        if (incoming_.empty()) {
-                            lock.unlock();
-                            static_cast<W *>(this)->idleWork();
-                            continue;
-                        }
-                        processing_.splice(processing_.end(), incoming_);
-                        lock.unlock();
-                        if constexpr (std::is_convertible_v<StateT *, OutputRealTimeThreadBufferSizeComponent *>) {
-                            std::ostringstream oss;
-                            oss << "Thread buffer for " << std::this_thread::get_id() << " size: " << processing_.size();
-                            processing_.front().environment->log(LogLevel::Debug, oss.str());
-                        }
-                    }
-                    while (!processing_.empty()) {
-                        auto &data = processing_.front();
-                        static_cast<W *>(this)->actuallyHandle(std::move(data));
-                        processing_.pop_front();
-                    }
-                }  
-            }
-        protected:
-            bool timeCheckGood(TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType> const &data) {
-                return timeChecker_(data);
-            }
-            bool timeCheckGood(TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType> &&data) {
-                return timeChecker_(std::move(data));
-            }
-        public:
-            ThreadedHandlerBase() : timeChecker_(), mutex_(), cond_(), th_(), running_(false), incoming_(), processing_() {
-            }
-            virtual ~ThreadedHandlerBase() {
-                stopThread();
-                try {
-                    if (th_.joinable()) {
-                        th_.join();
-                    }
-                } catch (...) {}
-            }
-            void startThread() {
-                running_ = true;
-                th_ = std::thread(&ThreadedHandlerBase::runThread, this);
-                th_.detach();
-            }
-            virtual std::optional<std::thread::native_handle_type> threadHandle() override final {
-                return th_.native_handle();
-            }
-        protected:
-            void putData(TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType> &&data) {
-                if (running_) {
-                    {
-                        std::lock_guard<std::mutex> _(mutex_);
-                        incoming_.push_back(std::move(data));
-                    }
-                    cond_.notify_one();
-                }                    
-            }
-            TimeChecker<false, T> const &timeChecker() const {
-                return timeChecker_;
-            }
-            void stop() {
-                stopThread();
-            }
-        };
-
     public:
-        template <class T, class W>
-        class ThreadedHandler : public virtual IHandler<T>, public ThreadedHandlerBase<T,W> {
-        public:
-            ThreadedHandler() : ThreadedHandlerBase<T,W>() {
-            }
-            virtual ~ThreadedHandler() {
-            }
-            virtual void handle(TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType> &&data) override final {
-                ThreadedHandlerBase<T,W>::putData(std::move(data));                
-            }
+        struct ThreadedPolicy {
+            template <class Item>
+            using Executor = RealTimeThreadedExecutorFor<StateT, Item>;
         };
-
-        #include <tm_kit/infra/RealTimeApp_ThreadedHandler_Piece.hpp>
+        struct InlinePolicy {
+            template <class Item>
+            using Executor = InlineExecutor<Item>;
+        };
+        template <bool Threaded>
+        using HandlerPolicy = std::conditional_t<Threaded, ThreadedPolicy, InlinePolicy>;
 
     private:
-        //busy loop can only be used to handle one kind of input
-        template <class T, class W>
-        class BusyLoopThreadedHandlerBase : public IRealTimeAppPossiblyThreadedNode {
+        template <class T, class W, class Policy>
+        class ExecHandlerCore : public IRealTimeAppPossiblyThreadedNode {
         private:
-            bool noYield_;
-            TimeChecker<false, T> timeChecker_;
-            std::mutex mutex_;
-            std::thread th_;
-            std::atomic<bool> running_;
-            std::list<TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType>> incoming_, processing_;  
+            using InputData = TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType>;
+            using Exec = typename Policy::template Executor<InputData>;
 
-            void stopThread() {
-                running_ = false;
-            }
-            void runThread() {
-                static_cast<W *>(this)->waitForStart();
-                while (running_) {
-                    static_cast<W *>(this)->idleWork();
-                    {
-                        std::lock_guard<std::mutex> _(mutex_);
-                        if (!incoming_.empty()) {
-                            processing_.splice(processing_.end(), incoming_);
-                        }
+            template <class X, class=void>
+            struct HasIdleWorkQuery : std::false_type {};
+            template <class X>
+            struct HasIdleWorkQuery<X, std::void_t<decltype(std::declval<X &>().hasIdleWork())>> : std::true_type {};
+
+            //the callback adapter handed to the executor, keeps the
+            //executor* names out of the classes deriving from the bases
+            struct Host {
+                ExecHandlerCore *self;
+                W *w() const {
+                    return static_cast<W *>(self);
+                }
+                void executorWaitForStart() {
+                    if constexpr (Exec::kOwnContext) {
+                        w()->waitForStart();
                     }
+                }
+                void executorHandle(InputData &&data) {
+                    w()->actuallyHandle(std::move(data));
+                }
+                void executorIdleWork() {
+                    if constexpr (Exec::kOwnContext) {
+                        w()->idleWork();
+                    }
+                }
+                bool executorHasIdleWork() {
+                    //handlers without hasIdleWork() keep the periodic idle
+                    //call they always had
+                    if constexpr (!Exec::kOwnContext) {
+                        return false;
+                    } else if constexpr (HasIdleWorkQuery<W>::value) {
+                        return w()->hasIdleWork();
+                    } else {
+                        return true;
+                    }
+                }
+                void executorBeforeBatch(InputData const &first, std::size_t pending) {
                     if constexpr (std::is_convertible_v<StateT *, OutputRealTimeThreadBufferSizeComponent *>) {
-                        if (!processing_.empty()) {
-                            std::ostringstream oss;
-                            oss << "Thread buffer for " << std::this_thread::get_id() << " size: " << processing_.size();
-                            processing_.front().environment->log(LogLevel::Debug, oss.str());
-                        }
+                        std::ostringstream oss;
+                        oss << "Thread buffer for " << std::this_thread::get_id() << " size: " << pending;
+                        first.environment->log(LogLevel::Debug, oss.str());
                     }
-                    while (!processing_.empty()) {
-                        auto &data = processing_.front();
-                        static_cast<W *>(this)->actuallyHandle(std::move(data));
-                        processing_.pop_front();
-                    }
-                    if (!noYield_) {
-                        std::this_thread::yield();
-                    }
-                }  
+                }
+            };
+
+            TimeChecker<!Exec::kSerialCallbacks, T> timeChecker_;
+            Host host_;
+            Exec exec_;
+
+            static ThreadedExecOptions makeOptions()
+            {
+                ThreadedExecOptions opts;
+                opts.trackPendingCount = std::is_convertible_v<StateT *, OutputRealTimeThreadBufferSizeComponent *>;
+                return opts;
             }
+
+        public:
+            static constexpr bool kOwnContext = Exec::kOwnContext;
+            static constexpr bool kSerialCallbacks = Exec::kSerialCallbacks;
+
         protected:
-            bool timeCheckGood(TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType> const &data) {
+            bool timeCheckGood(InputData const &data) {
                 return timeChecker_(data);
             }
-            bool timeCheckGood(TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType> &&data) {
+            bool timeCheckGood(InputData &&data) {
                 return timeChecker_(std::move(data));
             }
         public:
-            BusyLoopThreadedHandlerBase(bool noYield=false) : noYield_(noYield), timeChecker_(), mutex_(), th_(), running_(false), incoming_(), processing_() {
+            ExecHandlerCore()
+                : timeChecker_()
+                , host_{this}
+                , exec_(makeOptions())
+            {
             }
-            virtual ~BusyLoopThreadedHandlerBase() {
-                stopThread();
-                try {
-                    if (th_.joinable()) {
-                        th_.join();
-                    }
-                } catch (...) {}
+            virtual ~ExecHandlerCore()
+            {
+                exec_.stop();
             }
             void startThread() {
-                running_ = true;
-                th_ = std::thread(&BusyLoopThreadedHandlerBase::runThread, this);
-                th_.detach();
+                exec_.start(&host_);
             }
             virtual std::optional<std::thread::native_handle_type> threadHandle() override final {
-                return th_.native_handle();
+                return exec_.threadHandle();
             }
         protected:
-            void putData(TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType> &&data) {
-                if (running_) {
-                    std::lock_guard<std::mutex> _(mutex_);
-                    incoming_.push_back(std::move(data));
-                }                    
+            void putData(InputData &&data) {
+                realtime_threaded_executor_detail::submit(exec_, std::move(data), &host_, 0);
             }
-            TimeChecker<false, T> const &timeChecker() const {
+            TimeChecker<!Exec::kSerialCallbacks, T> const &timeChecker() const
+            {
                 return timeChecker_;
             }
             void stop() {
-                stopThread();
+                exec_.stop();
+            }
+            //to be called by W after the result of W::hasIdleWork() changed
+            void wakeIdle() {
+                exec_.wakeIdle();
             }
         };
 
     public:
-        template <class T, class W>
-        class BusyLoopThreadedHandler : public virtual IHandler<T>, public BusyLoopThreadedHandlerBase<T,W> {
+        template <class T, class W, class Policy>
+        class ExecHandler : public virtual IHandler<T>, public ExecHandlerCore<T, W, Policy> {
         public:
-            BusyLoopThreadedHandler(bool noYield=false) : BusyLoopThreadedHandlerBase<T,W>(noYield) {
-            }
-            virtual ~BusyLoopThreadedHandler() {
-            }
-            virtual void handle(TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType> &&data) override final {
-                BusyLoopThreadedHandlerBase<T,W>::putData(std::move(data));                
+            void handle(TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType> &&data) override final
+            {
+                this->putData(std::move(data));
             }
         };
+#include <tm_kit/infra/RealTimeApp_ThreadedHandler_Piece.hpp>
+        template <class T, class W>
+        // Keep the injected class name used by downstream derived classes.
+        class ThreadedHandler : public ExecHandler<T, W, ThreadedPolicy> {};
 
         template <class T>
         class Producer : public virtual IStoppableRealTimeProducer<1> {
@@ -1108,13 +1043,17 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
     
     public:
         template <class A, class B, bool Threaded, bool FireOnceOnly, class T>
-        class ActionCore {};
-        template <class A, class B, bool FireOnceOnly, class T>
-        class ActionCore<A,B,true,FireOnceOnly,T> : public RealTimeAppComponents<StateT>::template AbstractAction<A,B>, public RealTimeAppComponents<StateT>::template ThreadedHandler<A,ActionCore<A,B,true,FireOnceOnly,T>> {
+        class ActionCore
+            : public RealTimeAppComponents<StateT>::template AbstractAction<A, B>,
+              public RealTimeAppComponents<StateT>::template ExecHandler<A, ActionCore<A, B, Threaded, FireOnceOnly, T>, typename RealTimeAppComponents<StateT>::template HandlerPolicy<Threaded>> {
         private:
-            bool done_;
+            using Base =
+                typename RealTimeAppComponents<StateT>::template ExecHandler<A, ActionCore<A, B, Threaded, FireOnceOnly, T>, typename RealTimeAppComponents<StateT>::template HandlerPolicy<Threaded>>;
+            std::conditional_t<FireOnceOnly && !Base::kSerialCallbacks, std::atomic<bool>, bool> done_;
             std::function<void(void *)> idleWorker_;
             std::mutex idleWorkerMutex_;
+            //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+            std::atomic<bool> hasIdleWorker_ {false};
             T t_;
             std::function<void()> startWaiter_;
             std::mutex startWaiterMutex_;
@@ -1149,85 +1088,68 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             }
         public:
             template <class F>
-            ActionCore(F &&f) : RealTimeAppComponents<StateT>::template AbstractAction<A,B>(), RealTimeAppComponents<StateT>::template ThreadedHandler<A,ActionCore<A,B,true,FireOnceOnly,T>>(), done_(false), idleWorker_(), idleWorkerMutex_(), t_(std::move(f)), startWaiter_(), startWaiterMutex_() {
+            ActionCore(F &&f)
+                : RealTimeAppComponents<StateT>::template AbstractAction<A, B>()
+                , RealTimeAppComponents<StateT>::template ExecHandler<A, ActionCore<A, B, Threaded, FireOnceOnly, T>, typename RealTimeAppComponents<StateT>::template HandlerPolicy<Threaded>>()
+                , done_(false)
+                , idleWorker_()
+                , idleWorkerMutex_()
+                , t_(std::move(f))
+                , startWaiter_()
+                , startWaiterMutex_()
+            {
                 this->startThread();
             }
             virtual ~ActionCore() {
             }
             virtual bool isThreaded() const override final {
-                return true;
+                return this->kOwnContext;
             }
             virtual bool isOneTimeOnly() const override final {
                 return FireOnceOnly;
             }
             virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-                std::lock_guard<std::mutex> _(idleWorkerMutex_);
-                idleWorker_ = worker;
+                if constexpr (!Base::kOwnContext) {
+                    return;
+                }
+                {
+                    std::lock_guard<std::mutex> _(idleWorkerMutex_);
+                    hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+                    idleWorker_ = worker;
+                }
+                //the thread may already be sleeping without an idle period
+                this->wakeIdle();
+            }
+            bool hasIdleWork() {
+                return hasIdleWorker_.load(std::memory_order_acquire);
             }
             void idleWork() {
+                if constexpr (!Base::kOwnContext) {
+                    return;
+                }
+                if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+                    return;
+                }
                 std::lock_guard<std::mutex> _(idleWorkerMutex_);
                 if (idleWorker_) {
                     idleWorker_(t_.getIdleHandlerParam());
                 }
             }
             virtual void setStartWaiter(std::function<void()> waiter) override final {
+                if constexpr (!Base::kOwnContext) {
+                    return;
+                }
                 std::lock_guard<std::mutex> _(startWaiterMutex_);
                 startWaiter_ = waiter;
             }
             void waitForStart() {
+                if constexpr (!Base::kOwnContext) {
+                    return;
+                }
                 std::lock_guard<std::mutex> _(startWaiterMutex_);
                 if (startWaiter_) {
                     startWaiter_();
                 }
-            }
-        };
-        template <class A, class B, bool FireOnceOnly, class T>
-        class ActionCore<A,B,false,FireOnceOnly,T> : public RealTimeAppComponents<StateT>::template AbstractAction<A,B> {
-        private:
-            typename RealTimeAppComponents<StateT>::template TimeChecker<true, A> timeChecker_;
-            std::conditional_t<FireOnceOnly,std::atomic<bool>,bool> done_;
-            T t_;
-        public:
-            template <class F>
-            ActionCore(F &&f) : RealTimeAppComponents<StateT>::template AbstractAction<A,B>(), timeChecker_(), done_(false), t_(std::move(f)) {
-            }
-            virtual ~ActionCore() {
-            }
-            virtual void handle(InnerData<A> &&data) override final {
-                if constexpr (FireOnceOnly) {
-                    if (done_) {
-                        return;
-                    }
-                }
-                if (timeChecker_(data)) {
-                    GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
-                        data.environment, static_cast<AbstractAction<A,B> *>(this)
-                    );
-                    TraceNodesComponentWrapper<StateT,typename RealTimeAppComponents<StateT>::template AbstractAction<A,B>> tracer(
-                        data.environment 
-                        , this
-                    );
-                    auto res = t_.action(data.environment, std::move(data.timedData));
-                    if (res) {
-                        if constexpr (FireOnceOnly) {
-                            res->timedData.finalFlag = true;
-                        }
-                        Producer<B>::publish(std::move(*res));
-                        if constexpr (FireOnceOnly) {
-                            done_ = true;
-                        }
-                    }
-                }
-            }
-            virtual bool isThreaded() const override final {
-                return false;
-            }
-            virtual bool isOneTimeOnly() const override final {
-                return FireOnceOnly;
-            }
-            virtual void setIdleWorker(std::function<void(void *)>) override final {
-            }
-            virtual void setStartWaiter(std::function<void()>) override final {
             }
         };
         template <class A, class B, class F, bool Threaded, bool FireOnceOnly>
@@ -1344,13 +1266,17 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
         }
     private:
         template <class A, class B, bool Threaded, bool FireOnceOnly, class T>
-        class MultiActionCore {};
-        template <class A, class B, bool FireOnceOnly, class T>
-        class MultiActionCore<A,B,true,FireOnceOnly,T> : public RealTimeAppComponents<StateT>::template AbstractAction<A,B>, public RealTimeAppComponents<StateT>::template ThreadedHandler<A,MultiActionCore<A,B,true,FireOnceOnly,T>> {
+        class MultiActionCore : public RealTimeAppComponents<StateT>::template AbstractAction<A, B>,
+                                public RealTimeAppComponents<
+                                    StateT>::template ExecHandler<A, MultiActionCore<A, B, Threaded, FireOnceOnly, T>, typename RealTimeAppComponents<StateT>::template HandlerPolicy<Threaded>> {
         private:
-            bool done_;
+            using Base = typename RealTimeAppComponents<
+                StateT>::template ExecHandler<A, MultiActionCore<A, B, Threaded, FireOnceOnly, T>, typename RealTimeAppComponents<StateT>::template HandlerPolicy<Threaded>>;
+            std::conditional_t<FireOnceOnly && !Base::kSerialCallbacks, std::atomic<bool>, bool> done_;
             std::function<void(void *)> idleWorker_;
             std::mutex idleWorkerMutex_;
+            //lets idleWork / hasIdleWork skip the mutex while no idle worker is set
+            std::atomic<bool> hasIdleWorker_ {false};
             T t_;
             std::function<void()> startWaiter_;
             std::mutex startWaiterMutex_;
@@ -1403,104 +1329,68 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             }
         public:
             template <class F>
-            MultiActionCore(F &&f) : RealTimeAppComponents<StateT>::template AbstractAction<A,B>(), RealTimeAppComponents<StateT>::template ThreadedHandler<A,MultiActionCore<A,B,true,FireOnceOnly,T>>(), done_(false), idleWorker_(), idleWorkerMutex_(), t_(std::move(f)), startWaiter_(), startWaiterMutex_() {
+            MultiActionCore(F &&f)
+                : RealTimeAppComponents<StateT>::template AbstractAction<A, B>()
+                , RealTimeAppComponents<StateT>::template ExecHandler<A, MultiActionCore<A, B, Threaded, FireOnceOnly, T>, typename RealTimeAppComponents<StateT>::template HandlerPolicy<Threaded>>()
+                , done_(false)
+                , idleWorker_()
+                , idleWorkerMutex_()
+                , t_(std::move(f))
+                , startWaiter_()
+                , startWaiterMutex_()
+            {
                 this->startThread();
             }
             virtual ~MultiActionCore() {
             }
             virtual bool isThreaded() const override final {
-                return true;
+                return this->kOwnContext;
             }
             virtual bool isOneTimeOnly() const override final {
                 return FireOnceOnly;
             }
             virtual void setIdleWorker(std::function<void(void *)> worker) override final {
-                std::lock_guard<std::mutex> _(idleWorkerMutex_);
-                idleWorker_ = worker;
+                if constexpr (!Base::kOwnContext) {
+                    return;
+                }
+                {
+                    std::lock_guard<std::mutex> _(idleWorkerMutex_);
+                    hasIdleWorker_.store(static_cast<bool>(worker), std::memory_order_release);
+                    idleWorker_ = worker;
+                }
+                //the thread may already be sleeping without an idle period
+                this->wakeIdle();
+            }
+            bool hasIdleWork() {
+                return hasIdleWorker_.load(std::memory_order_acquire);
             }
             void idleWork() {
+                if constexpr (!Base::kOwnContext) {
+                    return;
+                }
+                if (!hasIdleWorker_.load(std::memory_order_acquire)) {
+                    return;
+                }
                 std::lock_guard<std::mutex> _(idleWorkerMutex_);
                 if (idleWorker_) {
                     idleWorker_(t_.getIdleHandlerParam());
                 }
             }
             virtual void setStartWaiter(std::function<void()> waiter) override final {
+                if constexpr (!Base::kOwnContext) {
+                    return;
+                }
                 std::lock_guard<std::mutex> _(startWaiterMutex_);
                 startWaiter_ = waiter;
             }
             void waitForStart() {
+                if constexpr (!Base::kOwnContext) {
+                    return;
+                }
                 std::lock_guard<std::mutex> _(startWaiterMutex_);
                 if (startWaiter_) {
                     startWaiter_();
                 }
-            }
-        };
-        template <class A, class B, bool FireOnceOnly, class T>
-        class MultiActionCore<A,B,false,FireOnceOnly,T> : public RealTimeAppComponents<StateT>::template AbstractAction<A,B> {
-        private:
-            typename RealTimeAppComponents<StateT>::template TimeChecker<true, A> timeChecker_;
-            bool fireOnceOnly_;
-            std::conditional_t<FireOnceOnly,std::atomic<bool>,bool> done_;
-            T t_;
-        public:
-            template <class F>
-            MultiActionCore(F &&f) : RealTimeAppComponents<StateT>::template AbstractAction<A,B>(), timeChecker_(), done_(false), t_(std::move(f)) {
-            }
-            virtual ~MultiActionCore() {
-            }
-            virtual void handle(InnerData<A> &&data) override final {
-                if constexpr (FireOnceOnly) {
-                    if (done_) {
-                        return;
-                    }
-                }
-                if (timeChecker_(data)) {
-                    GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
-                        data.environment, static_cast<AbstractAction<A,B> *>(this)
-                    );
-                    TraceNodesComponentWrapper<StateT,typename RealTimeAppComponents<StateT>::template AbstractAction<A,B>> tracer(
-                        data.environment 
-                        , this
-                    );
-                    auto res = t_.action(data.environment, std::move(data.timedData));
-                    if (res && !res->timedData.value.empty()) {
-                        if constexpr (FireOnceOnly) {
-                            Producer<B>::publish(InnerData<B> {
-                                res->environment
-                                , {
-                                    res->timedData.timePoint
-                                    , std::move(res->timedData.value[0])
-                                    , true
-                                }
-                            });
-                            done_ = true;
-                        } else {
-                            size_t l = res->timedData.value.size();
-                            size_t ii = l-1;
-                            for (auto &&item : res->timedData.value) {
-                                Producer<B>::publish(InnerData<B> {
-                                    res->environment
-                                    , {
-                                        res->timedData.timePoint
-                                        , std::move(item)
-                                        , ((ii==0)?res->timedData.finalFlag:false)
-                                    }
-                                });
-                                --ii;
-                            }
-                        }
-                    }
-                }
-            }
-            virtual bool isThreaded() const override final {
-                return false;
-            }
-            virtual bool isOneTimeOnly() const override final {
-                return FireOnceOnly;
-            }
-            virtual void setIdleWorker(std::function<void(void *)>) override final {
-            }
-            virtual void setStartWaiter(std::function<void()>) override final {
             }
         };
         template <class A, class B, class F, bool Threaded, bool FireOnceOnly>
@@ -1570,13 +1460,17 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
         }
     private:
         template <class A, class B, class ContinuationStructure, bool Threaded, bool FireOnceOnly>
-        class ContinuationActionCore {};
-        template <class A, class B, class ContinuationStructure, bool FireOnceOnly>
-        class ContinuationActionCore<A, B, ContinuationStructure, true, FireOnceOnly> : public RealTimeAppComponents<StateT>::template AbstractAction<A,B>, public RealTimeAppComponents<StateT>::template ThreadedHandler<A,ContinuationActionCore<A, B, ContinuationStructure, true, FireOnceOnly>> {
+        class ContinuationActionCore
+            : public RealTimeAppComponents<StateT>::template AbstractAction<A, B>,
+              public RealTimeAppComponents<StateT>::
+                  template ExecHandler<A, ContinuationActionCore<A, B, ContinuationStructure, Threaded, FireOnceOnly>, typename RealTimeAppComponents<StateT>::template HandlerPolicy<Threaded>> {
         private:
+            using Base = typename RealTimeAppComponents<
+                StateT>::template ExecHandler<A, ContinuationActionCore<A, B, ContinuationStructure, Threaded, FireOnceOnly>, typename RealTimeAppComponents<StateT>::template HandlerPolicy<Threaded>>;
             TimedAppModelContinuation<A, B, ContinuationStructure, EnvironmentType> cont_;
             ContinuationStructure state_;
-            bool done_;
+            std::conditional_t<FireOnceOnly && !Base::kSerialCallbacks, std::atomic<bool>, bool> done_;
+
         public:
             void actuallyHandle(InnerData<A> &&data) {
                 if constexpr (FireOnceOnly) {
@@ -1590,59 +1484,50 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 cont_(std::move(data), state_, [this](InnerData<B> &&x) {
                     if constexpr (FireOnceOnly) {
                         done_ = true;
+                        this->stop();
                     }
                     Producer<B>::publish(std::move(x));
                 });
             }
-            void idleWork() {}
-            void waitForStart() {}
+            // This built-in node has no idle callback or side effects.
+            bool hasIdleWork() const
+            {
+                return false;
+            }
+            void idleWork()
+            {
+                if constexpr (!Base::kOwnContext) {
+                    return;
+                }
+            }
+            void waitForStart()
+            {
+                if constexpr (!Base::kOwnContext) {
+                    return;
+                }
+            }
+
         public:
-            ContinuationActionCore(TimedAppModelContinuation<A, B, ContinuationStructure, EnvironmentType> const &cont, ContinuationStructure &&state=ContinuationStructure()) : RealTimeAppComponents<StateT>::template AbstractAction<A,B>(), RealTimeAppComponents<StateT>::template ThreadedHandler<A,ContinuationActionCore<A, B, ContinuationStructure, true, FireOnceOnly>>(), cont_(cont), state_(std::move(state)), done_(false) {
+            ContinuationActionCore(TimedAppModelContinuation<A, B, ContinuationStructure, EnvironmentType> const &cont, ContinuationStructure &&state = ContinuationStructure())
+                : RealTimeAppComponents<StateT>::template AbstractAction<A, B>()
+                , RealTimeAppComponents<StateT>::
+                      template ExecHandler<A, ContinuationActionCore<A, B, ContinuationStructure, Threaded, FireOnceOnly>, typename RealTimeAppComponents<StateT>::template HandlerPolicy<Threaded>>()
+                , cont_(cont)
+                , state_(std::move(state))
+                , done_(false)
+            {
                 this->startThread();
             }
             virtual ~ContinuationActionCore() {
             }
             virtual bool isThreaded() const override final {
-                return true;
+                return this->kOwnContext;
             }
             virtual bool isOneTimeOnly() const override final {
                 return FireOnceOnly;
             }
         };
-        template <class A, class B, class ContinuationStructure, bool FireOnceOnly>
-        class ContinuationActionCore<A,B,ContinuationStructure,false,FireOnceOnly> : public RealTimeAppComponents<StateT>::template AbstractAction<A,B> {
-        private:
-            typename RealTimeAppComponents<StateT>::template TimeChecker<true, A> timeChecker_;
-            TimedAppModelContinuation<A, B, ContinuationStructure, EnvironmentType> cont_;
-            ContinuationStructure state_;
-            std::atomic<bool> done_;
-        public:
-            ContinuationActionCore(TimedAppModelContinuation<A, B, ContinuationStructure, EnvironmentType> const &cont, ContinuationStructure &&state=ContinuationStructure()) : RealTimeAppComponents<StateT>::template AbstractAction<A,B>(), timeChecker_(), cont_(cont), state_(std::move(state)), done_(false) {
-            }
-            virtual ~ContinuationActionCore() {
-            }
-            virtual void handle(InnerData<A> &&data) override final {
-                if constexpr (FireOnceOnly) {
-                    if (done_) {
-                        return;
-                    }
-                }
-                if (timeChecker_(data)) {
-                    cont_(std::move(data), state_, [this](InnerData<B> &&x) {
-                        if constexpr (FireOnceOnly) {
-                            done_ = true;
-                        }
-                        Producer<B>::publish(std::move(x));
-                    });
-                }
-            }
-            virtual bool isThreaded() const override final {
-                return false;
-            }
-            virtual bool isOneTimeOnly() const override final {
-                return FireOnceOnly;
-            }
-        };
+
     public:
         template <class A, class B, class ContinuationStructure>
         static auto continuationAction(TimedAppModelContinuation<A, B, ContinuationStructure, EnvironmentType> const &cont, ContinuationStructure &&state=ContinuationStructure(), LiftParameters<TimePoint> const &liftParam = LiftParameters<TimePoint>()) -> std::shared_ptr<Action<A, B>> {
@@ -1734,10 +1619,12 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
         }
     public:
         template <class A, class B, bool Threaded, class T>
-        class OnOrderFacilityCore {};
-        template <class A, class B, class T>
-        class OnOrderFacilityCore<A,B,true,T> : public virtual RealTimeAppComponents<StateT>::template AbstractOnOrderFacility<A,B>, public RealTimeAppComponents<StateT>::template ThreadedHandler<Key<A>,OnOrderFacilityCore<A,B,true,T>> {
+        class OnOrderFacilityCore
+            : public virtual RealTimeAppComponents<StateT>::template AbstractOnOrderFacility<A, B>,
+              public RealTimeAppComponents<StateT>::template ExecHandler<Key<A>, OnOrderFacilityCore<A, B, Threaded, T>, typename RealTimeAppComponents<StateT>::template HandlerPolicy<Threaded>> {
         private:
+            using Base =
+                typename RealTimeAppComponents<StateT>::template ExecHandler<Key<A>, OnOrderFacilityCore<A, B, Threaded, T>, typename RealTimeAppComponents<StateT>::template HandlerPolicy<Threaded>>;
             T t_;
         public:
             void actuallyHandle(InnerData<Key<A>> &&data) {  
@@ -1759,52 +1646,46 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                     );
                 }
             }
-            void idleWork() {}
-            void waitForStart() {}
+            // This built-in node has no idle callback or side effects.
+            bool hasIdleWork() const
+            {
+                return false;
+            }
+            void idleWork()
+            {
+                if constexpr (!Base::kOwnContext) {
+                    return;
+                }
+            }
+            void waitForStart()
+            {
+                if constexpr (!Base::kOwnContext) {
+                    return;
+                }
+            }
+
         public:
             template <class F>
-            OnOrderFacilityCore(F &&f) : RealTimeAppComponents<StateT>::template AbstractOnOrderFacility<A,B>(), RealTimeAppComponents<StateT>::template ThreadedHandler<Key<A>,OnOrderFacilityCore<A,B,true,T>>(), t_(std::move(f)) {
+            OnOrderFacilityCore(F &&f)
+                : RealTimeAppComponents<StateT>::template AbstractOnOrderFacility<A, B>()
+                , RealTimeAppComponents<StateT>::template ExecHandler<Key<A>, OnOrderFacilityCore<A, B, Threaded, T>, typename RealTimeAppComponents<StateT>::template HandlerPolicy<Threaded>>()
+                , t_(std::move(f))
+            {
                 this->startThread();
             }
             virtual ~OnOrderFacilityCore() {
             }
         };
-        template <class A, class B, class T>
-        class OnOrderFacilityCore<A,B,false,T> : public virtual RealTimeAppComponents<StateT>::template AbstractOnOrderFacility<A,B> {
-        private:
-            typename RealTimeAppComponents<StateT>::template TimeChecker<true, Key<A>> timeChecker_;
-            T t_;
-        public:
-            template <class F>
-            OnOrderFacilityCore(F &&f) : RealTimeAppComponents<StateT>::template AbstractOnOrderFacility<A,B>(), timeChecker_(), t_(std::move(f)) {
-            }
-            virtual ~OnOrderFacilityCore() {
-            }
-            virtual void handle(InnerData<Key<A>> &&data) override final {
-                if (timeChecker_(data)) {
-                    GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
-                        data.environment, static_cast<AbstractOnOrderFacility<A,B> *>(this)
-                    );
-                    TM_INFRA_FACILITY_TRACER(data.environment);
-                    auto id = data.timedData.value.id();
-                    WithTime<A,TimePoint> a {data.timedData.timePoint, data.timedData.value.key()};
-                    auto res = t_.action(data.environment, std::move(a));
-                    if (res) {
-                        RealTimeAppComponents<StateT>::template OnOrderFacilityProducer<KeyedData<A,B>>::publish(
-                            pureInnerDataLift([id=std::move(id)](B &&b) -> Key<B> {
-                                return {std::move(id), std::move(b)};
-                            }, std::move(*res))
-                        );
-                    }
-                }
-            }
-        };
 
         template <class A, class B, bool Threaded, class T, class StartF>
-        class OnOrderFacilityCoreWithStart {};
-        template <class A, class B, class T, class StartF>
-        class OnOrderFacilityCoreWithStart<A,B,true,T,StartF> : public virtual RealTimeAppComponents<StateT>::IExternalComponent, public virtual RealTimeAppComponents<StateT>::template AbstractOnOrderFacility<A,B>, public RealTimeAppComponents<StateT>::template ThreadedHandler<Key<A>,OnOrderFacilityCoreWithStart<A,B,true,T,StartF>> {
+        class OnOrderFacilityCoreWithStart
+            : public virtual RealTimeAppComponents<StateT>::IExternalComponent,
+              public virtual RealTimeAppComponents<StateT>::template AbstractOnOrderFacility<A, B>,
+              public RealTimeAppComponents<
+                  StateT>::template ExecHandler<Key<A>, OnOrderFacilityCoreWithStart<A, B, Threaded, T, StartF>, typename RealTimeAppComponents<StateT>::template HandlerPolicy<Threaded>> {
         private:
+            using Base = typename RealTimeAppComponents<
+                StateT>::template ExecHandler<Key<A>, OnOrderFacilityCoreWithStart<A, B, Threaded, T, StartF>, typename RealTimeAppComponents<StateT>::template HandlerPolicy<Threaded>>;
             T t_;
             StartF startF_;
             std::atomic<bool> started_;
@@ -1828,8 +1709,21 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                     );
                 }
             }
-            void idleWork() {}
+            // This built-in node has no idle callback or side effects.
+            bool hasIdleWork() const
+            {
+                return false;
+            }
+            void idleWork()
+            {
+                if constexpr (!Base::kOwnContext) {
+                    return;
+                }
+            }
             void waitForStart() {
+                if constexpr (!Base::kOwnContext) {
+                    return;
+                }
                 while (!started_) {
                     std::this_thread::sleep_for(std::chrono::milliseconds(100));
                 }
@@ -1840,44 +1734,17 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             }
         public:
             template <class F>
-            OnOrderFacilityCoreWithStart(F &&f, StartF &&startF) : RealTimeAppComponents<StateT>::template AbstractOnOrderFacility<A,B>(), RealTimeAppComponents<StateT>::template ThreadedHandler<Key<A>,OnOrderFacilityCoreWithStart<A,B,true,T,StartF>>(), t_(std::move(f)), startF_(std::move(startF)), started_(false) {
+            OnOrderFacilityCoreWithStart(F &&f, StartF &&startF)
+                : RealTimeAppComponents<StateT>::template AbstractOnOrderFacility<A, B>()
+                , RealTimeAppComponents<
+                      StateT>::template ExecHandler<Key<A>, OnOrderFacilityCoreWithStart<A, B, Threaded, T, StartF>, typename RealTimeAppComponents<StateT>::template HandlerPolicy<Threaded>>()
+                , t_(std::move(f))
+                , startF_(std::move(startF))
+                , started_(false)
+            {
                 this->startThread();
             }
             virtual ~OnOrderFacilityCoreWithStart() {
-            }
-        };
-        template <class A, class B, class T, class StartF>
-        class OnOrderFacilityCoreWithStart<A,B,false,T,StartF> : public virtual RealTimeAppComponents<StateT>::IExternalComponent, public virtual RealTimeAppComponents<StateT>::template AbstractOnOrderFacility<A,B> {
-        private:
-            typename RealTimeAppComponents<StateT>::template TimeChecker<true, Key<A>> timeChecker_;
-            T t_;
-            StartF startF_;
-        public:
-            template <class F>
-            OnOrderFacilityCoreWithStart(F &&f, StartF &&startF) : RealTimeAppComponents<StateT>::template AbstractOnOrderFacility<A,B>(), timeChecker_(), t_(std::move(f)), startF_(std::move(startF)) {
-            }
-            virtual ~OnOrderFacilityCoreWithStart() {
-            }
-            virtual void handle(InnerData<Key<A>> &&data) override final {
-                if (timeChecker_(data)) {
-                    GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
-                        data.environment, static_cast<AbstractOnOrderFacility<A,B> *>(this)
-                    );
-                    TM_INFRA_FACILITY_TRACER(data.environment);
-                    auto id = data.timedData.value.id();
-                    WithTime<A,TimePoint> a {data.timedData.timePoint, data.timedData.value.key()};
-                    auto res = t_.action(data.environment, std::move(a));
-                    if (res) {
-                        RealTimeAppComponents<StateT>::template OnOrderFacilityProducer<KeyedData<A,B>>::publish(
-                            pureInnerDataLift([id=std::move(id)](B &&b) -> Key<B> {
-                                return {std::move(id), std::move(b)};
-                            }, std::move(*res))
-                        );
-                    }
-                }
-            }
-            virtual void start(StateT *env) override final {
-                startF_(env);
             }
         };
 
@@ -2666,10 +2533,11 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
         using Exporter = OneWayHolder<AbstractExporter<T>,T>;
     private:
         template <class T, class F, bool Threaded>
-        class SimpleExporter {};
-        template <class T, class F>
-        class SimpleExporter<T,F,true> final : public virtual AbstractExporter<T>, public RealTimeAppComponents<StateT>::template ThreadedHandler<T,SimpleExporter<T,F,true>> {
+        class SimpleExporter final
+            : public virtual AbstractExporter<T>,
+              public RealTimeAppComponents<StateT>::template ExecHandler<T, SimpleExporter<T, F, Threaded>, typename RealTimeAppComponents<StateT>::template HandlerPolicy<Threaded>> {
         private:
+            using Base = typename RealTimeAppComponents<StateT>::template ExecHandler<T, SimpleExporter<T, F, Threaded>, typename RealTimeAppComponents<StateT>::template HandlerPolicy<Threaded>>;
             F f_;  
             bool isTrivial_;
         public:
@@ -2682,15 +2550,36 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 );
                 TM_INFRA_EXPORTER_TRACER(d.environment);
                 f_(std::move(d));
-            }   
-            void idleWork() {} 
-            void waitForStart() {}
+            }
+            // This built-in node has no idle callback or side effects.
+            bool hasIdleWork() const
+            {
+                return false;
+            }
+            void idleWork()
+            {
+                if constexpr (!Base::kOwnContext) {
+                    return;
+                }
+            }
+            void waitForStart()
+            {
+                if constexpr (!Base::kOwnContext) {
+                    return;
+                }
+            }
+
         public:
-        #ifdef _MSC_VER
-            SimpleExporter(F &&f, bool isTrivial=false) : f_(std::move(f)), isTrivial_(isTrivial) {
-        #else
-            SimpleExporter(F &&f, bool isTrivial=false) : AbstractExporter<T>(), RealTimeAppComponents<StateT>::template ThreadedHandler<T,SimpleExporter<T,F,true>>(), f_(std::move(f)), isTrivial_(isTrivial) {
-        #endif            
+#ifdef _MSC_VER
+            SimpleExporter(F &&f, bool isTrivial = false) : f_(std::move(f)), isTrivial_(isTrivial) {
+#else
+            SimpleExporter(F &&f, bool isTrivial = false)
+                : AbstractExporter<T>()
+                , RealTimeAppComponents<StateT>::template ExecHandler<T, SimpleExporter<T, F, Threaded>, typename RealTimeAppComponents<StateT>::template HandlerPolicy<Threaded>>()
+                , f_(std::move(f))
+                , isTrivial_(isTrivial)
+            {
+#endif
                 this->startThread();
             }
             virtual ~SimpleExporter() {}
@@ -2699,33 +2588,7 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 return isTrivial_;
             }
         };
-        template <class T, class F>
-        class SimpleExporter<T,F,false> final : public virtual AbstractExporter<T> {
-        private:
-            F f_;    
-            typename RealTimeAppComponents<StateT>::template TimeChecker<true, T> timeChecker_; 
-            bool isTrivial_;
-        public:
-        #ifdef _MSC_VER
-            SimpleExporter(F &&f, bool isTrivial=false) : f_(std::move(f)), timeChecker_(), isTrivial_(isTrivial) {}
-        #else
-            SimpleExporter(F &&f, bool isTrivial=false) : AbstractExporter<T>(), f_(std::move(f)), timeChecker_(), isTrivial_(isTrivial) {}
-        #endif
-            virtual ~SimpleExporter() {}
-            virtual void handle(InnerData<T> &&d) override final {
-                if (timeChecker_(d)) {
-                    GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
-                        d.environment, static_cast<AbstractExporter<T> *>(this)
-                    );
-                    TM_INFRA_EXPORTER_TRACER(d.environment);
-                    f_(std::move(d));
-                }
-            } 
-            virtual void start(StateT *) override final {}
-            virtual bool isTrivialExporter() const override final {
-                return isTrivial_;
-            }
-        };
+
     public:       
         template <class T>
         static std::shared_ptr<Exporter<T>> exporter(AbstractExporter<T> *p) {
