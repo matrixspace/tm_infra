@@ -27,7 +27,7 @@ SharedPool引入路径从 `tm_kit/infra/RealTimeSharedPoolExecutor.hpp` 改为 `
 
 transport Debug定向构建成功；接入测试启动HTTP监听时中止：`Cannot open acceptor on port 39871`。独立Python探测固定端口39871和系统分配端口0均报 `PermissionError: [Errno 1] Operation not permitted`，确认当前沙箱禁止bind。本轮没有完成transport运行验证，也未把它计为通过。基础库测试已通过；没有新增API或调度行为。
 
-本轮代码提交：tm_basic `7edf028`，tm_transport `332e3c2`；infra删除旧实现与记录另行提交。保持feature分支，未合并/推送；reference按项目流程待推送后同步。
+本轮代码提交：tm_basic `7edf028`，tm_transport `332e3c2`；tm_infra `d067120`（删除旧实现、调整安装/测试与记录）。保持feature分支，未合并/推送；reference按项目流程待推送后同步。
 
 验证输出见下列归档：
 - [infra Release](executor-layering-validation/infra-tests.txt)
