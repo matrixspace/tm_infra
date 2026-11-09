@@ -72,7 +72,7 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 if (!versionChecker_.checkVersion(data.timedData.value)) {
                     return false;
                 }
-                if (StateT::CheckTime) {
+                if (CheckTimeEnabled<StateT>::value) {
                     if (hasData_ && data.timedData.timePoint < lastTime_) {
                         return false;
                     }
@@ -128,14 +128,14 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 }
             }
             //checked here (not at class level) so that StateT only needs to be
-            //complete where a node is instantiated, as for StateT::CheckTime
+            //complete where a node is instantiated, as for CheckTimeEnabled<StateT>::value
             static constexpr bool lockFreeEnabled = std::is_base_of_v<LockFreeTimeCheckerComponent, StateT>;
         public:
             static constexpr TimeCheckerMode value =
                 (!lockFreeEnabled || !VersionCheckerIsTrivial<T>::value)
                 ? TimeCheckerMode::Mutex
                 : (
-                    (!StateT::CheckTime)
+                    (!CheckTimeEnabled<StateT>::value)
                     ? TimeCheckerMode::Trivial
                     : (lockFreeTime() ? TimeCheckerMode::AtomicCAS : TimeCheckerMode::Mutex)
                 );
@@ -201,7 +201,7 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 if (!versionChecker_.checkVersion(data.timedData.value)) {
                     return false;
                 }
-                if (StateT::CheckTime) {
+                if (CheckTimeEnabled<StateT>::value) {
                     if (hasData_ && data.timedData.timePoint < lastTime_) {
                         return false;
                     }

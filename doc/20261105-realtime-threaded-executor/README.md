@@ -115,3 +115,5 @@
 2026-11-08 完成进一步的 [Enhanced 延迟关键路径优化与 Inline 对照](mpsc-node-recycling.md)：保留异步契约，验证SMT/自旋预算下的低延迟及CPU代价；四生产者小消息追加90次双基线对照，不把少量样本的波动误判为稳定回退。
 
 2026-11-09：[执行器实现分层](executor-layering.md)，SharedPool与专用队列迁入basic，覆盖此前infra位置的描述。
+
+2026-11-09：[默认关闭时间检查](default-time-check.md)；显式true保留时间检查，允许后续使用moodycamel。

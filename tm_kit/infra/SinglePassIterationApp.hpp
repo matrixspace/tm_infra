@@ -2,6 +2,7 @@
 #define TM_KIT_INFRA_SINGLE_PASS_ITERATION_APP_HPP_
 
 #include <tm_kit/infra/WithTimeData.hpp>
+#include <tm_kit/infra/Environments.hpp>
 #include <tm_kit/infra/ControllableNode.hpp>
 #include <tm_kit/infra/ObservableNode.hpp>
 #include <tm_kit/infra/StoppableProducer.hpp>
@@ -798,7 +799,7 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                     if (!versionChecker_.checkVersion(input->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !hasA_ || tp >= aTime_) {
+                    if (!CheckTimeEnabled<StateT>::value || !hasA_ || tp >= aTime_) {
                         hasA_ = true;
                         aTime_ = tp;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -947,7 +948,7 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                     if (!versionChecker_.checkVersion(input->timedData.value)) {
                         return std::nullopt;
                     }
-                    if (!StateT::CheckTime || !hasA_ || tp >= aTime_) {
+                    if (!CheckTimeEnabled<StateT>::value || !hasA_ || tp >= aTime_) {
                         hasA_ = true;
                         aTime_ = tp;
                         GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
@@ -1447,7 +1448,7 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                     if (!versionChecker_.checkVersion(input->timedData.value)) {
                         return {{std::nullopt}, std::nullopt};
                     }
-                    if (!StateT::CheckTime || !hasA_ || tp >= aTime_) {
+                    if (!CheckTimeEnabled<StateT>::value || !hasA_ || tp >= aTime_) {
                         hasA_ = true;
                         aTime_ = tp;
                         inputCopy_ = std::move(*input);
@@ -2502,7 +2503,7 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 auto env = input->environment;
                 auto tp = input->timedData.timePoint;
                 auto flag = input->timedData.finalFlag;
-                if (!StateT::CheckTime || !hasT_ || tp >= tTime_) {
+                if (!CheckTimeEnabled<StateT>::value || !hasT_ || tp >= tTime_) {
                     hasT_ = true;
                     tTime_ = tp;
                 } else {
