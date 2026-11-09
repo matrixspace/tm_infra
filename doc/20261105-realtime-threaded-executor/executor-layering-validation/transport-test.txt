@@ -1,0 +1,2 @@
+terminate called after throwing an instance of 'dev::cd606::tm::transport::json_rest::JsonRESTComponentException'
+  what():  Cannot open acceptor on port 39871

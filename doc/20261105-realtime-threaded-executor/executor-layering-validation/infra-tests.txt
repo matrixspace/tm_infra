@@ -1,0 +1,8 @@
+1/2 TM_kit_infra:dedicated_executor_test OK               0.11s
+2/2 TM_kit_infra:time_checker_test       OK               1.56s
+
+Ok:                2   
+Fail:              0   
+
+Full log written to /data/hxli/codes/tm_kit/worktrees/realtime-threaded-executor/tm_infra/builddir_release/meson-logs/testlog.txt
+NOTICE: You are using Python 3.9 which is EOL. Starting with v1.12.0, Meson will require Python 3.10 or newer
