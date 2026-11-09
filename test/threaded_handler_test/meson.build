@@ -10,3 +10,10 @@ dedicated_executor_test_exe = executable('dedicated_executor_test', 'DedicatedEx
     link_with: threaded_handler_test_lib,
     install: false)
 test('dedicated_executor_test', dedicated_executor_test_exe, timeout: 30)
+
+threaded_handler_compatibility_test_exe = executable('threaded_handler_compatibility_test', 'ThreadedHandlerCompatibilityTest.cpp',
+    include_directories: inc,
+    dependencies: common_deps,
+    link_with: threaded_handler_test_lib,
+    install: false)
+test('threaded_handler_compatibility_test', threaded_handler_compatibility_test_exe, timeout: 10)

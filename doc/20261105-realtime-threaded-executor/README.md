@@ -121,3 +121,5 @@
 2026-11-09：[Enhanced取消全局FIFO后的优化](unordered-enhanced.md)，用户接受吞吐大幅提升时单生产者延迟稍增。
 
 2026-11-09：[moodycamel执行器合并](moodycamel-unification.md)，替代Enhanced与旧BlockingQueue两套实现。
+
+2026-11-09：[ThreadedHandler 继承兼容性修复](threaded-handler-compatibility.md)：评审确认别名丢失注入类名；恢复薄类包装，补充具体 Environment 下旧写法的回归测试。

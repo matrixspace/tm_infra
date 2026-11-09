@@ -11,3 +11,5 @@
 - 2026-11-09：[Enhanced取消全局FIFO后的优化](20261105-realtime-threaded-executor/unordered-enhanced.md)：采用moodycamel分块队列与分片发布计数，以单生产者部分延迟代价换取多生产者吞吐。
 
 - 2026-11-09：[moodycamel执行器合并](20261105-realtime-threaded-executor/moodycamel-unification.md)：只保留MoodycamelThreadedExecutor，以可用性探测控制相关目标编译。
+
+- 2026-11-09：[ThreadedHandler 继承兼容性修复](20261105-realtime-threaded-executor/threaded-handler-compatibility.md)：恢复公开类包装，兼容旧的基类初始化与限定成员访问。

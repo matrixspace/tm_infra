@@ -352,7 +352,8 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
         };
 #include <tm_kit/infra/RealTimeApp_ThreadedHandler_Piece.hpp>
         template <class T, class W>
-        using ThreadedHandler = ExecHandler<T, W, ThreadedPolicy>;
+        // Keep the injected class name used by downstream derived classes.
+        class ThreadedHandler : public ExecHandler<T, W, ThreadedPolicy> {};
 
         template <class T>
         class Producer : public virtual IStoppableRealTimeProducer<1> {
