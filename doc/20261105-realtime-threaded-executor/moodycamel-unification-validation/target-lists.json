@@ -1,0 +1,68 @@
+{
+  "auto": {
+    "tests": [
+      "tsc_clock_test",
+      "moodycamel_executor_test",
+      "moodycamel_queue_test",
+      "chain_writer_loop_test",
+      "threaded_handler_test",
+      "executor_mechanism_test"
+    ],
+    "targets": [
+      "tm_kit_basic",
+      "tsc_clock_test",
+      "low_latency_bench",
+      "moodycamel_executor_test",
+      "moodycamel_queue_test",
+      "simple_graph_bench",
+      "chain_writer_loop_test",
+      "executor_bench",
+      "executor_bench_counts",
+      "executor_bench_direct",
+      "executor_bench_direct_counts",
+      "executor_bench_inline",
+      "executor_bench_inline_counts",
+      "executor_bench_inline_erased",
+      "executor_bench_inline_erased_counts",
+      "executor_bench_dedicated",
+      "executor_bench_dedicated_counts",
+      "executor_bench_pool",
+      "executor_bench_pool_counts",
+      "executor_bench_moody",
+      "executor_bench_moody_counts",
+      "executor_latency_bench",
+      "threaded_handler_test",
+      "executor_mechanism_test"
+    ]
+  },
+  "disabled": {
+    "tests": [
+      "tsc_clock_test",
+      "chain_writer_loop_test",
+      "threaded_handler_test",
+      "executor_mechanism_test"
+    ],
+    "targets": [
+      "tm_kit_basic",
+      "tsc_clock_test",
+      "low_latency_bench",
+      "simple_graph_bench",
+      "chain_writer_loop_test",
+      "executor_bench",
+      "executor_bench_counts",
+      "executor_bench_direct",
+      "executor_bench_direct_counts",
+      "executor_bench_inline",
+      "executor_bench_inline_counts",
+      "executor_bench_inline_erased",
+      "executor_bench_inline_erased_counts",
+      "executor_bench_dedicated",
+      "executor_bench_dedicated_counts",
+      "executor_bench_pool",
+      "executor_bench_pool_counts",
+      "executor_latency_bench",
+      "threaded_handler_test",
+      "executor_mechanism_test"
+    ]
+  }
+}

@@ -119,3 +119,5 @@
 2026-11-09：[默认关闭时间检查](default-time-check.md)；显式true保留时间检查，允许后续使用moodycamel。
 
 2026-11-09：[Enhanced取消全局FIFO后的优化](unordered-enhanced.md)，用户接受吞吐大幅提升时单生产者延迟稍增。
+
+2026-11-09：[moodycamel执行器合并](moodycamel-unification.md)，替代Enhanced与旧BlockingQueue两套实现。

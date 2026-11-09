@@ -1,0 +1,5 @@
+ninja: Entering directory `worktrees/realtime-threaded-executor/tm_basic/builddir_optional_off'
+[1/4] Compiling C++ object test/executor_bench/executor_bench_dedicated.p/ExecutorBench.cpp.o
+[2/4] Linking target test/executor_bench/executor_bench_dedicated
+[3/4] Compiling C++ object test/executor_bench/executor_latency_bench.p/ExecutorLatencyBench.cpp.o
+[4/4] Linking target test/executor_bench/executor_latency_bench

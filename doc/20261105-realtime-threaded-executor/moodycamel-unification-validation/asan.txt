@@ -1,0 +1,24 @@
+ok: empty queue never invokes consumer
+ok: throwing enqueue leaves queue unchanged
+ok: enqueue constructs move-only non-default item once
+ok: consume in place has no extra move and destroys queued item
+ok: reused-block construction exception does not retain Item
+ok: throwing consumer preserves remaining producer sequence
+ok: queue drains/destroys all item lifetimes
+ok: publication shard collisions preserve exact counts and producer FIFO
+ok: reusable blocks preserve per-producer FIFO across repeated bursts
+ok: producer exit and queue address reuse preserve ownership and counts
+ok: moodycamel rejects pushes before start
+ok: moodycamel starts once and drains concurrent producers in FIFO order
+ok: moodycamel preserves batch counts and native handle
+ok: moodycamel sleeps without periodic idle work
+ok: moodycamel wakeIdle activates periodic idle work
+ok: moodycamel stop is callback safe and rejects later pushes
+ok: publication alone wakes a sleeping consumer without idle tokens
+ok: publication alone wakes a sleeping consumer without idle tokens
+ok: concurrent idle wakes and publications drain without lost wakeups
+ok: final idle activation survives wake acknowledgement race
+ok: stop remains effective after wake stress
+ok: concurrent idle wakes and publications drain without lost wakeups
+ok: final idle activation survives wake acknowledgement race
+ok: stop remains effective after wake stress

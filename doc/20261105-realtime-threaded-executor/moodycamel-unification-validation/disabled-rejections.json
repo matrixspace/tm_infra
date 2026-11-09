@@ -1,0 +1,20 @@
+[
+  {
+    "command": [
+      "worktrees/realtime-threaded-executor/tm_basic/builddir_optional_off/test/executor_bench/executor_bench_dedicated",
+      "--executor",
+      "moody"
+    ],
+    "returncode": 2,
+    "stderr": "unknown/unavailable executor\n"
+  },
+  {
+    "command": [
+      "worktrees/realtime-threaded-executor/tm_basic/builddir_optional_off/test/executor_bench/executor_latency_bench",
+      "--executor",
+      "moody"
+    ],
+    "returncode": 2,
+    "stderr": "unknown/unavailable executor\n"
+  }
+]

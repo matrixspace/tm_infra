@@ -1,0 +1,12 @@
+p1
+p4
+large4
+latency
+p1 old CPU 398 wall 199 p50 0 p99 0
+p1 merged CPU 277 wall 152 p50 0 p99 0
+p4 old CPU 719 wall 150 p50 0 p99 0
+p4 merged CPU 155 wall 69 p50 0 p99 0
+large4 old CPU 758 wall 158 p50 0 p99 0
+large4 merged CPU 365 wall 125 p50 0 p99 0
+latency old CPU 2375 wall 1248 p50 614 p99 1007
+latency merged CPU 2245 wall 1172 p50 509 p99 698
