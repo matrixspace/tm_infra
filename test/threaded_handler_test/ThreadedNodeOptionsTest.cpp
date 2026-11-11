@@ -272,7 +272,7 @@ namespace
         }
         {
             auto n = M::liftPure<int>([](int &&x) { return x; }, thr);
-            check(throws([&] { M::configureThreadedNode(n, ThreadedNodeOptions().CpuAutoBind(99)); }) && fake.heldCount() == 0, "autobind: allocator exception propagates, nothing held");
+            check(throws([&] { M::configureThreadedNode(n, ThreadedNodeOptions().CpuAutoBindOnNuma(99)); }) && fake.heldCount() == 0, "autobind: allocator exception propagates, nothing held");
         }
         {
             // Node destruction joins its thread and returns the CPU.

@@ -173,7 +173,10 @@ namespace dev
                         cpuAutoBind = CpuAutoBindRequest{};
                         return *this;
                     }
-                    ThreadedNodeOptions &CpuAutoBind(int numaNode)
+                    // Automatic choice restricted to one NUMA node (OS index), e.g.
+                    // the node of the NIC this thread polls. Not a CPU number:
+                    // use Cpus() to pin to specific CPUs.
+                    ThreadedNodeOptions &CpuAutoBindOnNuma(int numaNode)
                     {
                         cpuAutoBind = CpuAutoBindRequest{numaNode};
                         return *this;

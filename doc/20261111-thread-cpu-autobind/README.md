@@ -15,7 +15,7 @@
 - 特殊性：每个 NUMA 节点的第一个核（承载中断与内核杂务）也要避开，不只是全局 CPU0 所在的核。
 
 ## 方案
-- infra：`ThreadedNodeOptions::CpuAutoBind([numaNode])`；分配器接口 `IThreadCpuAllocator`（acquire / release / reserve）；Environment 组件 `ThreadCpuAllocatorComponent<A>`；`ExecHandlerCore::configureThread` 解析自动绑核，转成单个 CPU 交给执行器已有的 `configure`，并持有租约，析构时归还。
+- infra：`ThreadedNodeOptions::CpuAutoBind()` / `CpuAutoBindOnNuma(numaNode)`；分配器接口 `IThreadCpuAllocator`（acquire / release / reserve）；Environment 组件 `ThreadCpuAllocatorComponent<A>`；`ExecHandlerCore::configureThread` 解析自动绑核，转成单个 CPU 交给执行器已有的 `configure`，并持有租约，析构时归还。
 - basic：`HwlocThreadCpuAllocator`（进程级单例，`configure(HwlocCpuAllocatorConfig)`），以物理核为分配单位。
 - 进程限制：可用 PU = `hwloc_get_cpubind(PROCESS)` ∩ allowed cpuset。NUMA 偏好：Linux 上 hwloc 不支持查询进程级 membind（实测 `get_thisproc_membind=0`，返回 -1），改为读取调用线程的 membind（numactl 设置会被所有线程继承），只有策略为 BIND 时才视为偏好节点（`numactl --membind/--preferred` 实测都报 pol=BIND、nodes=1；默认为 FIRSTTOUCH、nodes=0-1）。
 
@@ -41,7 +41,7 @@
    - 每个 NUMA 节点首个 PU（按完整拓扑判断，不受进程掩码影响）所在的核；
    - 已分配或已预留 PU 所在的核。
 3. NUMA 选择：
-   - 显式 `CpuAutoBind(n)` 时只在节点 n 内分配；节点不存在或不可用时抛异常。
+   - 显式 `CpuAutoBindOnNuma(n)` 时只在节点 n 内分配；节点不存在或不可用时抛异常。
    - 否则按以下顺序选节点：已有自动分配、且仍有空闲核的节点（集中）；线程 membind 为 BIND 策略时指定的节点；剩余节点按空闲核数降序。
    - 同一节点内按核顺序选择，线程绑到该核第一个可用 PU，同核的兄弟 PU 不再分配。
 4. 配置校验：`excludeCpus` 中不在进程可用集合、或不属于任何核的 CPU 号会抛异常，避免笔误被静默忽略。
@@ -59,7 +59,8 @@
     - 耗尽时抛 `CpuAutoBindError`，消息完整；release 后可复用；
     - 预留的核不会被自动分配；预留已自动分配的 CPU 时抛异常；首次使用后 configure 抛异常；
     - 8 线程 × 200 轮并发 acquire/release，从未分配同一核；
-    - 图集成：Dedicated 与 Moodycamel 节点各 pin 到单个 PU；SharedPool 节点抛异常。
+    - 图集成：Dedicated 与 Moodycamel 节点各 pin 到单个 PU；`CpuAutoBindOnNuma(1)` 的节点线程落在节点 1 的 CPU 上，`CpuAutoBindOnNuma(99)` 抛异常；SharedPool 节点抛异常。
+- 改名为 `CpuAutoBindOnNuma` 后重跑：tm_infra Release 4/4，tm_basic Release 8/8。
   - `hwloc_cpu_allocator_constraints`（`run_constraints.sh`）：
     - `taskset` 6 个整核（含全部 SMT 兄弟）时，6 个核全部可分配；
     - `taskset` 每核只给一个 PU 时，RequireFullCore 无可用核并抛异常；
@@ -69,6 +70,7 @@
 - TSan：`hwloc_cpu_allocator_test` 以 `-O1 -fsanitize=thread` 编译运行 ALL PASSED，无 TSan 报告；`-Wtsan` 警告来自 moodycamel 头文件内已有的 fence。
 - tm_basic Debug：7/8 通过，失败的是 `tsc_clock_test`（“TscClock::nowNs() is cheaper than system_clock::now()”）。develop 上的同一二进制连跑 3 次都失败，属于既有的 Debug 性能断言问题，与本任务无关；Release 下该测试通过。
 ## 兼容性与注意事项
+- 命名：限定 NUMA 的接口最初叫 `CpuAutoBind(int numaNode)`，调用处 `CpuAutoBind(1)` 容易被读成“自动绑定到 CPU 1”。合并前按用户确认改为 `CpuAutoBindOnNuma(1)`，没有保留旧重载。参数是 NUMA 节点而不是 CPU：指定具体 CPU 用 `Cpus()`，自动模式下只约束挑选范围，具体的核由框架按 SMT、节点首核和避让列表选出。
 - 只追加接口：已有 `Cpus()`、`SpinWait()` 的语义不变。`IThreadCpuAllocator`、`ThreadCpuAllocatorComponent` 是新的 infra 公开类型，infra 仍零第三方依赖。
 - 与 `Cpus()` / `SpinWait()` 的“不支持就返回 false”不同，`CpuAutoBind()` 任何不可满足的情况都抛异常（用户要求“异常情况下报错，不要默默处理”）。
 - 下游包含 `HwlocThreadCpuAllocator.hpp` 时需自行链接 hwloc；tm_basic 的 .pc 不要求 hwloc，未使用该功能的下游不受影响。
