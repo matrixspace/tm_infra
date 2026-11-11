@@ -2,7 +2,7 @@
 
 **任务开始时间：** 2026-11-11  
 **任务结束时间：** 2026-11-11  
-**状态：** 完成（待合并推送）  
+**状态：** 完成（待合并推送）；2026-11-11 追加 ThreadCpuLease  
 **分支：** `feature/thread-cpu-autobind`（tm_infra、tm_basic，均从 develop 建立）
 
 ## 背景
@@ -46,10 +46,28 @@
    - 同一节点内按核顺序选择，线程绑到该核第一个可用 PU，同核的兄弟 PU 不再分配。
 4. 配置校验：`excludeCpus` 中不在进程可用集合、或不属于任何核的 CPU 号会抛异常，避免笔误被静默忽略。
 5. 实现中的坑：最初把 hwloc 的核 logical index 直接用作内部数组 `cores_` 的下标，进程掩码窄于整机时会越界（numactl 约束测试中 libstdc++ 断言失败）。已改为直接使用 `cores_` 的下标。
-## 测试与验证（命令、构建类型、结果）
+### 追加：自写线程复用绑核（ThreadCpuLease）
+用户询问自写 importer 线程或其他能拿到 Environment 的地方能否复用绑核，并要求：限定 NUMA 的接口使用独立名字；`bindCurrentThread` 系列保证多线程调用安全。
+- tm_infra `RealTimeThreadedExecutor.hpp` 新增公开类 `ThreadCpuLease`（RAII，可移动不可拷贝），以及异常类型 `ThreadCpuBindError`：
+  - `bindCurrentThread<Env>(who)`：自动选核；
+  - `bindCurrentThreadOnNuma<Env>(numaNode, who)`：限定 NUMA 节点自动选核；
+  - `bindCurrentThreadTo<Env>(cpus, who)`：手工指定 CPU，先向分配器 reserve，让自动分配避开；
+  - 以上三个都有接收 `IThreadCpuAllocator &` 的重载，供只持有分配器的代码使用；
+  - `adopt(allocator, cpus)` 接管已分配的 CPU（图节点内部使用），另有 `cpu()`、`cpus()`、`active()`、`reset()`、`swap()`。
+  - 只作用于调用线程：在线程函数第一行调用即可，不需要线程句柄，也就没有句柄失效的问题。分配器不存在时 `static_assert` 编译失败；无可用核、CPU 列表为空或非法、pin 失败都抛异常。
+- 多线程安全：
+  - 分配器内部的 mutex 保证核的选择互斥；每个线程只改自己的亲和性。
+  - 同一线程同时只能持有一个 bindCurrentThread 租约，第二次调用抛异常，避免一个线程悄悄占两个核。登记表由 mutex 保护。
+  - 单个租约对象不支持两个线程同时操作（与标准库对象的约定一致），已写进头文件注释。
+- 踩坑：最初用 `std::thread::id` 记录哪些线程持有租约。线程结束后 OS 会复用 id；如果租约被 move 出线程且仍存活，复用了该 id 的新线程会被误判为重复绑定（basic 的混合测试中出现）。已改为进程内从不复用的线程序号（`thread_local`，由原子计数器分配）。
+- `ExecHandlerCore` 删除私有 `CpuLease`，改用 `ThreadCpuLease::adopt`，图节点与自写线程共用同一套归还逻辑。
+
 以下命令都先 `source build-common/build-env-setting.sh`（GCC 15.2.1），用 `ninja -j2` 定向编译；infra 头文件只装到 worktree 私有前缀。
 - tm_infra Release `threaded_node_options_test`：22 项 ALL PASSED，其中新增 14 项用假分配器覆盖扩展点：无分配器抛异常；Cpus+AutoBind 互斥；Inline 与无 configure 执行器抛异常且不占用 CPU；分配器异常透传；成功 pin 到分配的 CPU；重配置释放旧 CPU；节点 `delete` 后 CPU 归还；显式 Cpus 被 reserve，重配置释放，自动分配会避开。
 - tm_infra Release 与 Debug 各 4/4 通过。
+- ThreadCpuLease（infra，假分配器）：调用线程被 pin 到分配的 CPU；同一线程第二次绑定抛异常；线程函数结束后归还；异常退出也归还；`OnNuma(99)` 失败后同一线程仍可重新绑定；`bindCurrentThreadTo` 先 reserve、pin、结束后归还；空列表抛异常；move 后源租约失效、只归还一次；16 线程同时绑定，分到的 CPU 两两不同且都已 pin，结束后全部归还。
+- ThreadCpuLease（basic，真实 hwloc 分配器）：1 个自动绑核的图节点加 8 个并发自写线程，全部落在不同物理核；线程结束后核可以再次分配。
+- TSan：infra 与 basic 两个测试的 TSan 构建均 ALL PASSED，没有数据竞争报告。为此去掉了 infra 测试里故意泄漏节点、执行器和租约的写法：执行器现在会在析构时 join，测试可以正常销毁，TSan 也不再报线程泄漏。
 - tm_basic Release `meson test`：8/8 通过，其中新增两项：
   - `hwloc_cpu_allocator_test`：
     - 26 次分配各占不同物理核，且都在进程掩码内；

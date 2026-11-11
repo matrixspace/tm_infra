@@ -293,22 +293,6 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 }
             };
 
-            //CPUs this node holds from the Environment's IThreadCpuAllocator.
-            //Declared before exec_ so it is released after the thread is joined.
-            struct CpuLease {
-                IThreadCpuAllocator *allocator = nullptr;
-                std::vector<int> cpus;
-                void reset() noexcept {
-                    if (allocator && !cpus.empty()) {
-                        allocator->release(cpus);
-                    }
-                    allocator = nullptr;
-                    cpus.clear();
-                }
-                ~CpuLease() {
-                    reset();
-                }
-            };
             template <class X, class=void>
             struct ExecConfigurable : std::false_type {};
             template <class X>
@@ -316,8 +300,10 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
 
             TimeChecker<!Exec::kSerialCallbacks, T> timeChecker_;
             Host host_;
+            //CPUs this node holds from the Environment's IThreadCpuAllocator.
+            //Declared before exec_ so it is released after the thread is joined.
             std::mutex leaseMutex_;
-            CpuLease lease_;
+            ThreadCpuLease lease_;
             Exec exec_;
 
             static ThreadedExecOptions makeOptions()
@@ -398,22 +384,20 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                     }
                     allocator.reserve(cpus, nodeName());
                 }
-                CpuLease next;
-                next.allocator = &allocator;
-                next.cpus = cpus;
+                //the node thread is pinned by the executor, not by this thread
+                ThreadCpuLease next = ThreadCpuLease::adopt(allocator, cpus);
                 ThreadedNodeOptions applied = o;
                 applied.cpuAutoBind.reset();
                 applied.cpus = std::move(cpus);
                 bool ok = realtime_threaded_executor_detail::configure(exec_, applied, 0);
                 if (!ok) {
                     if (acquired) {
-                        throw RealTimeAppException("CpuAutoBind: failed to pin " + nodeName() + " to CPU " + std::to_string(next.cpus.front()));
+                        throw RealTimeAppException("CpuAutoBind: failed to pin " + nodeName() + " to CPU " + std::to_string(next.cpu()));
                     }
                     return false; //next releases the reservation
                 }
                 std::lock_guard<std::mutex> _(leaseMutex_);
-                std::swap(lease_.allocator, next.allocator);
-                std::swap(lease_.cpus, next.cpus);
+                lease_.swap(next);
                 return true; //next releases the previous lease
             }
         protected:

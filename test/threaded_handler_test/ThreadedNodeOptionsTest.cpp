@@ -25,6 +25,11 @@
 //     thread / Cpus()+CpuAutoBind() all throw; success pins to the acquired
 //     CPU; an allocator exception propagates; node destruction releases;
 //     explicit Cpus() is reserved and released on reconfigure
+//  7. ThreadCpuLease::bindCurrentThread / OnNuma / To from user threads:
+//     pins the calling thread, releases on destruction (also when the thread
+//     ends by exception), refuses a second lease on the same thread, moves
+//     without double release, and 16 threads binding concurrently never get
+//     the same CPU
 using namespace dev::cd606::tm::infra;
 namespace
 {
@@ -128,8 +133,7 @@ namespace
             check(!bad && now.size() == 1 && now[0] == target, "invalid CPU id rejected, affinity kept");
         }
 
-        // nodes intentionally leaked: their threads are detached
-        (void)env;
+        delete env;
     }
 
     struct Host {
@@ -157,7 +161,8 @@ namespace
         check(ok && now.size() == 1 && now[0] == target, "dedicated: affinity set before start applied at start");
         e->push(1);
         check(waitUntil([&] { return h->handled.load() == 1; }), "dedicated: spinWait accepted and ignored, data flows");
-        e->stop();
+        delete e; // stop + join: the host is no longer used afterwards
+        delete h;
     }
 
     void noConfigureExecutorTest()
@@ -297,6 +302,130 @@ namespace
             check(allowed.size() < 2 || (now.size() == 1 && now[0] != allowed.front()), "autobind: acquired CPU differs from the reserved one");
         }
     }
+
+    void threadLeaseTest()
+    {
+        auto allowed = allowedCpus();
+        auto &fake = FakeAccess::fake();
+        fake.pool = allowed;
+        auto baseHeld = fake.heldCount();
+        auto baseReserved = fake.reservedCount();
+        std::string err;
+        {
+            // Pins the calling thread to the acquired CPU.
+            std::vector<int> aff;
+            int got = -1;
+            bool second = false;
+            std::thread th([&] {
+                auto lease = ThreadCpuLease::bindCurrentThread<AllocEnv>("user-thread");
+                got = lease.cpu();
+                aff = affinityOf(pthread_self());
+                second = throws([&] { ThreadCpuLease::bindCurrentThread<AllocEnv>("user-thread-2"); });
+            });
+            th.join();
+            check(got >= 0 && aff.size() == 1 && aff[0] == got, "lease: bindCurrentThread pins the calling thread");
+            check(second, "lease: a second lease on the same thread throws");
+            check(fake.heldCount() == baseHeld, "lease: destroyed with the thread function, CPU returned");
+        }
+        {
+            // A thread ending with an exception still returns its CPU.
+            std::thread th([&] {
+                try {
+                    auto lease = ThreadCpuLease::bindCurrentThread<AllocEnv>("throwing");
+                    throw std::runtime_error("work failed");
+                } catch (std::exception const &) {
+                }
+            });
+            th.join();
+            check(fake.heldCount() == baseHeld, "lease: exception unwinding returns the CPU");
+        }
+        {
+            // Allocator failure propagates and the thread may bind again afterwards.
+            bool failed = false, retried = false;
+            std::thread th([&] {
+                failed = throws([&] { ThreadCpuLease::bindCurrentThreadOnNuma<AllocEnv>(99, "numa99"); });
+                auto lease = ThreadCpuLease::bindCurrentThreadOnNuma<AllocEnv>(0, "numa0");
+                retried = lease.active();
+            });
+            th.join();
+            check(failed && retried && fake.heldCount() == baseHeld, "lease: failed bind leaves the thread free to bind again");
+        }
+        {
+            // Explicit CPUs are reserved, pinned and released.
+            std::vector<int> aff;
+            std::size_t reservedInside = 0;
+            std::thread th([&] {
+                auto lease = ThreadCpuLease::bindCurrentThreadTo<AllocEnv>({allowed.back()}, "explicit");
+                aff = affinityOf(pthread_self());
+                reservedInside = fake.reservedCount();
+            });
+            th.join();
+            check(aff.size() == 1 && aff[0] == allowed.back() && reservedInside == baseReserved + 1 && fake.reservedCount() == baseReserved,
+                "lease: bindCurrentThreadTo reserves, pins and releases");
+            check(throws([&] { ThreadCpuLease::bindCurrentThreadTo<AllocEnv>({}, "empty"); }), "lease: empty explicit CPU list throws");
+        }
+        {
+            // Moving keeps exactly one owner; the moved-to lease releases once.
+            ThreadCpuLease outer;
+            std::thread th([&] {
+                auto lease = ThreadCpuLease::bindCurrentThread<AllocEnv>("moved");
+                outer = std::move(lease);
+                check(!lease.active(), "lease: moved-from lease is inactive");
+            });
+            th.join();
+            check(outer.active() && fake.heldCount() == baseHeld + 1, "lease: moved lease still holds the CPU after the thread ended");
+            outer.reset();
+            check(fake.heldCount() == baseHeld, "lease: reset releases exactly once");
+        }
+        {
+            // Concurrent binds from many threads: distinct CPUs, all returned.
+            unsigned n = std::min<unsigned>(16, (unsigned)allowed.size());
+            std::mutex m;
+            std::set<int> seen;
+            std::atomic<int> dup{0}, ok{0}, ready{0};
+            std::atomic<bool> go{false}, hold{true};
+            std::vector<std::thread> ts;
+            for (unsigned i = 0; i < n; ++i) {
+                ts.emplace_back([&, i] {
+                    ++ready;
+                    while (!go.load()) {
+                        std::this_thread::yield();
+                    }
+                    try {
+                        auto lease = ThreadCpuLease::bindCurrentThread<AllocEnv>("c" + std::to_string(i));
+                        auto aff = affinityOf(pthread_self());
+                        {
+                            std::lock_guard<std::mutex> _(m);
+                            if (!seen.insert(lease.cpu()).second) {
+                                ++dup;
+                            }
+                        }
+                        if (aff.size() == 1 && aff[0] == lease.cpu()) {
+                            ++ok;
+                        }
+                        while (hold.load()) { // keep every lease alive at once
+                            std::this_thread::yield();
+                        }
+                    } catch (std::exception const &) {
+                    }
+                });
+            }
+            while (ready.load() < (int)n) {
+                std::this_thread::yield();
+            }
+            go = true;
+            while (ok.load() + dup.load() < (int)n && fake.heldCount() < baseHeld + n) {
+                std::this_thread::yield();
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
+            hold = false;
+            for (auto &t : ts) {
+                t.join();
+            }
+            check(dup.load() == 0 && ok.load() == (int)n, "lease: " + std::to_string(n) + " concurrent binds get distinct CPUs and pin themselves");
+            check(fake.heldCount() == baseHeld, "lease: all concurrent leases returned");
+        }
+    }
 } // namespace
 
 int main()
@@ -305,6 +434,7 @@ int main()
     dedicatedBeforeStartTest();
     noConfigureExecutorTest();
     autoBindTest();
+    threadLeaseTest();
     std::puts(failures ? "FAILED" : "ALL PASSED");
     return failures ? 1 : 0;
 }
