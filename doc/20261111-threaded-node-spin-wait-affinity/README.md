@@ -41,12 +41,24 @@
   - SharedPool 与 Inline：`configure` 分发返回 false，不抛异常。
 - 未做：TSan、transport / examples 回归（未改动 transport；新增接口只追加，未改已有签名）。
 
+## 追加：threaded 节点后台线程改为可 join（2026-11-11）
+
+用户要求 threaded 节点的后台线程不再 detach，改为合理管理生命周期。按"影响最小"的边界实施：只改 `DedicatedThreadExecutor` 与 `MoodycamelThreadedExecutor` 两个执行器，不动手写 importer 节点、ChainWriter、SharedPool 和 AppRunner。
+
+- `start()` 把 `std::thread` 移入执行器成员 `thread_`，不再 detach；`~DedicatedThreadExecutor()` / `~MoodycamelThreadedExecutor()` 先 `stop()` 再 `join()`。
+- 线程函数只捕获 `shared_ptr<State>`，不访问执行器对象本身，因此析构先于线程退出在内存上是安全的，join 只是等线程函数返回。
+- 从自身回调内析构执行器时不能自 join，判断 `thread_.get_id() == std::this_thread::get_id()` 后退化为 detach，线程在回调返回后自行退出（保留原有的"回调内 stop"能力）。
+- 语义变化：`stop()` 仍是非阻塞的（契约不变），join 只发生在析构。显式 `delete` 执行器/节点的路径现在会等到线程退出；不 delete 的路径（测试中的有意泄漏）行为与以前一致。
+- 测试：`detachedStateTest`（专测 detach 语义）替换为 `joinOnDestroyTest`，验证 delete 返回后线程已退出、不再有回调。infra 4/4、basic 6/6 全部通过。
+
 ## 兼容性与注意事项
 - 纯新增接口，下游源码零改动。`IRealTimeAppPossiblyThreadedNode` 新增的是带默认实现的虚函数，已有实现类（ChainReader、ChainWriter、CommonFlowUtils 中的节点等）不受影响，对它们调用返回 false。
 - 语义：在节点创建后、图运行前调用。线程在节点构造时已启动，所以绑核立即作用于该线程；moodycamel 的 spinWait 从消费者下一次等待开始生效。
 - 返回值：true 表示执行器接受了设置（Dedicated 的 spinWait 按约定忽略，仍返回 true）；false 表示节点非 threaded、执行器不支持（SharedPool、Inline、旧的自定义执行器），或 CPU 号无效 / 设置亲和性失败。CPU 号无效时整个调用都不生效。
 - SharedPool 的 spinWait 与绑核仍由 `SharedThreadPoolConfig` 在池级配置。
 - 开发过程中另一个会话曾并发修改同一 worktree，在 `configure` 分发处留下三份重复定义。用户停掉该会话后已合并为一份。
+- 线程生命周期改动只覆盖两个默认执行器。`SimpleImporter`、`BunchedImporter`、`ChainReader`、`ChainWriter`、`CommonFlowUtils` 中的节点和 `SharedThreadPool` 仍使用 detach，属于后续可继续收敛的范围。
+- 已知边界：如果执行器以外的代码持有 `Host*` 并在执行器析构后继续使用，join 只保证线程不再回调，不改变 Host 的生命周期要求。
 
 ## 相关文档
 - [realtime-threaded-executor](../20261105-realtime-threaded-executor/README.md)

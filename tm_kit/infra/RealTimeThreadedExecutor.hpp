@@ -29,7 +29,7 @@
 // push returns false after stop; stop is nonblocking and callback-safe.
 // Per-producer FIFO is required; weaker cross-producer ordering must be
 // documented. The default also preserves linearized cross-producer FIFO.
-// Host must outlive callbacks, including detached-thread shutdown.
+// Host must outlive callbacks, including shutdown after stop()+join.
 // Optional: bool configure(ThreadedNodeOptions const &), called before the
 // graph starts (possibly after start()); executors without it ignore options.
 
@@ -177,6 +177,7 @@ namespace dev
                         }
                     };
                     std::shared_ptr<State> state_;
+                    std::thread thread_;           // joined in destructor after stop()
                     std::optional<std::thread::native_handle_type> handle_;
                     std::vector<int> pendingCpus_; // protected by state_->mutex
 
@@ -225,6 +226,15 @@ namespace dev
                     ~DedicatedThreadExecutor()
                     {
                         stop();
+                        if (thread_.joinable()) {
+                            // Destroyed from its own callback: the thread cannot join
+                            // itself; it exits on its own after the callback returns.
+                            if (thread_.get_id() == std::this_thread::get_id()) {
+                                thread_.detach();
+                            } else {
+                                thread_.join();
+                            }
+                        }
                     }
                     template <class Host>
                     void start(Host *host)
@@ -236,7 +246,7 @@ namespace dev
                             handle_ = thread.native_handle();
                             realtime_threaded_executor_detail::setThreadAffinity(*handle_, pendingCpus_);
                         }
-                        thread.detach();
+                        thread_ = std::move(thread);
                     }
                     bool push(Item &&item)
                     {
