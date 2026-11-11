@@ -13,6 +13,11 @@
 #include <thread>
 #include <type_traits>
 #include <utility>
+#include <vector>
+#ifdef __linux__
+#include <pthread.h>
+#include <sched.h>
+#endif
 
 // Handler executor contract: template <class Item> class Exec.
 // Exec(ThreadedExecOptions), start(Host*), push(Item&&), stop(), wakeIdle(),
@@ -24,7 +29,9 @@
 // push returns false after stop; stop is nonblocking and callback-safe.
 // Per-producer FIFO is required; weaker cross-producer ordering must be
 // documented. The default also preserves linearized cross-producer FIFO.
-// Host must outlive callbacks, including detached-thread shutdown.
+// Host must outlive callbacks, including shutdown after stop()+join.
+// Optional: bool configure(ThreadedNodeOptions const &), called before the
+// graph starts (possibly after start()); executors without it ignore options.
 
 namespace dev
 {
@@ -86,7 +93,70 @@ namespace dev
                         return false;
                     }
 
+                    // True when every id is usable in a cpu_set_t (Linux only).
+                    inline bool validCpus(std::vector<int> const &cpus)
+                    {
+#ifdef __linux__
+                        for (int c : cpus) {
+                            if (c < 0 || c >= CPU_SETSIZE) {
+                                return false;
+                            }
+                        }
+                        return true;
+#else
+                        return cpus.empty();
+#endif
+                    }
+
+                    // Pins a thread to the given CPU set. Empty cpus leaves the
+                    // affinity unchanged. Returns false on failure or non-Linux.
+                    inline bool setThreadAffinity(std::thread::native_handle_type h, std::vector<int> const &cpus)
+                    {
+                        if (cpus.empty()) {
+                            return true;
+                        }
+#ifdef __linux__
+                        cpu_set_t set;
+                        CPU_ZERO(&set);
+                        for (int c : cpus) {
+                            if (c < 0 || c >= CPU_SETSIZE) {
+                                return false;
+                            }
+                            CPU_SET(c, &set);
+                        }
+                        return pthread_setaffinity_np(h, sizeof(set), &set) == 0;
+#else
+                        (void)h;
+                        return false;
+#endif
+                    }
+
                 } // namespace realtime_threaded_executor_detail
+
+                // Per-node thread settings, applied after the node is created and
+                // before the graph starts (RealTimeApp::configureThreadedNode).
+                // Executors opt in with bool configure(ThreadedNodeOptions const &);
+                // executors without it (Inline, SharedPool, older custom ones)
+                // ignore the settings and report false.
+                struct ThreadedNodeOptions {
+                    // Overrides ThreadedExecOptions::spinWait for this node. Ignored
+                    // by the default mutex/list DedicatedThreadExecutor.
+                    std::optional<std::chrono::nanoseconds> spinWait;
+                    // CPUs the node's dedicated thread may run on (Linux). Empty
+                    // keeps the inherited affinity.
+                    std::vector<int> cpus;
+
+                    ThreadedNodeOptions &SpinWait(std::chrono::nanoseconds s)
+                    {
+                        spinWait = s;
+                        return *this;
+                    }
+                    ThreadedNodeOptions &Cpus(std::vector<int> c)
+                    {
+                        cpus = std::move(c);
+                        return *this;
+                    }
+                };
 
                 // Default dedicated executor: mutex-protected incoming list and
                 // consumer-local processing list, transferred with splice. Predicate
@@ -107,7 +177,9 @@ namespace dev
                         }
                     };
                     std::shared_ptr<State> state_;
+                    std::thread thread_;           // joined in destructor after stop()
                     std::optional<std::thread::native_handle_type> handle_;
+                    std::vector<int> pendingCpus_; // protected by state_->mutex
 
                     template <class Host>
                     static void run(std::shared_ptr<State> s, Host *host)
@@ -154,14 +226,27 @@ namespace dev
                     ~DedicatedThreadExecutor()
                     {
                         stop();
+                        if (thread_.joinable()) {
+                            // Destroyed from its own callback: the thread cannot join
+                            // itself; it exits on its own after the callback returns.
+                            if (thread_.get_id() == std::this_thread::get_id()) {
+                                thread_.detach();
+                            } else {
+                                thread_.join();
+                            }
+                        }
                     }
                     template <class Host>
                     void start(Host *host)
                     {
                         state_->running.store(true, std::memory_order_release);
                         std::thread thread(&DedicatedThreadExecutor::run<Host>, state_, host);
-                        handle_ = thread.native_handle();
-                        thread.detach();
+                        {
+                            std::lock_guard<std::mutex> lock(state_->mutex);
+                            handle_ = thread.native_handle();
+                            realtime_threaded_executor_detail::setThreadAffinity(*handle_, pendingCpus_);
+                        }
+                        thread_ = std::move(thread);
                     }
                     bool push(Item &&item)
                     {
@@ -190,6 +275,23 @@ namespace dev
                             state_->wakeRequested = true;
                         }
                         state_->cond.notify_one();
+                    }
+                    // spinWait is ignored (this executor never spins). The CPU set
+                    // is applied immediately when the thread runs, otherwise at start.
+                    bool configure(ThreadedNodeOptions const &o)
+                    {
+                        if (!realtime_threaded_executor_detail::validCpus(o.cpus)) {
+                            return false;
+                        }
+                        std::lock_guard<std::mutex> lock(state_->mutex);
+                        if (o.cpus.empty()) {
+                            return true; // keep the current / pending affinity
+                        }
+                        pendingCpus_ = o.cpus;
+                        if (handle_ && state_->running.load(std::memory_order_acquire)) {
+                            return realtime_threaded_executor_detail::setThreadAffinity(*handle_, pendingCpus_);
+                        }
+                        return true;
                     }
                     std::optional<std::thread::native_handle_type> threadHandle()
                     {
@@ -268,6 +370,18 @@ namespace dev
                     bool submit(Exec &exec, Item &&item, Host *, long)
                     {
                         return exec.push(std::move(item));
+                    }
+
+                    // Executors without configure(ThreadedNodeOptions) ignore node options.
+                    template <class Exec>
+                    auto configure(Exec &exec, ThreadedNodeOptions const &o, int) -> decltype(exec.configure(o), bool())
+                    {
+                        return exec.configure(o);
+                    }
+                    template <class Exec>
+                    bool configure(Exec &, ThreadedNodeOptions const &, long)
+                    {
+                        return false;
                     }
 
                     template <class StateT, class Item, class = void>

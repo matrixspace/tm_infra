@@ -189,24 +189,26 @@ namespace
             delete e;
         }
     }
-    void detachedStateTest()
+    void joinOnDestroyTest()
     {
+        // After delete, the thread has exited: joining happens inside ~DedicatedThreadExecutor.
         auto *h = new Host;
         auto *e = new Exec;
+        h->release();                          // let the thread run immediately
         e->start(h);
-        check(wait([&] { return h->entered.load(std::memory_order_acquire); }), "destruction during startup entered");
+        check(wait([&] { return h->entered.load(std::memory_order_acquire); }), "join-on-destroy: thread entered");
         e->push(Item(0, 0));
+        // stop() + join in ~DedicatedThreadExecutor; afterwards no callback runs.
         delete e;
-        h->release();
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
-        check(h->count.load() == 0, "shared state survives executor destruction and drops pending data");
+        // No sleep needed: the destructor guarantees the thread has exited.
+        check(h->count.load() <= 1, "join-on-destroy: no callback runs after destructor returns");
     }
 } // namespace
 int main()
 {
     fifoAndIdleTest();
     callbackStopTest();
-    detachedStateTest();
+    joinOnDestroyTest();
     queuedContinuationTest();
     idleWakeContinuationTest();
     std::puts(failures ? "FAILED" : "ALL PASSED");
