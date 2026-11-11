@@ -6,10 +6,14 @@
 #include <chrono>
 #include <condition_variable>
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <list>
 #include <mutex>
 #include <optional>
+#include <set>
+#include <stdexcept>
+#include <string>
 #include <thread>
 #include <type_traits>
 #include <utility>
@@ -133,11 +137,19 @@ namespace dev
 
                 } // namespace realtime_threaded_executor_detail
 
+                // Automatic CPU choice for a busy node thread (see IThreadCpuAllocator).
+                struct CpuAutoBindRequest {
+                    // Restrict the choice to this NUMA node (OS index); empty lets
+                    // the allocator choose.
+                    std::optional<int> numaNode;
+                };
+
                 // Per-node thread settings, applied after the node is created and
                 // before the graph starts (RealTimeApp::configureThreadedNode).
                 // Executors opt in with bool configure(ThreadedNodeOptions const &);
                 // executors without it (Inline, SharedPool, older custom ones)
-                // ignore the settings and report false.
+                // ignore spinWait / cpus and report false. cpuAutoBind is
+                // resolved by the node, see ExecHandlerCore::configureThread.
                 struct ThreadedNodeOptions {
                     // Overrides ThreadedExecOptions::spinWait for this node. Ignored
                     // by the default mutex/list DedicatedThreadExecutor.
@@ -145,6 +157,9 @@ namespace dev
                     // CPUs the node's dedicated thread may run on (Linux). Empty
                     // keeps the inherited affinity.
                     std::vector<int> cpus;
+                    // Let the Environment's IThreadCpuAllocator pick one CPU for
+                    // this thread. Exclusive with cpus; failures throw.
+                    std::optional<CpuAutoBindRequest> cpuAutoBind;
 
                     ThreadedNodeOptions &SpinWait(std::chrono::nanoseconds s)
                     {
@@ -155,6 +170,47 @@ namespace dev
                     {
                         cpus = std::move(c);
                         return *this;
+                    }
+                    ThreadedNodeOptions &CpuAutoBind()
+                    {
+                        cpuAutoBind = CpuAutoBindRequest{};
+                        return *this;
+                    }
+                    // Automatic choice restricted to one NUMA node (OS index), e.g.
+                    // the node of the NIC this thread polls. Not a CPU number:
+                    // use Cpus() to pin to specific CPUs.
+                    ThreadedNodeOptions &CpuAutoBindOnNuma(int numaNode)
+                    {
+                        cpuAutoBind = CpuAutoBindRequest{numaNode};
+                        return *this;
+                    }
+                };
+
+                // Chooses CPUs for busy node threads. Implementations must be
+                // thread safe and throw (never fall back silently) when no
+                // suitable CPU exists. basic::HwlocThreadCpuAllocator is the
+                // hwloc-based implementation.
+                class IThreadCpuAllocator {
+                public:
+                    virtual ~IThreadCpuAllocator() = default;
+                    // Returns the OS CPU index the thread is to be pinned to.
+                    virtual int acquire(CpuAutoBindRequest const &req, std::string const &who) = 0;
+                    // Records CPUs pinned explicitly (ThreadedNodeOptions::cpus) so
+                    // automatic choices avoid them; throws if they conflict with
+                    // automatically assigned CPUs.
+                    virtual void reserve(std::vector<int> const &cpus, std::string const &who) = 0;
+                    // Returns CPUs obtained from acquire() or reserve(); never throws.
+                    virtual void release(std::vector<int> const &cpus) noexcept = 0;
+                };
+
+                //Environment component providing the allocator used by CpuAutoBind,
+                //e.g. struct MyEnv : ..., ThreadCpuAllocatorComponent<MyAllocatorAccess> {};
+                //where MyAllocatorAccess::instance() returns IThreadCpuAllocator &.
+                template <class Access>
+                struct ThreadCpuAllocatorComponent {
+                    static IThreadCpuAllocator &threadCpuAllocator()
+                    {
+                        return Access::instance();
                     }
                 };
 
@@ -384,6 +440,12 @@ namespace dev
                         return false;
                     }
 
+                    // Detects StateT::threadCpuAllocator() (ThreadCpuAllocatorComponent).
+                    template <class StateT, class = void>
+                    struct HasThreadCpuAllocator : std::false_type {};
+                    template <class StateT>
+                    struct HasThreadCpuAllocator<StateT, std::void_t<decltype(StateT::threadCpuAllocator())>> : std::true_type {};
+
                     template <class StateT, class Item, class = void>
                     struct ExecutorFor {
                         using type = DedicatedThreadExecutor<Item>;
@@ -397,6 +459,211 @@ namespace dev
                 //complete there (same rule as TimeCheckerModeFor)
                 template <class StateT, class Item>
                 using RealTimeThreadedExecutorFor = typename realtime_threaded_executor_detail::ExecutorFor<StateT, Item>::type;
+
+                // Thrown by ThreadCpuLease when a thread cannot be pinned.
+                class ThreadCpuBindError : public std::runtime_error {
+                public:
+                    explicit ThreadCpuBindError(std::string const &s) : std::runtime_error(s) {}
+                };
+
+                // CPUs held from an IThreadCpuAllocator; returned when the lease is
+                // destroyed, reset or overwritten by move assignment. Movable, not
+                // copyable; one lease object must not be used by two threads at once.
+                //
+                // bindCurrentThread* pin the calling thread, so they can be called
+                // concurrently from any number of threads: the allocator serialises
+                // the choice, each thread only changes its own affinity. A thread may
+                // hold at most one such lease at a time; a second bind on the same
+                // thread throws instead of silently occupying another core.
+                //
+                //   // first line of your own thread function
+                //   auto lease = ThreadCpuLease::bindCurrentThread<Env>("nic-rx");
+                class ThreadCpuLease {
+                public:
+                    ThreadCpuLease() = default;
+                    ThreadCpuLease(ThreadCpuLease const &) = delete;
+                    ThreadCpuLease &operator=(ThreadCpuLease const &) = delete;
+                    ThreadCpuLease(ThreadCpuLease &&o) noexcept
+                    {
+                        take(o);
+                    }
+                    ThreadCpuLease &operator=(ThreadCpuLease &&o) noexcept
+                    {
+                        if (this != &o) {
+                            reset();
+                            take(o);
+                        }
+                        return *this;
+                    }
+                    ~ThreadCpuLease()
+                    {
+                        reset();
+                    }
+
+                    // Automatic choice (same rules as ThreadedNodeOptions::CpuAutoBind).
+                    template <class Env>
+                    static ThreadCpuLease bindCurrentThread(std::string const &who)
+                    {
+                        static_assert(realtime_threaded_executor_detail::HasThreadCpuAllocator<Env>::value,
+                            "ThreadCpuLease::bindCurrentThread needs an Environment with a ThreadCpuAllocatorComponent (e.g. basic::HwlocThreadCpuAllocatorComponent)");
+                        return bindCurrentThread(Env::threadCpuAllocator(), who);
+                    }
+                    // Automatic choice restricted to one NUMA node (OS index).
+                    template <class Env>
+                    static ThreadCpuLease bindCurrentThreadOnNuma(int numaNode, std::string const &who)
+                    {
+                        static_assert(realtime_threaded_executor_detail::HasThreadCpuAllocator<Env>::value,
+                            "ThreadCpuLease::bindCurrentThreadOnNuma needs an Environment with a ThreadCpuAllocatorComponent (e.g. basic::HwlocThreadCpuAllocatorComponent)");
+                        return bindCurrentThreadOnNuma(Env::threadCpuAllocator(), numaNode, who);
+                    }
+                    // Explicit CPUs, reserved so automatic choices avoid them.
+                    template <class Env>
+                    static ThreadCpuLease bindCurrentThreadTo(std::vector<int> const &cpus, std::string const &who)
+                    {
+                        static_assert(realtime_threaded_executor_detail::HasThreadCpuAllocator<Env>::value,
+                            "ThreadCpuLease::bindCurrentThreadTo needs an Environment with a ThreadCpuAllocatorComponent (e.g. basic::HwlocThreadCpuAllocatorComponent)");
+                        return bindCurrentThreadTo(Env::threadCpuAllocator(), cpus, who);
+                    }
+
+                    // Same, for code that holds the allocator rather than the Environment.
+                    static ThreadCpuLease bindCurrentThread(IThreadCpuAllocator &a, std::string const &who)
+                    {
+                        return bindSelf(a, who, [&] { return std::vector<int>{a.acquire(CpuAutoBindRequest{}, who)}; });
+                    }
+                    static ThreadCpuLease bindCurrentThreadOnNuma(IThreadCpuAllocator &a, int numaNode, std::string const &who)
+                    {
+                        return bindSelf(a, who, [&] { return std::vector<int>{a.acquire(CpuAutoBindRequest{numaNode}, who)}; });
+                    }
+                    static ThreadCpuLease bindCurrentThreadTo(IThreadCpuAllocator &a, std::vector<int> const &cpus, std::string const &who)
+                    {
+                        if (cpus.empty() || !realtime_threaded_executor_detail::validCpus(cpus)) {
+                            throw ThreadCpuBindError("ThreadCpuLease for " + who + ": invalid CPU list");
+                        }
+                        return bindSelf(a, who, [&] {
+                            a.reserve(cpus, who);
+                            return cpus;
+                        });
+                    }
+
+                    // Takes ownership of CPUs already obtained from a (acquire or
+                    // reserve) for a thread pinned by other means, e.g. a node thread.
+                    static ThreadCpuLease adopt(IThreadCpuAllocator &a, std::vector<int> cpus) noexcept
+                    {
+                        ThreadCpuLease l;
+                        l.allocator_ = &a;
+                        l.cpus_ = std::move(cpus);
+                        return l;
+                    }
+
+                    bool active() const
+                    {
+                        return allocator_ != nullptr && !cpus_.empty();
+                    }
+                    std::vector<int> const &cpus() const
+                    {
+                        return cpus_;
+                    }
+                    // First (for automatic leases: the only) CPU; -1 when inactive.
+                    int cpu() const
+                    {
+                        return cpus_.empty() ? -1 : cpus_.front();
+                    }
+                    // Exchanges ownership; nothing is released.
+                    void swap(ThreadCpuLease &o) noexcept
+                    {
+                        std::swap(allocator_, o.allocator_);
+                        cpus_.swap(o.cpus_);
+                        bound_.swap(o.bound_);
+                    }
+                    friend void swap(ThreadCpuLease &a, ThreadCpuLease &b) noexcept
+                    {
+                        a.swap(b);
+                    }
+                    // Returns the CPUs now. The thread's affinity is left as it is.
+                    void reset() noexcept
+                    {
+                        if (allocator_ && !cpus_.empty()) {
+                            allocator_->release(cpus_);
+                        }
+                        if (bound_) {
+                            unregisterThread(*bound_);
+                        }
+                        allocator_ = nullptr;
+                        cpus_.clear();
+                        bound_.reset();
+                    }
+
+                private:
+                    IThreadCpuAllocator *allocator_ = nullptr;
+                    std::vector<int> cpus_;
+                    std::optional<std::uint64_t> bound_; // thread token, set by bindCurrentThread*
+
+                    void take(ThreadCpuLease &o) noexcept
+                    {
+                        allocator_ = o.allocator_;
+                        cpus_ = std::move(o.cpus_);
+                        bound_ = o.bound_;
+                        o.allocator_ = nullptr;
+                        o.cpus_.clear();
+                        o.bound_.reset();
+                    }
+
+                    // Never reused within the process, unlike std::thread::id: a lease
+                    // moved off a finished thread must not block a later thread that
+                    // happens to receive the same id.
+                    static std::uint64_t currentThreadToken()
+                    {
+                        static std::atomic<std::uint64_t> next{1};
+                        thread_local std::uint64_t const token = next.fetch_add(1, std::memory_order_relaxed);
+                        return token;
+                    }
+                    // Threads currently holding a bindCurrentThread* lease, by token
+                    // (not a thread_local flag) so a lease moved to and destroyed on
+                    // another thread still unregisters the right one.
+                    static std::mutex &registryMutex()
+                    {
+                        static std::mutex *m = new std::mutex; // leaked: used from detached threads at exit
+                        return *m;
+                    }
+                    static std::set<std::uint64_t> &registry()
+                    {
+                        static std::set<std::uint64_t> *r = new std::set<std::uint64_t>;
+                        return *r;
+                    }
+                    static void unregisterThread(std::uint64_t id) noexcept
+                    {
+                        std::lock_guard<std::mutex> _(registryMutex());
+                        registry().erase(id);
+                    }
+
+                    template <class Obtain>
+                    static ThreadCpuLease bindSelf(IThreadCpuAllocator &a, std::string const &who, Obtain &&obtain)
+                    {
+                        auto const self = currentThreadToken();
+                        {
+                            std::lock_guard<std::mutex> _(registryMutex());
+                            if (!registry().insert(self).second) {
+                                throw ThreadCpuBindError("ThreadCpuLease for " + who + ": this thread already holds a CPU lease; reset it before binding again");
+                            }
+                        }
+                        ThreadCpuLease l;
+                        l.bound_ = self; // unregisters on any exit below
+                        l.allocator_ = &a;
+                        l.cpus_ = obtain(); // allocator exceptions propagate
+#ifdef __linux__
+                        if (!realtime_threaded_executor_detail::setThreadAffinity(pthread_self(), l.cpus_)) {
+                            std::string list;
+                            for (int c : l.cpus_) {
+                                list += (list.empty() ? "" : ",") + std::to_string(c);
+                            }
+                            throw ThreadCpuBindError("ThreadCpuLease for " + who + ": pthread_setaffinity_np failed for CPUs " + list);
+                        }
+#else
+                        throw ThreadCpuBindError("ThreadCpuLease for " + who + ": thread CPU binding is only supported on Linux");
+#endif
+                        return l;
+                    }
+                };
             } // namespace infra
         } // namespace tm
     } // namespace cd606
