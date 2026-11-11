@@ -114,3 +114,6 @@
 
 ## 后续任务
 - [多进程 CPU 自协商（CpuAutoBind 跨进程）](../../../tm_basic/doc/20261111-cpu-cross-process-negotiation/README.md)：跨进程协商组件；显式绑定改为进程内独占并遵守 excludeCpus（不兼容变更）。
+
+## 后续任务
+- [多进程 CPU 自协商（tm_basic）](../../../tm_basic/doc/20261111-cpu-cross-process-negotiation/README.md)：跨进程 flock 协商；显式绑定改为进程内独占（新增 `reserveReplacing`）。
