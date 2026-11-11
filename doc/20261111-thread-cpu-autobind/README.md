@@ -94,6 +94,9 @@
 - 合并后在 develop 上复测：infra Release/Debug 均 4/4；basic Release 8/8，Debug 7/8（`tsc_clock_test` 为 develop 既有的性能断言失败）。
 - infra 的 Release/Debug 头文件已安装到工作区 `install/`；tm_basic 的全量安装与 reference 同步未做，等推送后再进行。
 
+## 代码评审与修复（2026-11-11）
+用户提供的外部评审报告归档在 [CODE_REVIEW.md](CODE_REVIEW.md)，其中 7 项问题（1×P1、6×P2）全部修复并逐项复现验证：reserve 持锁重入死锁、显式预留未按物理核检查冲突、受限拓扑下整核判定错误、拓扑初始化失败状态未回滚、moodycamel 关闭时测试构建失败、租约测试并发数超容量导致 terminate、无 SMT 机器上约束脚本误判。详见该文档的“修复记录”。
+
 ## 兼容性与注意事项
 - 命名：限定 NUMA 的接口最初叫 `CpuAutoBind(int numaNode)`，调用处 `CpuAutoBind(1)` 容易被读成“自动绑定到 CPU 1”。合并前按用户确认改为 `CpuAutoBindOnNuma(1)`，没有保留旧重载。参数是 NUMA 节点而不是 CPU：指定具体 CPU 用 `Cpus()`，自动模式下只约束挑选范围，具体的核由框架按 SMT、节点首核和避让列表选出。
 - 只追加接口：已有 `Cpus()`、`SpinWait()` 的语义不变。`IThreadCpuAllocator`、`ThreadCpuAllocatorComponent` 是新的 infra 公开类型，infra 仍零第三方依赖。
@@ -104,3 +107,7 @@
 - tm_kit_reference：`tm_infra/10-realtime-executors.md`「自动绑核」一节、`BUILD.md` 的 feature 选项（待合并推送后同步）
 - [逐节点 spinWait 与绑核](../20261111-threaded-node-spin-wait-affinity/README.md)
 - [实时执行器总记录](../20261105-realtime-threaded-executor/README.md)
+
+## 代码评审归档（2026-11-11）
+
+- [代码评审报告](CODE_REVIEW.md)：归档用户提供的完整评审结论及 7 条意见（1 条 P1、6 条 P2），均待修复。本次仅更新文档，未修改代码或重新运行测试。
