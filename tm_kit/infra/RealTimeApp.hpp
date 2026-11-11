@@ -382,7 +382,14 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                     if (!realtime_threaded_executor_detail::validCpus(cpus)) {
                         return false;
                     }
-                    allocator.reserve(cpus, nodeName());
+                    //the node's current CPUs are its own: reconfiguring onto them
+                    //(or their SMT siblings) is not a conflict with another holder
+                    std::vector<int> previous;
+                    {
+                        std::lock_guard<std::mutex> _(leaseMutex_);
+                        previous = lease_.cpus();
+                    }
+                    allocator.reserveReplacing(cpus, previous, nodeName());
                 }
                 //the node thread is pinned by the executor, not by this thread
                 ThreadCpuLease next = ThreadCpuLease::adopt(allocator, cpus);

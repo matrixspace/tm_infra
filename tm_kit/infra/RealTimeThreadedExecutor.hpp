@@ -201,6 +201,16 @@ namespace dev
                     virtual void reserve(std::vector<int> const &cpus, std::string const &who) = 0;
                     // Returns CPUs obtained from acquire() or reserve(); never throws.
                     virtual void release(std::vector<int> const &cpus) noexcept = 0;
+                    // reserve() for a holder that is about to give back `previous`
+                    // (a node being reconfigured): CPUs in `previous` belong to the
+                    // caller and are not conflicts. The caller still releases
+                    // `previous` afterwards. Allocators whose reserve() lets explicit
+                    // reservations overlap need not override it.
+                    virtual void reserveReplacing(std::vector<int> const &cpus, std::vector<int> const &previous, std::string const &who)
+                    {
+                        (void)previous;
+                        reserve(cpus, who);
+                    }
                 };
 
                 //Environment component providing the allocator used by CpuAutoBind,

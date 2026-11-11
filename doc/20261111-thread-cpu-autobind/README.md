@@ -111,3 +111,9 @@
 ## 代码评审归档（2026-11-11）
 
 - [代码评审报告](CODE_REVIEW.md)：归档用户提供的完整评审结论及 7 条意见（1 条 P1、6 条 P2），均待修复。本次仅更新文档，未修改代码或重新运行测试。
+
+## 后续任务
+- [多进程 CPU 自协商（CpuAutoBind 跨进程）](../../../tm_basic/doc/20261111-cpu-cross-process-negotiation/README.md)：跨进程协商组件；显式绑定改为进程内独占并遵守 excludeCpus（不兼容变更）。
+
+## 后续任务
+- [多进程 CPU 自协商（tm_basic）](../../../tm_basic/doc/20261111-cpu-cross-process-negotiation/README.md)：跨进程 flock 协商；显式绑定改为进程内独占（新增 `reserveReplacing`）。

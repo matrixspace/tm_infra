@@ -19,3 +19,7 @@
 - 2026-11-11：[Threaded 节点独立配置 spinWait 与绑核](20261111-threaded-node-spin-wait-affinity/README.md)：新增 `RealTimeApp::configureThreadedNode`，在图启动前为单个 threaded 节点设置 spinWait（moodycamel 生效）和线程绑核。
 
 - 2026-11-11：[节点线程自动绑核（CpuAutoBind）](20261111-thread-cpu-autobind/README.md)：infra 增加分配器扩展点，basic 增加基于 hwloc 的可选实现；考虑 taskset/numactl、SMT、NUMA 首核与避让列表，失败时抛异常。
+
+- 2026-11-11：[多进程 CPU 自协商（CpuAutoBind 跨进程）](../../tm_basic/doc/20261111-cpu-cross-process-negotiation/README.md)：主记录在 tm_basic；infra 为 `IThreadCpuAllocator` 追加带默认实现的 `reserveReplacing`，节点重配置到自身 CPU 不算冲突。
+
+- 2026-11-11：[→ tm_basic/20261111-cpu-cross-process-negotiation](../../tm_basic/doc/20261111-cpu-cross-process-negotiation/README.md)：多进程 CPU 自协商；infra 新增 `IThreadCpuAllocator::reserveReplacing`（带默认实现），节点重配置时把当前 CPU 作为 previous 传入。
