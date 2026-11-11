@@ -10,6 +10,7 @@
 #include <list>
 #include <mutex>
 #include <optional>
+#include <string>
 #include <thread>
 #include <type_traits>
 #include <utility>
@@ -133,11 +134,19 @@ namespace dev
 
                 } // namespace realtime_threaded_executor_detail
 
+                // Automatic CPU choice for a busy node thread (see IThreadCpuAllocator).
+                struct CpuAutoBindRequest {
+                    // Restrict the choice to this NUMA node (OS index); empty lets
+                    // the allocator choose.
+                    std::optional<int> numaNode;
+                };
+
                 // Per-node thread settings, applied after the node is created and
                 // before the graph starts (RealTimeApp::configureThreadedNode).
                 // Executors opt in with bool configure(ThreadedNodeOptions const &);
                 // executors without it (Inline, SharedPool, older custom ones)
-                // ignore the settings and report false.
+                // ignore spinWait / cpus and report false. cpuAutoBind is
+                // resolved by the node, see ExecHandlerCore::configureThread.
                 struct ThreadedNodeOptions {
                     // Overrides ThreadedExecOptions::spinWait for this node. Ignored
                     // by the default mutex/list DedicatedThreadExecutor.
@@ -145,6 +154,9 @@ namespace dev
                     // CPUs the node's dedicated thread may run on (Linux). Empty
                     // keeps the inherited affinity.
                     std::vector<int> cpus;
+                    // Let the Environment's IThreadCpuAllocator pick one CPU for
+                    // this thread. Exclusive with cpus; failures throw.
+                    std::optional<CpuAutoBindRequest> cpuAutoBind;
 
                     ThreadedNodeOptions &SpinWait(std::chrono::nanoseconds s)
                     {
@@ -155,6 +167,44 @@ namespace dev
                     {
                         cpus = std::move(c);
                         return *this;
+                    }
+                    ThreadedNodeOptions &CpuAutoBind()
+                    {
+                        cpuAutoBind = CpuAutoBindRequest{};
+                        return *this;
+                    }
+                    ThreadedNodeOptions &CpuAutoBind(int numaNode)
+                    {
+                        cpuAutoBind = CpuAutoBindRequest{numaNode};
+                        return *this;
+                    }
+                };
+
+                // Chooses CPUs for busy node threads. Implementations must be
+                // thread safe and throw (never fall back silently) when no
+                // suitable CPU exists. basic::HwlocThreadCpuAllocator is the
+                // hwloc-based implementation.
+                class IThreadCpuAllocator {
+                public:
+                    virtual ~IThreadCpuAllocator() = default;
+                    // Returns the OS CPU index the thread is to be pinned to.
+                    virtual int acquire(CpuAutoBindRequest const &req, std::string const &who) = 0;
+                    // Records CPUs pinned explicitly (ThreadedNodeOptions::cpus) so
+                    // automatic choices avoid them; throws if they conflict with
+                    // automatically assigned CPUs.
+                    virtual void reserve(std::vector<int> const &cpus, std::string const &who) = 0;
+                    // Returns CPUs obtained from acquire() or reserve(); never throws.
+                    virtual void release(std::vector<int> const &cpus) noexcept = 0;
+                };
+
+                //Environment component providing the allocator used by CpuAutoBind,
+                //e.g. struct MyEnv : ..., ThreadCpuAllocatorComponent<MyAllocatorAccess> {};
+                //where MyAllocatorAccess::instance() returns IThreadCpuAllocator &.
+                template <class Access>
+                struct ThreadCpuAllocatorComponent {
+                    static IThreadCpuAllocator &threadCpuAllocator()
+                    {
+                        return Access::instance();
                     }
                 };
 
@@ -383,6 +433,12 @@ namespace dev
                     {
                         return false;
                     }
+
+                    // Detects StateT::threadCpuAllocator() (ThreadCpuAllocatorComponent).
+                    template <class StateT, class = void>
+                    struct HasThreadCpuAllocator : std::false_type {};
+                    template <class StateT>
+                    struct HasThreadCpuAllocator<StateT, std::void_t<decltype(StateT::threadCpuAllocator())>> : std::true_type {};
 
                     template <class StateT, class Item, class = void>
                     struct ExecutorFor {

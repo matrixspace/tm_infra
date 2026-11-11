@@ -21,6 +21,9 @@
 #include <any>
 #include <array>
 #include <limits>
+#include <typeinfo>
+#include <stdexcept>
+#include <string>
 
 namespace dev { namespace cd606 { namespace tm { namespace infra {
     template <class M>
@@ -290,8 +293,31 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 }
             };
 
+            //CPUs this node holds from the Environment's IThreadCpuAllocator.
+            //Declared before exec_ so it is released after the thread is joined.
+            struct CpuLease {
+                IThreadCpuAllocator *allocator = nullptr;
+                std::vector<int> cpus;
+                void reset() noexcept {
+                    if (allocator && !cpus.empty()) {
+                        allocator->release(cpus);
+                    }
+                    allocator = nullptr;
+                    cpus.clear();
+                }
+                ~CpuLease() {
+                    reset();
+                }
+            };
+            template <class X, class=void>
+            struct ExecConfigurable : std::false_type {};
+            template <class X>
+            struct ExecConfigurable<X, std::void_t<decltype(std::declval<X &>().configure(std::declval<ThreadedNodeOptions const &>()))>> : std::true_type {};
+
             TimeChecker<!Exec::kSerialCallbacks, T> timeChecker_;
             Host host_;
+            std::mutex leaseMutex_;
+            CpuLease lease_;
             Exec exec_;
 
             static ThreadedExecOptions makeOptions()
@@ -329,8 +355,66 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             virtual std::optional<std::thread::native_handle_type> threadHandle() override final {
                 return exec_.threadHandle();
             }
+            //cpuAutoBind is resolved here: the Environment's allocator picks a CPU,
+            //which is applied through the executor's configure(). Unlike spinWait /
+            //cpus, an unsatisfiable automatic binding throws instead of reporting false.
             virtual bool configureThread(ThreadedNodeOptions const &o) override final {
-                return realtime_threaded_executor_detail::configure(exec_, o, 0);
+                using realtime_threaded_executor_detail::HasThreadCpuAllocator;
+                if (o.cpuAutoBind && !o.cpus.empty()) {
+                    throw std::invalid_argument("ThreadedNodeOptions: Cpus() and CpuAutoBind() are mutually exclusive");
+                }
+                if (!o.cpuAutoBind) {
+                    if constexpr (HasThreadCpuAllocator<StateT>::value) {
+                        if (!o.cpus.empty() && ExecConfigurable<Exec>::value) {
+                            return configureWithLease(o, o.cpus, false);
+                        }
+                    }
+                    return realtime_threaded_executor_detail::configure(exec_, o, 0);
+                }
+                if constexpr (!HasThreadCpuAllocator<StateT>::value) {
+                    throw RealTimeAppException("CpuAutoBind requested for " + nodeName() + " but the Environment has no ThreadCpuAllocatorComponent (e.g. basic::HwlocThreadCpuAllocatorComponent)");
+                } else {
+                    if (!Exec::kOwnContext || !ExecConfigurable<Exec>::value || !exec_.threadHandle()) {
+                        throw RealTimeAppException("CpuAutoBind requested for " + nodeName() + " but its executor has no dedicated thread that can be pinned (inline, shared pool or custom executor without configure())");
+                    }
+                    int cpu = StateT::threadCpuAllocator().acquire(*o.cpuAutoBind, nodeName());
+                    return configureWithLease(o, {cpu}, true);
+                }
+            }
+        private:
+            std::string nodeName() const {
+                std::ostringstream oss;
+                oss << typeid(W).name() << '@' << static_cast<void const *>(this);
+                return oss.str();
+            }
+            //cpus already acquired (automatic) or still to be reserved (explicit);
+            //applied through the executor, then held until reconfigure / destruction
+            template <class S = StateT>
+            bool configureWithLease(ThreadedNodeOptions const &o, std::vector<int> cpus, bool acquired) {
+                auto &allocator = S::threadCpuAllocator();
+                if (!acquired) {
+                    if (!realtime_threaded_executor_detail::validCpus(cpus)) {
+                        return false;
+                    }
+                    allocator.reserve(cpus, nodeName());
+                }
+                CpuLease next;
+                next.allocator = &allocator;
+                next.cpus = cpus;
+                ThreadedNodeOptions applied = o;
+                applied.cpuAutoBind.reset();
+                applied.cpus = std::move(cpus);
+                bool ok = realtime_threaded_executor_detail::configure(exec_, applied, 0);
+                if (!ok) {
+                    if (acquired) {
+                        throw RealTimeAppException("CpuAutoBind: failed to pin " + nodeName() + " to CPU " + std::to_string(next.cpus.front()));
+                    }
+                    return false; //next releases the reservation
+                }
+                std::lock_guard<std::mutex> _(leaseMutex_);
+                std::swap(lease_.allocator, next.allocator);
+                std::swap(lease_.cpus, next.cpus);
+                return true; //next releases the previous lease
             }
         protected:
             void putData(InputData &&data) {

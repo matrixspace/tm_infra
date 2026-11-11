@@ -17,3 +17,5 @@
 - 2026-11-09：[合并 develop 与交付状态](20261105-realtime-threaded-executor/develop-integration.md)：按用户要求整合三个库；examples 无源码差异，远程访问受环境限制。
 
 - 2026-11-11：[Threaded 节点独立配置 spinWait 与绑核](20261111-threaded-node-spin-wait-affinity/README.md)：新增 `RealTimeApp::configureThreadedNode`，在图启动前为单个 threaded 节点设置 spinWait（moodycamel 生效）和线程绑核。
+
+- 2026-11-11：[节点线程自动绑核（CpuAutoBind）](20261111-thread-cpu-autobind/README.md)：infra 增加分配器扩展点，basic 增加基于 hwloc 的可选实现；考虑 taskset/numactl、SMT、NUMA 首核与避让列表，失败时抛异常。
