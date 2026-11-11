@@ -37,6 +37,11 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
     public:
         virtual ~IRealTimeAppPossiblyThreadedNode() = default;
         virtual std::optional<std::thread::native_handle_type> threadHandle() = 0;
+        //per-node spinWait / CPU affinity, set before the graph runs; false
+        //when the node's executor does not support (or failed to apply) them
+        virtual bool configureThread(ThreadedNodeOptions const &) {
+            return false;
+        }
     };
     
     template <uint8_t N>
@@ -323,6 +328,9 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             }
             virtual std::optional<std::thread::native_handle_type> threadHandle() override final {
                 return exec_.threadHandle();
+            }
+            virtual bool configureThread(ThreadedNodeOptions const &o) override final {
+                return realtime_threaded_executor_detail::configure(exec_, o, 0);
             }
         protected:
             void putData(InputData &&data) {
@@ -3110,6 +3118,17 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             } else {
                 return std::nullopt;
             }
+        }
+        //Per-node threaded settings; call after the node is created and before
+        //the graph starts. Returns false (and changes nothing) for nodes whose
+        //executor does not support it, e.g. non-threaded or shared-pool nodes.
+        template<class T>
+        static bool configureThreadedNode(
+            std::shared_ptr<T> const &node
+            , ThreadedNodeOptions const &opts
+        ) {
+            auto *p = node->threadInfo_;
+            return p ? p->configureThread(opts) : false;
         }
 
     public:

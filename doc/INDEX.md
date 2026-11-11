@@ -15,3 +15,5 @@
 - 2026-11-09：[ThreadedHandler 继承兼容性修复](20261105-realtime-threaded-executor/threaded-handler-compatibility.md)：恢复公开类包装，兼容旧的基类初始化与限定成员访问。
 
 - 2026-11-09：[合并 develop 与交付状态](20261105-realtime-threaded-executor/develop-integration.md)：按用户要求整合三个库；examples 无源码差异，远程访问受环境限制。
+
+- 2026-11-11：[Threaded 节点独立配置 spinWait 与绑核](20261111-threaded-node-spin-wait-affinity/README.md)：新增 `RealTimeApp::configureThreadedNode`，在图启动前为单个 threaded 节点设置 spinWait（moodycamel 生效）和线程绑核。
