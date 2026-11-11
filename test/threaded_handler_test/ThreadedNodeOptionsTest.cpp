@@ -426,6 +426,57 @@ namespace
             check(fake.heldCount() == baseHeld, "lease: all concurrent leases returned");
         }
     }
+
+    // Allocators that do not override reserveReplacing() get the default,
+    // which forwards to reserve(); the node reconfigure path calls it with the
+    // node's current CPUs as `previous`.
+    struct RecordingAllocator : FakeAllocator {
+        std::vector<int> lastPrevious;
+        int replacingCalls = 0;
+        void reserveReplacing(std::vector<int> const &cpus, std::vector<int> const &previous, std::string const &who) override
+        {
+            {
+                std::lock_guard<std::mutex> _(m);
+                lastPrevious = previous;
+                ++replacingCalls;
+            }
+            FakeAllocator::reserveReplacing(cpus, previous, who); // default: reserve()
+        }
+    };
+    struct RecordingAccess {
+        static RecordingAllocator &rec()
+        {
+            static RecordingAllocator *a = new RecordingAllocator;
+            return *a;
+        }
+        static IThreadCpuAllocator &instance() { return rec(); }
+    };
+    struct RecordingEnv : DefaultEnv, ThreadCpuAllocatorComponent<RecordingAccess> {};
+
+    void reserveReplacingTest()
+    {
+        auto allowed = allowedCpus();
+        auto &rec = RecordingAccess::rec();
+        rec.pool = allowed;
+        // Default implementation forwards to reserve().
+        {
+            FakeAllocator plain;
+            plain.pool = allowed;
+            IThreadCpuAllocator &base = plain;
+            base.reserveReplacing({allowed.front()}, {allowed.front()}, "x");
+            check(plain.reservedCount() == 1, "reserveReplacing: default implementation forwards to reserve()");
+            base.release({allowed.front()});
+            check(plain.reservedCount() == 0, "reserveReplacing: the forwarded reservation is released normally");
+        }
+        using M = RealTimeApp<RecordingEnv>;
+        auto n = M::liftPure<int>([](int &&x) { return x; }, LiftParameters<TP>().SuggestThreaded(true));
+        check(M::configureThreadedNode(n, ThreadedNodeOptions().Cpus({allowed.back()})), "reserveReplacing: first Cpus() configure succeeds");
+        check(rec.replacingCalls == 1 && rec.lastPrevious.empty(), "reserveReplacing: first configure passes no previous CPUs");
+        check(M::configureThreadedNode(n, ThreadedNodeOptions().Cpus({allowed.front()})), "reserveReplacing: reconfigure succeeds");
+        check(rec.replacingCalls == 2 && rec.lastPrevious == std::vector<int>{allowed.back()},
+            "reserveReplacing: reconfigure passes the node's current CPUs as previous");
+        check(rec.reservedCount() == 1, "reserveReplacing: the previous reservation is released after reconfigure");
+    }
 } // namespace
 
 int main()
@@ -435,6 +486,7 @@ int main()
     noConfigureExecutorTest();
     autoBindTest();
     threadLeaseTest();
+    reserveReplacingTest();
     std::puts(failures ? "FAILED" : "ALL PASSED");
     return failures ? 1 : 0;
 }
