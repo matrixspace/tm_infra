@@ -2,7 +2,7 @@
 
 **任务开始时间：** 2026-11-11  
 **任务结束时间：** 2026-11-11  
-**状态：** 完成（待合并推送）；2026-11-11 追加 ThreadCpuLease  
+**状态：** 完成（已合并 develop，未推送）；2026-11-11 追加 ThreadCpuLease  
 **分支：** `feature/thread-cpu-autobind`（tm_infra、tm_basic，均从 develop 建立）
 
 ## 背景
@@ -87,6 +87,13 @@
 - 依赖禁用：在独立 `builddir_hwloc_off` 中配置 `-Dhwloc_cpu_allocator=disabled`，无 hwloc 目标，其他目标正常编译。
 - TSan：`hwloc_cpu_allocator_test` 以 `-O1 -fsanitize=thread` 编译运行 ALL PASSED，无 TSan 报告；`-Wtsan` 警告来自 moodycamel 头文件内已有的 fence。
 - tm_basic Debug：7/8 通过，失败的是 `tsc_clock_test`（“TscClock::nowNs() is cheaper than system_clock::now()”）。develop 上的同一二进制连跑 3 次都失败，属于既有的 Debug 性能断言问题，与本任务无关；Release 下该测试通过。
+## 合并（2026-11-11）
+- tm_infra develop：`ff1c8ea`（--no-ff 合并 `feature/thread-cpu-autobind`，领先 origin/develop 4 个提交）。
+- tm_basic develop：`10d4306`（同上，领先 4 个提交）。
+- 按用户要求本轮未推送。
+- 合并后在 develop 上复测：infra Release/Debug 均 4/4；basic Release 8/8，Debug 7/8（`tsc_clock_test` 为 develop 既有的性能断言失败）。
+- infra 的 Release/Debug 头文件已安装到工作区 `install/`；tm_basic 的全量安装与 reference 同步未做，等推送后再进行。
+
 ## 兼容性与注意事项
 - 命名：限定 NUMA 的接口最初叫 `CpuAutoBind(int numaNode)`，调用处 `CpuAutoBind(1)` 容易被读成“自动绑定到 CPU 1”。合并前按用户确认改为 `CpuAutoBindOnNuma(1)`，没有保留旧重载。参数是 NUMA 节点而不是 CPU：指定具体 CPU 用 `Cpus()`，自动模式下只约束挑选范围，具体的核由框架按 SMT、节点首核和避让列表选出。
 - 只追加接口：已有 `Cpus()`、`SpinWait()` 的语义不变。`IThreadCpuAllocator`、`ThreadCpuAllocatorComponent` 是新的 infra 公开类型，infra 仍零第三方依赖。
