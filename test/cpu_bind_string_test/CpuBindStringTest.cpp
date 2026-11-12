@@ -239,6 +239,109 @@ namespace
         }
     }
 
+    // ── code review regressions (codereview.md) ───────────────────────────────
+
+    // Only std::invalid_argument counts: a different exception (e.g. bad_alloc
+    // from runaway range expansion) must not pass as "rejected".
+    bool throwsInvalid(std::function<void()> f)
+    {
+        try { f(); return false; }
+        catch (std::invalid_argument const &) { return true; }
+        catch (...) { return false; }
+    }
+
+    void testStrictNumberParsing()
+    {
+        // [P2] trailing garbage and extra separators must be rejected
+        check(throwsInvalid([] { parseCpuList("2foo"); }), "review: parseCpuList '2foo' throws");
+        check(throwsInvalid([] { parseCpuList("2-3-8"); }), "review: parseCpuList '2-3-8' throws");
+        check(throwsInvalid([] { parseCpuList("2-3x"); }), "review: parseCpuList '2-3x' throws");
+        check(throwsInvalid([] { parseCpuList("2-"); }), "review: parseCpuList '2-' throws");
+        check(throwsInvalid([] { parseCpuList("-1"); }), "review: parseCpuList '-1' throws");
+        check(throwsInvalid([] { parseCpuList("+2"); }), "review: parseCpuList '+2' throws");
+        check(throwsInvalid([] { parseCpuList("2 3"); }), "review: parseCpuList '2 3' throws");
+        check(throwsInvalid([] { parseCpuList("99999999999"); }), "review: parseCpuList above INT_MAX throws");
+        check(throwsInvalid([] { CpuBindingSpec::parse("cpus:2foo"); }), "review: parse 'cpus:2foo' throws");
+        check(throwsInvalid([] { CpuBindingSpec::parse("2-3-8"); }), "review: parse shorthand '2-3-8' throws");
+        check(throwsInvalid([] { CpuBindingSpec::parse("numa:1,2"); }), "review: parse 'numa:1,2' throws");
+        check(throwsInvalid([] { CpuBindingSpec::parse("numa:1x"); }), "review: parse 'numa:1x' throws");
+        check(throwsInvalid([] { CpuBindingSpec::parse("numa:"); }), "review: parse 'numa:' throws");
+        check(throwsInvalid([] { CpuBindingSpec::parse("numa:-1"); }), "review: parse 'numa:-1' throws");
+        // valid forms still accepted, including blanks inside a range
+        check(eq(parseCpuList("2 - 4"), {2, 3, 4}), "review: parseCpuList '2 - 4' still accepted");
+        {
+            auto s = CpuBindingSpec::parse("numa: 1 ");
+            check(s.kind == CpuBindKind::AutoOnNuma && s.numaNode == 1, "review: parse 'numa: 1 ' still accepted");
+        }
+    }
+
+    void testRangeAtIntMax()
+    {
+        // [P2] expanding a range ending at INT_MAX must not overflow ++c
+        // (run under -fsanitize=undefined to see the UB on the old code)
+        bool ok = false;
+        try {
+            auto v = parseCpuList("2147483647-2147483647");
+            ok = v.size() == 1 && v[0] == 2147483647;
+        } catch (...) {
+        }
+        check(ok, "review: range INT_MAX-INT_MAX expands to exactly one element");
+        try {
+            auto v = parseCpuList("2147483646-2147483647");
+            ok = v.size() == 2 && v[1] == 2147483647;
+        } catch (...) {
+            ok = false;
+        }
+        check(ok, "review: range INT_MAX-1..INT_MAX expands to two elements");
+    }
+
+    // [P2] Env without ThreadCpuAllocatorComponent: bindCurrentThreadBy<Env>
+    // must compile; "none" returns an inactive lease, real bindings throw.
+    struct EnvWithoutAllocator {};
+
+    StubAllocator &envStub()
+    {
+        static StubAllocator s;
+        return s;
+    }
+    struct EnvStubAccess {
+        static IThreadCpuAllocator &instance() { return envStub(); }
+    };
+    struct EnvWithAllocator : ThreadCpuAllocatorComponent<EnvStubAccess> {};
+
+    void testTemplateEntryWithoutAllocator()
+    {
+        {
+            auto lease = ThreadCpuLease::bindCurrentThreadBy<EnvWithoutAllocator>("none", "test");
+            check(!lease.active(), "review: bindCurrentThreadBy<EnvWithoutAllocator>('none') compiles, inactive");
+        }
+        {
+            auto lease = ThreadCpuLease::bindCurrentThreadBy<EnvWithoutAllocator>("", "test");
+            check(!lease.active(), "review: bindCurrentThreadBy<EnvWithoutAllocator>('') inactive");
+        }
+        for (char const *spec : {"auto", "numa:0", "cpus:0"}) {
+            bool got = false;
+            try {
+                ThreadCpuLease::bindCurrentThreadBy<EnvWithoutAllocator>(spec, "test");
+            } catch (ThreadCpuBindError const &) {
+                got = true;
+            } catch (...) {
+            }
+            check(got, std::string("review: bindCurrentThreadBy<EnvWithoutAllocator>('") + spec + "') throws ThreadCpuBindError");
+        }
+        // malformed spec still reports a parse error, not a missing component
+        check(throwsInvalid([] { ThreadCpuLease::bindCurrentThreadBy<EnvWithoutAllocator>("cpus:2foo", "test"); }),
+            "review: bindCurrentThreadBy<EnvWithoutAllocator>('cpus:2foo') throws invalid_argument");
+        // "none" through an Env that has an allocator does not touch it
+        {
+            envStub().acquireCalls = 0;
+            envStub().reserveCalls = 0;
+            auto lease = ThreadCpuLease::bindCurrentThreadBy<EnvWithAllocator>("none", "test");
+            check(!lease.active() && envStub().acquireCalls == 0 && envStub().reserveCalls == 0,
+                "review: bindCurrentThreadBy<EnvWithAllocator>('none') leaves allocator untouched");
+        }
+    }
+
 } // anonymous namespace
 
 int main()
@@ -247,6 +350,9 @@ int main()
     testCpuBindingSpec();
     testThreadedNodeOptionsCpuBind();
     testBindCurrentThreadByNone();
+    testStrictNumberParsing();
+    testRangeAtIntMax();
+    testTemplateEntryWithoutAllocator();
 
     std::printf("\n%s (%d failure%s)\n",
         failures == 0 ? "PASS" : "FAIL",

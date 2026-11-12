@@ -3,11 +3,13 @@
 
 #include <atomic>
 #include <algorithm>
+#include <cctype>
 #include <chrono>
 #include <condition_variable>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <limits>
 #include <list>
 #include <mutex>
 #include <optional>
@@ -135,6 +137,31 @@ namespace dev
 #endif
                     }
 
+                    // Parses a non-negative decimal index (CPU or NUMA node). The whole
+                    // token, apart from surrounding blanks, must be digits: "2foo",
+                    // "1,2", "-1" and values above INT_MAX throw std::invalid_argument.
+                    inline int parseCpuIndex(std::string const &tok, char const *what)
+                    {
+                        std::size_t b = 0, e = tok.size();
+                        while (b < e && (tok[b] == ' ' || tok[b] == '\t')) { ++b; }
+                        while (e > b && (tok[e - 1] == ' ' || tok[e - 1] == '\t')) { --e; }
+                        if (b == e) {
+                            throw std::invalid_argument(std::string(what) + ": missing number in \"" + tok + "\"");
+                        }
+                        long long v = 0;
+                        for (std::size_t i = b; i < e; ++i) {
+                            unsigned char ch = static_cast<unsigned char>(tok[i]);
+                            if (!std::isdigit(ch)) {
+                                throw std::invalid_argument(std::string(what) + ": invalid number \"" + tok + "\"");
+                            }
+                            v = v * 10 + (ch - '0');
+                            if (v > std::numeric_limits<int>::max()) {
+                                throw std::invalid_argument(std::string(what) + ": number out of range \"" + tok + "\"");
+                            }
+                        }
+                        return static_cast<int>(v);
+                    }
+
                 } // namespace realtime_threaded_executor_detail
 
                 // Parses a compact CPU list string into a vector of OS CPU indices.
@@ -173,16 +200,20 @@ namespace dev
                                 }
                             }
                             if (sep == std::string::npos) {
-                                ret.push_back(std::stoi(tok));
+                                ret.push_back(realtime_threaded_executor_detail::parseCpuIndex(tok, "parseCpuList"));
                             } else {
-                                int lo = std::stoi(tok.substr(0, sep));
-                                int hi = std::stoi(tok.substr(sep + 1));
+                                int lo = realtime_threaded_executor_detail::parseCpuIndex(tok.substr(0, sep), "parseCpuList");
+                                int hi = realtime_threaded_executor_detail::parseCpuIndex(tok.substr(sep + 1), "parseCpuList");
                                 if (lo > hi) {
                                     throw std::invalid_argument(
                                         "parseCpuList: empty range \"" + tok + "\"");
                                 }
-                                for (int c = lo; c <= hi; ++c) {
+                                // stops at hi without incrementing past it (hi may be INT_MAX)
+                                for (int c = lo;; ++c) {
                                     ret.push_back(c);
+                                    if (c == hi) {
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -238,7 +269,7 @@ namespace dev
                             auto val = str.substr(5);
                             CpuBindingSpec spec;
                             spec.kind = CpuBindKind::AutoOnNuma;
-                            spec.numaNode = std::stoi(val);
+                            spec.numaNode = realtime_threaded_executor_detail::parseCpuIndex(val, "CpuBindingSpec numa");
                             return spec;
                         }
                         // "cpus:<list>" or pure shorthand
@@ -709,21 +740,21 @@ namespace dev
                     // handled as their named overloads.
                     // Requires a ThreadCpuAllocatorComponent in Env for all variants
                     // other than "none".
+                    // Env without a ThreadCpuAllocatorComponent compiles: "none"/"" then
+                    // return an inactive lease, any real binding throws ThreadCpuBindError.
                     template <class Env>
                     static ThreadCpuLease bindCurrentThreadBy(std::string const &spec, std::string const &who)
                     {
                         auto const s = CpuBindingSpec::parse(spec);
-                        switch (s.kind) {
-                            case CpuBindKind::None:
-                                return ThreadCpuLease{};
-                            case CpuBindKind::Auto:
-                                return bindCurrentThread<Env>(who);
-                            case CpuBindKind::AutoOnNuma:
-                                return bindCurrentThreadOnNuma<Env>(*s.numaNode, who);
-                            case CpuBindKind::Cpus:
-                                return bindCurrentThreadTo<Env>(s.cpus, who);
+                        if (s.kind == CpuBindKind::None) {
+                            return ThreadCpuLease{};
                         }
-                        return ThreadCpuLease{}; // unreachable
+                        if constexpr (realtime_threaded_executor_detail::HasThreadCpuAllocator<Env>::value) {
+                            return bindCurrentThreadBy(Env::threadCpuAllocator(), spec, who);
+                        } else {
+                            throw ThreadCpuBindError("ThreadCpuLease for " + who + ": binding \"" + spec
+                                + "\" needs an Environment with a ThreadCpuAllocatorComponent (e.g. basic::HwlocThreadCpuAllocatorComponent)");
+                        }
                     }
                     // Same, for code that holds the allocator rather than the Environment.
                     static ThreadCpuLease bindCurrentThreadBy(IThreadCpuAllocator &a, std::string const &spec, std::string const &who)

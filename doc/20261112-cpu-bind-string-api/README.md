@@ -108,3 +108,19 @@ ninja -j4 -C builddir_debug test/cpu_bind_string_test/cpu_bind_string_basic_test
 - [20261111-thread-cpu-autobind](../20261111-thread-cpu-autobind/README.md)：`CpuAutoBind` 与 `IThreadCpuAllocator` 扩展点。
 - tm_kit_reference：`tm_infra/10-realtime-executors.md`（逐节点绑核 / 自动绑核 / ThreadCpuLease）、`tm_basic/11-hwloc-cpu-allocator.md`。
 - tm_basic 侧记录：[../../tm_basic/doc/20261112-cpu-bind-string-api/README.md](../../tm_basic/doc/20261112-cpu-bind-string-api/README.md)
+
+## 代码评审修复（2026-11-12）
+
+评审报告：[tm_basic/doc/20261112-cpu-bind-string-api/codereview.md](../../../tm_basic/doc/20261112-cpu-bind-string-api/codereview.md)
+
+| 评审意见 | 修复 |
+|---|---|
+| [P2] `std::stoi` 只解析数字前缀，`cpus:2foo`、`2-3-8`、`numa:1,2` 被静默接受 | 新增 `realtime_threaded_executor_detail::parseCpuIndex`：除首尾空白外整个 token 必须是十进制数字，否则抛 `std::invalid_argument`；同时拒绝 `-1`、`+2` 和超过 `INT_MAX` 的值。`parseCpuList` 的单值、区间上下界以及 `numa:` 分支都改用它 |
+| [P2] `bindCurrentThreadBy<Env>("none")` 在没有分配器组件的 Env 下编译失败 | 改为 `if constexpr` 分发：`none`/`""` 直接返回非激活租约；有分配器时转调接收 `IThreadCpuAllocator &` 的重载；没有分配器但请求了真实绑定时抛 `ThreadCpuBindError` |
+| [P2] `2147483647-2147483647` 展开时 `++c` 有符号溢出 | 区间循环在 `c == hi` 时先 break 再递增，不会越过上界 |
+
+行为变化：`"2 - 4"`、`"numa: 1 "` 这类数字两侧带空白的写法仍然接受；`"2 3"`（中间有空格的单个 token）现在报错。
+
+测试（debug 构建）：
+- `tm_infra/test/cpu_bind_string_test` 新增 25 个回归用例（非法后缀、多余分隔符、负数、越界、INT_MAX 区间、无分配器 Env 的 none/auto/numa/cpus），全部通过；另用 `-fsanitize=undefined` 构建运行，无 UBSan 报告
+- `tm_basic/test/cpu_bind_string_test` 新增 8 个用例，覆盖 `cpusFromString` 和 `HwlocCpuAllocatorConfig::fromString` 复用新解析器后的行为，全部通过
