@@ -137,6 +137,144 @@ namespace dev
 
                 } // namespace realtime_threaded_executor_detail
 
+                // Parses a compact CPU list string into a vector of OS CPU indices.
+                // Supported formats (may be mixed with commas):
+                //   "3"        single CPU
+                //   "2,3"      explicit list
+                //   "2-5"      inclusive range
+                //   "2:5"      inclusive range (colon separator)
+                // Leading/trailing whitespace around each token is ignored.
+                // Throws std::invalid_argument on empty range (lo > hi) or non-numeric
+                // tokens. An empty string returns an empty vector.
+                inline std::vector<int> parseCpuList(std::string const &s)
+                {
+                    std::vector<int> ret;
+                    std::size_t pos = 0;
+                    while (pos <= s.size()) {
+                        // find next comma delimiter
+                        auto end = s.find(',', pos);
+                        if (end == std::string::npos) {
+                            end = s.size();
+                        }
+                        // trim whitespace from token
+                        auto b = pos;
+                        auto e = end;
+                        while (b < e && (s[b] == ' ' || s[b] == '\t')) { ++b; }
+                        while (e > b && (s[e-1] == ' ' || s[e-1] == '\t')) { --e; }
+                        if (b < e) {
+                            auto const tok = s.substr(b, e - b);
+                            // look for range separator '-' or ':'
+                            auto sep = std::string::npos;
+                            // '-' may appear after a digit only (not at pos 0)
+                            for (std::size_t i = 1; i < tok.size(); ++i) {
+                                if (tok[i] == '-' || tok[i] == ':') {
+                                    sep = i;
+                                    break;
+                                }
+                            }
+                            if (sep == std::string::npos) {
+                                ret.push_back(std::stoi(tok));
+                            } else {
+                                int lo = std::stoi(tok.substr(0, sep));
+                                int hi = std::stoi(tok.substr(sep + 1));
+                                if (lo > hi) {
+                                    throw std::invalid_argument(
+                                        "parseCpuList: empty range \"" + tok + "\"");
+                                }
+                                for (int c = lo; c <= hi; ++c) {
+                                    ret.push_back(c);
+                                }
+                            }
+                        }
+                        if (end == s.size()) { break; }
+                        pos = end + 1;
+                    }
+                    return ret;
+                }
+
+                // Represents a CPU binding strategy parsed from a string.
+                // The string syntax is:
+                //   ""  or  "none"          -- do not change affinity (CpuBindKind::None)
+                //   "auto"                  -- auto-bind via IThreadCpuAllocator
+                //   "numa:<node>"           -- auto-bind restricted to NUMA node <node>
+                //   "cpus:<list>"           -- explicit CPU list (parseCpuList format)
+                //   "<list>"                -- shorthand for "cpus:<list>" (pure digits / ranges)
+                // Case-insensitive; surrounding whitespace stripped.
+                // Throws std::invalid_argument on unknown keywords or malformed lists.
+                enum class CpuBindKind { None, Auto, AutoOnNuma, Cpus };
+
+                struct CpuBindingSpec {
+                    CpuBindKind kind = CpuBindKind::None;
+                    std::optional<int> numaNode;    // set when kind == AutoOnNuma
+                    std::vector<int> cpus;          // set when kind == Cpus
+
+                    // Parses the binding string described above.
+                    static CpuBindingSpec parse(std::string const &s)
+                    {
+                        // strip leading/trailing whitespace
+                        std::size_t b = 0, e = s.size();
+                        while (b < e && (s[b] == ' ' || s[b] == '\t')) { ++b; }
+                        while (e > b && (s[e-1] == ' ' || s[e-1] == '\t')) { --e; }
+                        auto const str = s.substr(b, e - b);
+
+                        if (str.empty()) {
+                            return CpuBindingSpec{};
+                        }
+                        // case-fold for keyword comparison
+                        std::string lower = str;
+                        for (auto &c : lower) {
+                            if (c >= 'A' && c <= 'Z') { c = static_cast<char>(c | 0x20); }
+                        }
+                        if (lower == "none") {
+                            return CpuBindingSpec{};
+                        }
+                        if (lower == "auto") {
+                            CpuBindingSpec spec;
+                            spec.kind = CpuBindKind::Auto;
+                            return spec;
+                        }
+                        // "numa:<n>"
+                        if (lower.substr(0, 5) == "numa:") {
+                            auto val = str.substr(5);
+                            CpuBindingSpec spec;
+                            spec.kind = CpuBindKind::AutoOnNuma;
+                            spec.numaNode = std::stoi(val);
+                            return spec;
+                        }
+                        // "cpus:<list>" or pure shorthand
+                        std::string listStr;
+                        if (lower.substr(0, 5) == "cpus:") {
+                            listStr = str.substr(5);
+                        } else {
+                            // accept as shorthand only if it looks like a CPU list:
+                            // digits, commas, hyphens, colons, spaces
+                            bool looksLikeCpuList = !str.empty();
+                            for (unsigned char ch : str) {
+                                if (!std::isdigit(ch) && ch != ',' && ch != '-'
+                                    && ch != ':' && ch != ' ' && ch != '\t') {
+                                    looksLikeCpuList = false;
+                                    break;
+                                }
+                            }
+                            if (looksLikeCpuList) {
+                                listStr = str;
+                            } else {
+                                throw std::invalid_argument(
+                                    "CpuBindingSpec: unknown binding spec \"" + str
+                                    + "\"; expected none, auto, numa:<n>, cpus:<list>, or a plain CPU list");
+                            }
+                        }
+                        CpuBindingSpec spec;
+                        spec.kind = CpuBindKind::Cpus;
+                        spec.cpus = parseCpuList(listStr);
+                        if (spec.cpus.empty()) {
+                            // "cpus:" with empty list degrades to none
+                            spec.kind = CpuBindKind::None;
+                        }
+                        return spec;
+                    }
+                };
+
                 // Automatic CPU choice for a busy node thread (see IThreadCpuAllocator).
                 struct CpuAutoBindRequest {
                     // Restrict the choice to this NUMA node (OS index); empty lets
@@ -183,6 +321,34 @@ namespace dev
                     {
                         cpuAutoBind = CpuAutoBindRequest{numaNode};
                         return *this;
+                    }
+                    // Applies a binding strategy from a string. Supported syntax:
+                    //   ""  or  "none"      -- keep current affinity (no-op)
+                    //   "auto"              -- CpuAutoBind()
+                    //   "numa:<n>"          -- CpuAutoBindOnNuma(n)
+                    //   "cpus:<list>"       -- Cpus(), parseCpuList format
+                    //   "<digits/ranges>"   -- shorthand for "cpus:<list>"
+                    // Throws std::invalid_argument on unknown keywords or bad lists.
+                    ThreadedNodeOptions &CpuBind(std::string const &s)
+                    {
+                        auto spec = CpuBindingSpec::parse(s);
+                        switch (spec.kind) {
+                            case CpuBindKind::None:
+                                // keep current cpus/cpuAutoBind unchanged
+                                break;
+                            case CpuBindKind::Auto:
+                                return CpuAutoBind();
+                            case CpuBindKind::AutoOnNuma:
+                                return CpuAutoBindOnNuma(*spec.numaNode);
+                            case CpuBindKind::Cpus:
+                                return Cpus(std::move(spec.cpus));
+                        }
+                        return *this;
+                    }
+                    // Factory: returns a ThreadedNodeOptions with only the CPU binding set.
+                    static ThreadedNodeOptions fromCpuBindString(std::string const &s)
+                    {
+                        return ThreadedNodeOptions{}.CpuBind(s);
                     }
                 };
 
@@ -533,6 +699,47 @@ namespace dev
                         static_assert(realtime_threaded_executor_detail::HasThreadCpuAllocator<Env>::value,
                             "ThreadCpuLease::bindCurrentThreadTo needs an Environment with a ThreadCpuAllocatorComponent (e.g. basic::HwlocThreadCpuAllocatorComponent)");
                         return bindCurrentThreadTo(Env::threadCpuAllocator(), cpus, who);
+                    }
+
+                    // Uniform string-based entry point. Parses the binding spec string
+                    // and dispatches to the appropriate bindCurrentThread* overload.
+                    // "none" or "" returns an inactive (default-constructed) lease;
+                    // the thread's affinity is left unchanged and no CPU is reserved.
+                    // "auto", "numa:<n>", "cpus:<list>", and plain CPU lists are
+                    // handled as their named overloads.
+                    // Requires a ThreadCpuAllocatorComponent in Env for all variants
+                    // other than "none".
+                    template <class Env>
+                    static ThreadCpuLease bindCurrentThreadBy(std::string const &spec, std::string const &who)
+                    {
+                        auto const s = CpuBindingSpec::parse(spec);
+                        switch (s.kind) {
+                            case CpuBindKind::None:
+                                return ThreadCpuLease{};
+                            case CpuBindKind::Auto:
+                                return bindCurrentThread<Env>(who);
+                            case CpuBindKind::AutoOnNuma:
+                                return bindCurrentThreadOnNuma<Env>(*s.numaNode, who);
+                            case CpuBindKind::Cpus:
+                                return bindCurrentThreadTo<Env>(s.cpus, who);
+                        }
+                        return ThreadCpuLease{}; // unreachable
+                    }
+                    // Same, for code that holds the allocator rather than the Environment.
+                    static ThreadCpuLease bindCurrentThreadBy(IThreadCpuAllocator &a, std::string const &spec, std::string const &who)
+                    {
+                        auto const s = CpuBindingSpec::parse(spec);
+                        switch (s.kind) {
+                            case CpuBindKind::None:
+                                return ThreadCpuLease{};
+                            case CpuBindKind::Auto:
+                                return bindCurrentThread(a, who);
+                            case CpuBindKind::AutoOnNuma:
+                                return bindCurrentThreadOnNuma(a, *s.numaNode, who);
+                            case CpuBindKind::Cpus:
+                                return bindCurrentThreadTo(a, s.cpus, who);
+                        }
+                        return ThreadCpuLease{}; // unreachable
                     }
 
                     // Same, for code that holds the allocator rather than the Environment.
