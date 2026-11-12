@@ -1051,6 +1051,13 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
         static bool actionIsOneTimeOnly(std::shared_ptr<Action<A,B>> const &a) {
             return a->core_->isOneTimeOnly();
         }
+        // No-op: TopDownSinglePassIterationApp has no dedicated node threads.
+        // Accepts the same signature as RealTimeApp::configureThreadedNode so
+        // that code shared between realtime and singlepass builds compiles unchanged.
+        template <class T, class Opts>
+        static bool configureThreadedNode(std::shared_ptr<T> const &, Opts const &) {
+            return false;
+        }
 
         template <class A, class F>
         static auto liftPure1(F &&f, LiftParameters<TimePoint> const &liftParam = LiftParameters<TimePoint>()) -> std::shared_ptr<Action<A,decltype(f(std::declval<A>()))>> {

@@ -24,3 +24,10 @@ threaded_node_options_test_exe = executable('threaded_node_options_test', 'Threa
     link_with: threaded_handler_test_lib,
     install: false)
 test('threaded_node_options_test', threaded_node_options_test_exe, timeout: 30)
+
+non_realtime_configure_threaded_node_test_exe = executable('non_realtime_configure_threaded_node_test', 'NonRealtimeConfigureThreadedNodeTest.cpp',
+    include_directories: inc,
+    dependencies: common_deps,
+    link_with: threaded_handler_test_lib,
+    install: false)
+test('non_realtime_configure_threaded_node_test', non_realtime_configure_threaded_node_test_exe, timeout: 30)

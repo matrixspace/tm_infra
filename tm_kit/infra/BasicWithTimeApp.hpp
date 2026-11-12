@@ -105,6 +105,13 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
         static bool actionIsOneTimeOnly(std::shared_ptr<Action<A,B>> const &p) {
             return p->oneTimeOnly;
         }
+        // No-op: BasicWithTimeApp has no dedicated node threads. Accepts the
+        // same signature as RealTimeApp::configureThreadedNode so that code
+        // shared between realtime and non-realtime builds compiles unchanged.
+        template <class T, class Opts>
+        static bool configureThreadedNode(std::shared_ptr<T> const &, Opts const &) {
+            return false;
+        }
 
         template <class A, class B>
         static auto emptyAction(LiftParameters<TimePoint> const &liftParam = LiftParameters<TimePoint>()) 
