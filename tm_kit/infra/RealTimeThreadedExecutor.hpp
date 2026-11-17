@@ -912,6 +912,82 @@ namespace dev
                         return l;
                     }
                 };
+
+                // Pins a node's dedicated thread to CPUs chosen by the
+                // Environment's IThreadCpuAllocator (CpuAutoBind) or explicitly
+                // (Cpus), for nodes that run their own std::thread rather than an
+                // executor. Mirrors ExecHandlerCore::configureThread but applies the
+                // affinity directly to a native handle instead of through an
+                // executor's configure(). spinWait is ignored.
+                template <class StateT>
+                class ThreadCpuBinding {
+                private:
+                    std::mutex leaseMutex_;
+                    ThreadCpuLease lease_;
+
+                    template <class S = StateT>
+                    bool configureWithLease(std::vector<int> cpus, bool acquired,
+                                            std::thread::native_handle_type handle, std::string const &who) {
+                        auto &allocator = S::threadCpuAllocator();
+                        if (!acquired) {
+                            if (!realtime_threaded_executor_detail::validCpus(cpus)) {
+                                return false;
+                            }
+                            std::vector<int> previous;
+                            {
+                                std::lock_guard<std::mutex> _(leaseMutex_);
+                                previous = lease_.cpus();
+                            }
+                            allocator.reserveReplacing(cpus, previous, who);
+                        }
+                        ThreadCpuLease next = ThreadCpuLease::adopt(allocator, cpus);
+                        bool ok = realtime_threaded_executor_detail::setThreadAffinity(handle, cpus);
+                        if (!ok) {
+                            if (acquired) {
+                                throw ThreadCpuBindError("CpuAutoBind: failed to pin " + who + " to CPU " + std::to_string(next.cpu()));
+                            }
+                            return false; // next releases the reservation
+                        }
+                        std::lock_guard<std::mutex> _(leaseMutex_);
+                        lease_.swap(next);
+                        return true; // next releases the previous lease
+                    }
+
+                public:
+                    // o: per-node ThreadedNodeOptions; handle: the node thread's
+                    // native handle (cached before any detach()); who: name used in
+                    // allocator bookkeeping and error messages.
+                    bool configure(ThreadedNodeOptions const &o,
+                                   std::optional<std::thread::native_handle_type> const &handle,
+                                   std::string const &who) {
+                        using realtime_threaded_executor_detail::HasThreadCpuAllocator;
+                        if (o.cpuAutoBind && !o.cpus.empty()) {
+                            throw std::invalid_argument("ThreadedNodeOptions: Cpus() and CpuAutoBind() are mutually exclusive");
+                        }
+                        if (!o.cpuAutoBind) {
+                            if (o.cpus.empty()) {
+                                return true; // keep current affinity
+                            }
+                            if (!handle) {
+                                return false;
+                            }
+                            if constexpr (HasThreadCpuAllocator<StateT>::value) {
+                                return configureWithLease(o.cpus, false, *handle, who);
+                            } else {
+                                return realtime_threaded_executor_detail::setThreadAffinity(*handle, o.cpus);
+                            }
+                        }
+                        if constexpr (!HasThreadCpuAllocator<StateT>::value) {
+                            throw ThreadCpuBindError("CpuAutoBind requested for " + who + " but the Environment has no ThreadCpuAllocatorComponent (e.g. basic::HwlocThreadCpuAllocatorComponent)");
+                        } else {
+                            if (!handle) {
+                                throw ThreadCpuBindError("CpuAutoBind requested for " + who + " but the node has no dedicated thread that can be pinned");
+                            }
+                            int cpu = StateT::threadCpuAllocator().acquire(*o.cpuAutoBind, who);
+                            return configureWithLease({cpu}, true, *handle, who);
+                        }
+                    }
+                };
             } // namespace infra
         } // namespace tm
     } // namespace cd606

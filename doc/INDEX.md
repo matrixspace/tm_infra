@@ -27,3 +27,5 @@
 - 2026-11-11：[→ tm_basic/20261111-cpu-cross-process-negotiation](../../tm_basic/doc/20261111-cpu-cross-process-negotiation/README.md)：多进程 CPU 自协商；infra 新增 `IThreadCpuAllocator::reserveReplacing`（带默认实现），节点重配置时把当前 CPU 作为 previous 传入。
 
 - 2026-11-12：[非实时 App 的 configureThreadedNode no-op](20261112-configure-threaded-node-noop-singlepass/README.md)：给 `SinglePassIterationApp`、`TopDownSinglePassIterationApp`、`BasicWithTimeApp` 各加一个返回 `false` 的 no-op `configureThreadedNode`，使实时/回测共享代码无需条件编译即可编译通过。
+
+- 2026-11-17：[→ tm_basic/20261117-common-flow-utils-cpu-bind](../../tm_basic/doc/20261117-common-flow-utils-cpu-bind/README.md)：新增 `infra::ThreadCpuBinding<StateT>`，让自建线程节点（CommonFlowUtils 的 bunch/delayer/actionWithBufferedState）复用框架绑核（主记录在 tm_basic）。
