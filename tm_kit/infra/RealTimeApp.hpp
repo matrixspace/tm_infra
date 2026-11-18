@@ -2356,11 +2356,15 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                     }
                     void trigger() {
                         if (running_) {
+                            bool wasZero;
                             {
                                 std::lock_guard<std::mutex> _(mutex_);
+                                wasZero = (count_ == 0);
                                 ++count_;
                             }
-                            cond_.notify_one();
+                            if (wasZero) {
+                                cond_.notify_one();
+                            }
                         }
                     }
                     virtual std::optional<std::thread::native_handle_type> threadHandle() override final {
@@ -2517,7 +2521,7 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             std::thread th_;
             std::atomic<bool> running_;
 
-            std::list<TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType>> incoming_, processing_;
+            std::deque<TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType>> incoming_, processing_;
         
             std::shared_ptr<Importer<T>> underlyingImporter_;
 
@@ -2535,7 +2539,7 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                             lock.unlock();
                             return;
                         }
-                        processing_.splice(processing_.end(), incoming_);
+                        processing_.swap(incoming_);
                         lock.unlock();
                         if constexpr (std::is_convertible_v<StateT *, OutputRealTimeThreadBufferSizeComponent *>) {
                             std::ostringstream oss;
@@ -2592,12 +2596,16 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             }
             virtual void handle(TimedDataWithEnvironment<T, StateT, typename StateT::TimePointType> &&data) override final {
                 if (running_ && timeChecker_(data)) {
+                    bool wasEmpty;
                     {
                         std::lock_guard<std::mutex> _(mutex_);
+                        wasEmpty = incoming_.empty();
                         incoming_.push_back(std::move(data));
                     }
-                    cond_.notify_one();
-                }                
+                    if (wasEmpty) {
+                        cond_.notify_one();
+                    }
+                }
             }
         };
     public:
