@@ -92,7 +92,7 @@ int main(int argc, char **argv) {
         return 2;
     }
 
-    auto *env = new Env(); //leaked: detached node threads outlive main
+    auto *env = new Env(); //leaked: node threads outlive main
     auto *r = new R(env);
     auto *sink = new VectorSink();
     auto underlying = M::triggerImporter<Payload>();

@@ -114,7 +114,7 @@ namespace {
 int main() {
     {
         constexpr int64_t kN = 200000;
-        auto *env = new Env(); //leaked: detached node threads outlive main
+        auto *env = new Env(); //leaked: node threads outlive main
         auto *r = new R(env);
         auto *sink = new VectorSink<Payload>();
         auto underlying = M::triggerImporter<Payload>();
@@ -124,10 +124,10 @@ int main() {
         r->finalize();
         auto &fire = std::get<1>(underlying);
 
-        //Both the trigger and the bunch threads set their running flags inside
-        //their own threads, so a fire() right after finalize() can be dropped:
-        //retry until one item has landed (negative seq is ignored by the order
-        //check).
+        //The trigger and bunch threads set their running flags in start()
+        //before creating their threads, so fire() right after finalize() is
+        //delivered; the retry is kept as a warm-up guard (negative seq is
+        //ignored by the order check).
         for (int tries = 0; tries < 1000 && sink->items.load() == 0; ++tries) {
             fire(Payload{-1});
             std::this_thread::sleep_for(std::chrono::milliseconds(1));

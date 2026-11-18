@@ -70,7 +70,7 @@ namespace {
 
 int main() {
     constexpr int64_t kN = 200000;
-    auto *env = new Env(); //leaked: the detached importer thread outlives main
+    auto *env = new Env(); //leaked: the importer thread outlives main
     auto *r = new R(env);
 
     std::atomic<int64_t> received{0};
@@ -87,8 +87,9 @@ int main() {
     r->finalize();
     auto &fire = std::get<1>(trigger);
 
-    //constTriggerImporter sets its running flag inside its own thread, so a
-    //fire() right after finalize() can be dropped: retry until one lands.
+    //constTriggerImporter sets its running flag in start() before creating
+    //its thread, so fire() right after finalize() is delivered; the retry is
+    //kept as a warm-up guard.
     for (int tries = 0; tries < 1000 && received.load() == 0; ++tries) {
         fire();
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
