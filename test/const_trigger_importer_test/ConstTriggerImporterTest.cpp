@@ -70,8 +70,8 @@ namespace {
 
 int main() {
     constexpr int64_t kN = 200000;
-    auto *env = new Env(); //leaked: the importer thread outlives main
-    auto *r = new R(env);
+    Env env;
+    auto r = std::make_unique<R>(&env);
 
     std::atomic<int64_t> received{0};
     std::atomic<int64_t> bad{0};
@@ -104,6 +104,8 @@ int main() {
     while (received.load() - base < kN && std::chrono::steady_clock::now() < deadline) {
         std::this_thread::sleep_for(std::chrono::microseconds(100));
     }
+    std::get<0>(trigger).reset();
+    r.reset(); // Join the importer before reading its final counters.
     check(received.load() - base == kN, "constTriggerImporter delivered exactly N items");
     check(bad.load() == 0, "constTriggerImporter delivered the same value each time");
 

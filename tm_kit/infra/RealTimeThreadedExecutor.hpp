@@ -468,13 +468,13 @@ namespace dev
                             if (s->opts.trackPendingCount) {
                                 host->executorBeforeBatch(s->processing.front(), s->processing.size());
                             }
-                            for (auto &item : s->processing) {
+                            while (!s->processing.empty()) {
                                 if (!s->running.load(std::memory_order_acquire)) {
                                     return;
                                 }
-                                host->executorHandle(std::move(item));
+                                host->executorHandle(std::move(s->processing.front()));
+                                s->processing.pop_front();
                             }
-                            s->processing.clear();
                         }
                     }
 

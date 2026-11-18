@@ -96,10 +96,11 @@ namespace {
         Host host;
         Exec exec;
         exec.start(&host);
-        if (!waitFor(host.entered, true)) {
+        bool const entered = waitFor(host.entered, true);
+        host.release();
+        if (!entered) {
             return {-1.0, -1.0, false};
         }
-        host.release();
 
         //warmup: fill and drain so the first measured batch is not the cold path
         for (int64_t i = 0; i < warmup; ++i) {
@@ -118,12 +119,11 @@ namespace {
         for (int64_t i = 0; i < messages; ++i) {
             exec.push(Item{static_cast<uint64_t>(i), 0, 0, 0, 0, 0, 0, 0});
         }
-        auto const wallEnd = std::chrono::steady_clock::now();
-        auto const cpuEnd = std::clock();
-
         if (!waitFor(host.count, base + static_cast<uint64_t>(messages))) {
             return {-1.0, -1.0, false};
         }
+        auto const wallEnd = std::chrono::steady_clock::now();
+        auto const cpuEnd = std::clock();
         bool const ok = host.count.load(std::memory_order_acquire) == base + static_cast<uint64_t>(messages)
                         && host.errors.load(std::memory_order_relaxed) == 0;
         double const wallNs = std::chrono::duration<double, std::nano>(wallEnd - wallBegin).count();
