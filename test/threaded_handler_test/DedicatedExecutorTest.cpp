@@ -124,6 +124,40 @@ namespace
         check(!e->push(Item(0, 5000)), "reject after stop");
         delete e;
     }
+    void releaseEachItemTest()
+    {
+        Host host;
+        bool released = false;
+        bool releasedBeforeNextCallback = false;
+        // Keep the first item's resource in the queue element. The second
+        // callback must see its destruction even when both share one batch.
+        using Resource = std::shared_ptr<int>;
+        struct ResourceHost {
+            Host &gate;
+            bool &releasedBeforeNext;
+            bool const &released;
+            void executorWaitForStart() { gate.executorWaitForStart(); }
+            void executorBeforeBatch(Resource const &, std::size_t) {}
+            void executorIdleWork() {}
+            void executorHandle(Resource &&item) {
+                if (!item) {
+                    releasedBeforeNext = released;
+                    gate.count.store(2, std::memory_order_release);
+                }
+            }
+        };
+        ResourceHost resourceHost{host, releasedBeforeNextCallback, released};
+        DedicatedThreadExecutor<Resource> resourceExec;
+        resourceExec.start(&resourceHost);
+        resourceExec.push(Resource(new int(0), [&released](int *p) {
+            delete p;
+            released = true;
+        }));
+        resourceExec.push(Resource{});
+        host.release();
+        check(wait([&] { return host.count.load(std::memory_order_acquire) == 2; })
+                && releasedBeforeNextCallback, "each queue item is destroyed before the next callback");
+    }
     void callbackStopTest()
     {
         auto *h = new Host;
@@ -208,6 +242,7 @@ int main()
 {
     fifoAndIdleTest();
     callbackStopTest();
+    releaseEachItemTest();
     joinOnDestroyTest();
     queuedContinuationTest();
     idleWakeContinuationTest();

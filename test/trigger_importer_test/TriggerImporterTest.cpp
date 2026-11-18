@@ -5,6 +5,7 @@
 #include <chrono>
 #include <cstdint>
 #include <cstdio>
+#include <future>
 #include <mutex>
 #include <string>
 #include <thread>
@@ -119,8 +120,8 @@ namespace {
         constexpr int64_t kSentinel = -1;
         constexpr int64_t kN = 100000;
         Collector<int64_t> state(kSentinel);
-        auto *env = new Env(); //leaked: the importer thread outlives main
-        auto *r = new R(env);
+        Env env;
+        auto r = std::make_unique<R>(&env);
         auto imp = M::triggerImporter<int64_t>();
         auto sink = M::template pureExporter<int64_t>([&state](int64_t &&v) {
             state.handle(std::move(v));
@@ -137,6 +138,8 @@ namespace {
         }
         check(waitUntil([&] { return state.size() == base + kN; }, std::chrono::seconds(30)), "single producer: all items delivered");
 
+        std::get<0>(imp).reset();
+        r.reset(); // Join the importer while the sink and its state are still alive.
         auto seqs = state.snapshot();
         bool exact = static_cast<int64_t>(seqs.size()) == base + kN;
         for (int64_t i = 0; i < base && exact; ++i) {
@@ -152,6 +155,28 @@ namespace {
         check(exact, "single producer: exact count, no loss/dup, seq 0..N-1 in order");
     }
 
+    void uniformImporterStopTest() {
+        Env env;
+        auto runner = std::make_unique<R>(&env);
+        std::promise<void> entered;
+        auto enteredFuture = entered.get_future();
+        bool interrupted = false;
+        auto importer = M::uniformSimpleImporter<int>([&](Env *, M::ImporterStopContext const &stop)
+            -> std::tuple<bool, M::Data<int>> {
+            entered.set_value();
+            interrupted = stop.waitForStop(std::chrono::seconds(60));
+            return {false, std::nullopt};
+        });
+        auto sink = M::pureExporter<int>([](int &&) {});
+        runner->connect(runner->importItem("uniform", importer), runner->exporterAsSink("sink", sink));
+        runner->finalize();
+        check(enteredFuture.wait_for(std::chrono::seconds(5)) == std::future_status::ready,
+            "uniform importer entered callback");
+        importer.reset();
+        runner.reset();
+        check(interrupted, "uniform importer wakes callback on destruction");
+    }
+
     struct TaggedItem {
         int32_t producer;
         int64_t seq;
@@ -161,8 +186,8 @@ namespace {
         constexpr int32_t kProducers = 4;
         constexpr int64_t kPerProducer = 25000;
         Collector<TaggedItem> state(TaggedItem {-1, -1});
-        auto *env = new Env();
-        auto *r = new R(env);
+        Env env;
+        auto r = std::make_unique<R>(&env);
         auto imp = M::triggerImporter<TaggedItem>();
         auto sink = M::template pureExporter<TaggedItem>([&state](TaggedItem &&v) {
             state.handle(std::move(v));
@@ -188,6 +213,8 @@ namespace {
         int64_t const expected = kProducers * kPerProducer;
         check(waitUntil([&] { return state.size() == base + expected; }, std::chrono::seconds(30)), "multi-producer: all items delivered");
 
+        std::get<0>(imp).reset();
+        r.reset(); // Join the importer while the sink and its state are still alive.
         auto seqs = state.snapshot();
         bool exact = static_cast<int64_t>(seqs.size()) == base + expected;
         for (int64_t i = 0; i < base && exact; ++i) {
@@ -214,6 +241,7 @@ namespace {
 int main() {
     singleProducerFifoTest();
     multiProducerNoLossTest();
+    uniformImporterStopTest();
     std::puts(g_failures ? "FAILED" : "ALL PASSED");
     return g_failures ? 1 : 0;
 }

@@ -2244,18 +2244,68 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
         }
     private:
         template <class T, class F>
+        class UniformSimpleImporter;
+    public:
+        // A callback may accept (StateT *, ImporterStopContext const &) to
+        // interrupt its own waits. Legacy callbacks still receive StateT *.
+        class ImporterStopContext {
+            template <class T, class F>
+            friend class UniformSimpleImporter;
+
+            mutable std::mutex mutex_;
+            mutable std::condition_variable cond_;
+            std::atomic<bool> stopped_{false};
+
+            void requestStop() {
+                {
+                    std::lock_guard<std::mutex> lock(mutex_);
+                    stopped_ = true;
+                }
+                cond_.notify_all();
+            }
+
+        public:
+            bool stopRequested() const {
+                return stopped_;
+            }
+            // Returns true if interrupted by a stop request.
+            template <class Rep, class Period>
+            bool waitForStop(std::chrono::duration<Rep, Period> const &duration) const {
+                std::unique_lock<std::mutex> lock(mutex_);
+                return cond_.wait_for(lock, duration, [this] { return stopRequested(); });
+            }
+        };
+
+    private:
+        template <class T, class F>
         class UniformSimpleImporter final : public IRealTimeAppPossiblyThreadedNode, public AbstractImporter<T> {
         private:
-            F f_;
+            struct Worker {
+                F f;
+                ImporterStopContext stop;
+                explicit Worker(F &&callback) : f(std::move(callback)) {}
+
+                auto read(StateT *env) {
+                    if constexpr (std::is_invocable_v<F &, StateT *>) {
+                        return f(env);
+                    } else {
+                        return f(env, stop);
+                    }
+                }
+            };
+            std::shared_ptr<Worker> worker_;
             std::thread th_;
             std::optional<std::thread::native_handle_type> thHandle_;
-            std::atomic<bool> running_;
-            void run(StateT *env) {
-                while (running_) {
+
+            void run(StateT *env, Worker &worker) {
+                while (!worker.stop.stopRequested()) {
                     GraphStructureBasedResourceHolderComponent_CurrentNodeSetter<StateT> ns(
                         env, static_cast<AbstractImporter<T> *>(this)
                     );
-                    auto x = f_(env);
+                    auto x = worker.read(env);
+                    if (worker.stop.stopRequested()) {
+                        break;
+                    }
                     if (std::get<1>(x)) {
                         bool final = std::get<1>(x)->timedData.finalFlag;
                         this->publish(std::move(*(std::get<1>(x))));
@@ -2269,9 +2319,9 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 }
             }
         public:
-            UniformSimpleImporter(F &&f) : f_(std::move(f)), th_(), thHandle_(std::nullopt), running_(false) {}
+            UniformSimpleImporter(F &&f) : worker_(std::make_shared<Worker>(std::move(f))), th_(), thHandle_(std::nullopt) {}
             ~UniformSimpleImporter() {
-                running_ = false;
+                worker_->stop.requestStop();
                 if (th_.joinable()) {
                     if (th_.get_id() == std::this_thread::get_id()) {
                         th_.detach();
@@ -2281,9 +2331,8 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 }
             }
             virtual void start(StateT *env) override final {
-                running_ = true;
-                th_ = std::thread ([this,env]() {
-                    run(env);
+                th_ = std::thread([this, env, worker = worker_]() {
+                    run(env, *worker);
                 });
                 thHandle_ = th_.native_handle();
             }
@@ -2341,7 +2390,10 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                     LocalI(T &&t) : t_(std::move(t)), env_(nullptr), count_(0), cond_(), mutex_(), th_(), running_(false) {
                     }
                     ~LocalI() {
-                        running_ = false;
+                        {
+                            std::lock_guard<std::mutex> lock(mutex_);
+                            running_ = false;
+                        }
                         cond_.notify_one();
                         if (th_.joinable()) {
                             if (th_.get_id() == std::this_thread::get_id()) {
@@ -2438,7 +2490,10 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                     LocalI() : incoming_(), processing_(), env_(nullptr), cond_(), mutex_(), th_(), running_(false) {
                     }
                     ~LocalI() {
-                        running_ = false;
+                        {
+                            std::lock_guard<std::mutex> lock(mutex_);
+                            running_ = false;
+                        }
                         cond_.notify_one();
                         if (th_.joinable()) {
                             if (th_.get_id() == std::this_thread::get_id()) {
@@ -2529,7 +2584,10 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             std::shared_ptr<Importer<T>> underlyingImporter_;
 
             void stopThread() {
-                running_ = false;
+                {
+                    std::lock_guard<std::mutex> lock(mutex_);
+                    running_ = false;
+                }
                 cond_.notify_one();
             }
 
@@ -2560,7 +2618,7 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                         }
                         processing_.clear();
                         if (final) {
-                            running_ = false;
+                            stopThread();
                         }
                         this->publish(InnerData<std::vector<T>> {
                             env
