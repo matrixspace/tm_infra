@@ -8,6 +8,7 @@
 #include <condition_variable>
 #include <cstddef>
 #include <cstdint>
+#include <deque>
 #include <memory>
 #include <limits>
 #include <list>
@@ -421,8 +422,8 @@ namespace dev
                     }
                 };
 
-                // Default dedicated executor: mutex-protected incoming list and
-                // consumer-local processing list, transferred with splice. Predicate
+                // Default dedicated executor: mutex-protected incoming deque and
+                // consumer-local processing deque, transferred with swap. Predicate
                 // waits prevent lost batch notifications. Periodic idle callbacks are
                 // retained even when HasIdleWork is false; spinWait is ignored.
                 template <class Item, class Config = DedicatedThreadExecutorConfig>
@@ -433,7 +434,7 @@ namespace dev
                         std::condition_variable cond;
                         std::atomic<bool> running{false};
                         bool wakeRequested = false; // protected by mutex
-                        std::list<Item> incoming, processing;
+                        std::deque<Item> incoming, processing;
                         explicit State(ThreadedExecOptions const &o)
                             : opts(o)
                         {
@@ -462,18 +463,18 @@ namespace dev
                                     host->executorIdleWork();
                                     continue;
                                 }
-                                s->processing.splice(s->processing.end(), s->incoming);
+                                s->processing.swap(s->incoming);
                             }
                             if (s->opts.trackPendingCount) {
                                 host->executorBeforeBatch(s->processing.front(), s->processing.size());
                             }
-                            while (!s->processing.empty()) {
+                            for (auto &item : s->processing) {
                                 if (!s->running.load(std::memory_order_acquire)) {
                                     return;
                                 }
-                                host->executorHandle(std::move(s->processing.front()));
-                                s->processing.pop_front();
+                                host->executorHandle(std::move(item));
                             }
+                            s->processing.clear();
                         }
                     }
 
@@ -516,11 +517,15 @@ namespace dev
                         if (!state_->running.load(std::memory_order_acquire)) {
                             return false;
                         }
+                        bool wasEmpty;
                         {
                             std::lock_guard<std::mutex> lock(state_->mutex);
+                            wasEmpty = state_->incoming.empty();
                             state_->incoming.push_back(std::move(item));
                         }
-                        state_->cond.notify_one();
+                        if (wasEmpty) {
+                            state_->cond.notify_one();
+                        }
                         return true;
                     }
                     void stop()
