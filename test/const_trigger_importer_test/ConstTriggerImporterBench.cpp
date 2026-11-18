@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
         return 2;
     }
 
-    auto *env = new Env(); //leaked: the detached importer thread outlives main
+    auto *env = new Env(); //leaked: the importer thread outlives main
     auto *r = new R(env);
 
     std::atomic<int64_t> received{0};

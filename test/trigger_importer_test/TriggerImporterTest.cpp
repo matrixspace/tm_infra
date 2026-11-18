@@ -16,10 +16,10 @@
 //  2. several producer threads fire tagged items; nothing may be lost or
 //     duplicated and each producer's sequence must stay in order
 //
-//triggerImporter sets its running flag inside its own thread, so a fire()
-//right after finalize() can be dropped. Every test therefore first hands
-//shakes with a sentinel value until the thread is up, then waits for the
-//queue to drain before firing the measured items.
+//triggerImporter sets its running flag in start() before creating its
+//thread, so fire() right after finalize() is delivered. Every test still
+//hand-shakes with a sentinel value until the thread is up, then waits for
+//the queue to drain before firing the measured items.
 
 using namespace dev::cd606::tm;
 
@@ -119,7 +119,7 @@ namespace {
         constexpr int64_t kSentinel = -1;
         constexpr int64_t kN = 100000;
         Collector<int64_t> state(kSentinel);
-        auto *env = new Env(); //leaked: the importer thread is detached
+        auto *env = new Env(); //leaked: the importer thread outlives main
         auto *r = new R(env);
         auto imp = M::triggerImporter<int64_t>();
         auto sink = M::template pureExporter<int64_t>([&state](int64_t &&v) {

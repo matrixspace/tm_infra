@@ -102,7 +102,7 @@ int main(int argc, char **argv) {
     }
 
     Sink sink;
-    auto *env = new Env(); //leaked: the importer thread is detached
+    auto *env = new Env(); //leaked: the importer thread outlives main
     auto *r = new R(env);
     auto imp = M::triggerImporter<int64_t>();
     auto exporter = M::template pureExporter<int64_t>([&sink](int64_t &&v) {
@@ -161,6 +161,6 @@ int main(int argc, char **argv) {
         std::fprintf(stderr, "order check failed (%lld bad)\n", static_cast<long long>(sink.bad.load(std::memory_order_relaxed)));
         return 1;
     }
-    //graph leaked on purpose: the importer thread is detached
+    //graph leaked on purpose: the importer thread outlives main
     return 0;
 }
