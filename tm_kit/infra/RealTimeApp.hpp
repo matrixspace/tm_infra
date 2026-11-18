@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <list>
+#include <deque>
 #include <mutex>
 #include <condition_variable>
 #include <atomic>
@@ -2405,7 +2406,7 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             if constexpr (HasOwnThread) {
                 class LocalI final : public IRealTimeAppPossiblyThreadedNode, public AbstractImporter<T> {
                 private:
-                    std::list<T> incoming_, processing_;
+                    std::deque<T> incoming_, processing_;
                     StateT *env_;
                     std::condition_variable cond_;
                     std::mutex mutex_;
@@ -2420,13 +2421,12 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                                 lock.unlock();
                                 break;
                             }
-                            processing_.splice(processing_.end(), incoming_);
+                            processing_.swap(incoming_);
                             lock.unlock();
-                            while (!processing_.empty()) {
-                                T &data = processing_.front();
+                            for (auto &data : processing_) {
                                 this->publish(env_, std::move(data));
-                                processing_.pop_front();
                             }
+                            processing_.clear();
                         }
                     }
                 public:
@@ -2450,11 +2450,15 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                         if (!running_) {
                             return;
                         }
+                        bool wasEmpty;
                         {
                             std::lock_guard<std::mutex> _(mutex_);
+                            wasEmpty = incoming_.empty();
                             incoming_.push_back(std::move(t));
                         }
-                        cond_.notify_one();
+                        if (wasEmpty) {
+                            cond_.notify_one();
+                        }
                     }
                     virtual std::optional<std::thread::native_handle_type> threadHandle() override final {
                         return th_.native_handle();
