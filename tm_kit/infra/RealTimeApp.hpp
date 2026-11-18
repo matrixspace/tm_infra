@@ -2271,11 +2271,13 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
         public:
             UniformSimpleImporter(F &&f) : f_(std::move(f)), th_(), thHandle_(std::nullopt), running_(false) {}
             ~UniformSimpleImporter() {
-                if (running_) {
-                    running_ = false;
-                    try {
+                running_ = false;
+                if (th_.joinable()) {
+                    if (th_.get_id() == std::this_thread::get_id()) {
+                        th_.detach();
+                    } else {
                         th_.join();
-                    } catch (std::exception &) {}
+                    }
                 }
             }
             virtual void start(StateT *env) override final {
@@ -2283,7 +2285,6 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                 th_ = std::thread ([this,env]() {
                     run(env);
                 });
-                th_.detach();
                 thHandle_ = th_.native_handle();
             }
             virtual std::optional<std::thread::native_handle_type> threadHandle() override final {
@@ -2321,7 +2322,6 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                     std::thread th_;
                     std::atomic<bool> running_;
                     void run() {
-                        running_ = true;
                         while (running_) {
                             std::unique_lock<std::mutex> lock(mutex_);
                             cond_.wait(lock, [this]{ return !running_ || count_ != 0; });
@@ -2341,18 +2341,20 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                     LocalI(T &&t) : t_(std::move(t)), env_(nullptr), count_(0), cond_(), mutex_(), th_(), running_(false) {
                     }
                     ~LocalI() {
-                        if (running_) {
-                            running_ = false;
-                            cond_.notify_one();
-                            if (th_.joinable()) {
+                        running_ = false;
+                        cond_.notify_one();
+                        if (th_.joinable()) {
+                            if (th_.get_id() == std::this_thread::get_id()) {
+                                th_.detach();
+                            } else {
                                 th_.join();
                             }
                         }
                     }
                     virtual void start(StateT *env) override final {
                         env_ = env;
+                        running_ = true;
                         th_ = std::thread(&LocalI::run, this);
-                        th_.detach();
                     }
                     void trigger() {
                         if (running_) {
@@ -2417,7 +2419,6 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                     std::thread th_;
                     std::atomic<bool> running_;
                     void run() {
-                        running_ = true;
                         while (running_) {
                             std::unique_lock<std::mutex> lock(mutex_);
                             cond_.wait(lock, [this]{ return !running_ || !incoming_.empty(); });
@@ -2437,18 +2438,20 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
                     LocalI() : incoming_(), processing_(), env_(nullptr), cond_(), mutex_(), th_(), running_(false) {
                     }
                     ~LocalI() {
-                        if (running_) {
-                            running_ = false;
-                            cond_.notify_one();
-                            if (th_.joinable()) {
+                        running_ = false;
+                        cond_.notify_one();
+                        if (th_.joinable()) {
+                            if (th_.get_id() == std::this_thread::get_id()) {
+                                th_.detach();
+                            } else {
                                 th_.join();
                             }
                         }
                     }
                     virtual void start(StateT *env) override final {
                         env_ = env;
+                        running_ = true;
                         th_ = std::thread(&LocalI::run, this);
-                        th_.detach();
                     }
                     void trigger(T &&t) {
                         if (!running_) {
@@ -2579,16 +2582,17 @@ namespace dev { namespace cd606 { namespace tm { namespace infra {
             }
             ~BunchedImporter() {
                 stopThread();
-                try {
-                    if (th_.joinable()) {
+                if (th_.joinable()) {
+                    if (th_.get_id() == std::this_thread::get_id()) {
+                        th_.detach();
+                    } else {
                         th_.join();
                     }
-                } catch (...) {}
+                }
             }
             virtual void start(StateT *env) override final {
                 running_ = true;
                 th_ = std::thread(&BunchedImporter::runThread, this);
-                th_.detach();
                 underlyingImporter_->core_->start(env);
             }
             virtual std::optional<std::thread::native_handle_type> threadHandle() override final {

@@ -33,3 +33,5 @@
 - 2026-11-17：[→ tm_basic/20261117-fix-cv-1ms-poll](../../tm_basic/doc/20261117-fix-cv-1ms-poll/README.md)：`constTriggerImporter`/`triggerImporter`/`bunchedImporter` 从无谓词的 `wait_for(lock, 1ms)` 改为带谓词阻塞 `wait`（主记录在 tm_basic）。
 
 - 2026-11-18：[实时模式队列聚合节点优化：list→deque + 条件 notify](20261118-realtime-queue-deque-optimization/README.md)：把 bunch-throughput 提炼的四个手法（list→deque、splice→swap、range-for+clear、空→非空条件 notify）应用到默认执行器 `DedicatedThreadExecutor` 与 `triggerImporter`/`bunchedImporter`/`constTriggerImporter`；默认执行器约 3.3×、triggerImporter 约 6.3× 吞吐提升，9/9 测试通过，三 feature 分支并行开发后合并回 develop。
+
+- 2026-11-18：[→ tm_basic/20261118-graceful-thread-stop](../../tm_basic/doc/20261118-graceful-thread-stop/README.md)：`UniformSimpleImporter`/`constTriggerImporter`/`triggerImporter`/`BunchedImporter` 去 detach、析构真正 join（主记录在 tm_basic）。
